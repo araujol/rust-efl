@@ -3,7 +3,7 @@
 Rust bindings for the Enlightenment Foundation Libraries (version 1.9-0.0.1.99).
 
 These versions of the bindings currently correspond to the latest code base
-both for EFL (1.9.x) and the Rust language, so it is necessary to fetch and 
+both for EFL (1.9.x) and the Rust language, so it is required to fetch and 
 install the necessary libraries/implementation from the master git repository 
 for both of these projects.
 
