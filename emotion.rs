@@ -21,6 +21,7 @@ extern crate libc;
 use emotion::libc::c_char;
 use evas;
 use eina;
+use eseful;
 
 #[link(name = "emotion")]
 extern "C" {
@@ -48,10 +49,6 @@ pub fn object_file_set(obj: &evas::EvasObject, filename: ~str) -> eina::EinaBool
 
 pub fn object_play_set(obj: &evas::EvasObject, play: bool) {
     unsafe { 
-        emotion_object_play_set(obj, 
-                                match play { 
-                                    true => eina::EINA_TRUE, 
-                                    false => eina::EINA_FALSE 
-                                })
+        emotion_object_play_set(obj, eseful::from_bool_to_eina(play))
     }
 }

@@ -22,9 +22,11 @@
 
 extern crate libc;
 
-use eseful::libc::c_char;
 use std::c_str::{CString};
 use std::cast::forget;
+
+use eseful::libc::c_char;
+use eina;
 
 // Empty value handy to use in the 'data' field for callbacks.
 pub static Empty: Option<()> = None;
@@ -50,4 +52,18 @@ pub fn get_c_args(argv: ~[~str]) -> **c_char {
         forget(vchars);
     }
     return vchars_ptr;
+}
+
+pub fn from_bool_to_eina(b: bool) -> eina::EinaBool {
+    match b {
+        true => eina::EINA_TRUE,
+        false => eina::EINA_FALSE
+    }
+}
+
+pub fn from_eina_to_bool(eb: eina::EinaBool) -> bool {
+    match eb {
+        eina::EINA_TRUE => true,
+        _ => false
+    }
 }

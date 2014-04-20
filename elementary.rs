@@ -25,7 +25,7 @@ use std::cast::forget;
 use elementary::libc::{c_int, c_uint, c_char};
 use evas;
 use eina;
-use eseful::{get_c_args};
+use eseful;
 
 
 /// Types of windows that can be created.
@@ -142,6 +142,11 @@ extern "C" {
     /* elm_button */
     fn elm_button_add(parent: *evas::EvasObject) -> *evas::EvasObject;
 
+    /* elm_check */
+    fn elm_check_add(parent: *evas::EvasObject) -> *evas::EvasObject;
+    fn elm_check_state_set(obj: *evas::EvasObject, state: eina::EinaBool);
+    fn elm_check_state_get(obj: *evas::EvasObject) -> eina::EinaBool;
+
     /* elm_label */
     fn elm_label_add(parent: *evas::EvasObject) -> *evas::EvasObject;
     fn elm_label_slide_mode_set(obj: *evas::EvasObject, mode: c_uint);
@@ -171,7 +176,7 @@ extern "C" {
 }
 
 pub fn init(argc: uint, argv: ~[~str]) -> uint {
-    let vchars_ptr: **c_char = get_c_args(argv);
+    let vchars_ptr: **c_char = eseful::get_c_args(argv);
 
     let ret = unsafe {
         elm_init(argc as c_int, vchars_ptr)
@@ -216,17 +221,17 @@ pub fn object_text_set(obj: &evas::EvasObject, text: ~str) {
     })
 }
 
-pub fn object_focus_get(obj: &evas::EvasObject) -> eina::EinaBool {
-    unsafe { elm_object_focus_get(obj) as eina::EinaBool }
+pub fn object_focus_get(obj: &evas::EvasObject) -> bool {
+    unsafe { eseful::from_eina_to_bool(elm_object_focus_get(obj)) }
 }
 
-pub fn object_focus_set(obj: &evas::EvasObject, focus: eina::EinaBool) {
-    unsafe { elm_object_focus_set(obj, focus) }
+pub fn object_focus_set(obj: &evas::EvasObject, focus: bool) {
+    unsafe { elm_object_focus_set(obj, eseful::from_bool_to_eina(focus)) }
 }
 
-pub fn object_style_set(obj: &evas::EvasObject, style: ~str) -> eina::EinaBool {
+pub fn object_style_set(obj: &evas::EvasObject, style: ~str) -> bool {
     style.with_c_str(|c_style| unsafe {
-        elm_object_style_set(obj, c_style) as eina::EinaBool
+        eseful::from_eina_to_bool(elm_object_style_set(obj, c_style))
     })
 }
 
@@ -255,8 +260,10 @@ pub fn win_util_standard_add(name: ~str, title: ~str) -> ~evas::EvasObject {
 }
 
 /// Set the window autodel state.
-pub fn win_autodel_set(obj: &evas::EvasObject, autodel: eina::EinaBool) {
-    unsafe { elm_win_autodel_set(obj, autodel as u8) }
+pub fn win_autodel_set(obj: &evas::EvasObject, autodel: bool) {
+    unsafe {
+        elm_win_autodel_set(obj, eseful::from_bool_to_eina(autodel))
+    }
 }
 
 // Add 'subobj' as a resize object of window 'obj'.
@@ -293,8 +300,10 @@ pub fn box_pack_end(obj: &evas::EvasObject, subobj: &evas::EvasObject) {
 }
 
 // Set the box to arrange its children homogeneously.
-pub fn box_homogeneous_set(obj: &evas::EvasObject, homogeneous: eina::EinaBool) {
-    unsafe { elm_box_homogeneous_set(obj, homogeneous) }
+pub fn box_homogeneous_set(obj: &evas::EvasObject, homogeneous: bool) {
+    unsafe {
+        elm_box_homogeneous_set(obj, eseful::from_bool_to_eina(homogeneous))
+    }
 }
 
 // Set the space (padding) between the box's elements.
@@ -309,6 +318,24 @@ pub fn button_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
     unsafe { evas::cast_to_evas_obj(elm_button_add(parent)) }
 }
 
+/* Check methods */
+// Add a new Check object.
+pub fn check_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
+    unsafe { evas::cast_to_evas_obj(elm_check_add(parent)) }
+}
+
+// Set the on/off state of the check object.
+pub fn check_state_set(obj: &evas::EvasObject, state: bool) {
+    unsafe {
+        elm_check_state_set(obj, eseful::from_bool_to_eina(state))
+    }
+}
+
+// Get the state of the check object.
+pub fn check_state_get(obj: &evas::EvasObject) -> bool {
+    unsafe { eseful::from_eina_to_bool(elm_check_state_get(obj)) }
+}
+
 /* Entry methods */
 // This adds an entry to parent object.
 pub fn entry_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
@@ -321,13 +348,17 @@ pub fn entry_is_empty(obj: &evas::EvasObject) -> eina::EinaBool {
 }
 
 // Enable or disable scrolling in entry.
-pub fn entry_scrollable_set(obj: &evas::EvasObject, scroll: eina::EinaBool) {
-    unsafe {  elm_entry_scrollable_set(obj, scroll) }
+pub fn entry_scrollable_set(obj: &evas::EvasObject, scroll: bool) {
+    unsafe {
+        elm_entry_scrollable_set(obj, eseful::from_bool_to_eina(scroll))
+    }
 }
 
 // Sets the entry to single line mode.
-pub fn entry_single_line_set(obj: &evas::EvasObject, single_line: eina::EinaBool) {
-    unsafe { elm_entry_single_line_set(obj, single_line); }
+pub fn entry_single_line_set(obj: &evas::EvasObject, single_line: bool) {
+    unsafe {
+        elm_entry_single_line_set(obj, eseful::from_bool_to_eina(single_line))
+    }
 }
 
 // This returns the text currently shown in object entry.

@@ -17,7 +17,6 @@ use std::option::{Option};
 use efl::ecore;
 use efl::evas;
 use efl::elementary;
-use efl::eina;
 use efl::eseful::{EventInfo, Empty};
 
 struct OnClickedData<'r> {
@@ -87,8 +86,8 @@ fn main() {
 
     /* Entry */
     let ent: ~evas::EvasObject = elementary::entry_add(win);
-    elementary::entry_scrollable_set(ent, eina::EINA_TRUE);
-    elementary::entry_single_line_set(ent, eina::EINA_TRUE);
+    elementary::entry_scrollable_set(ent, true);
+    elementary::entry_single_line_set(ent, true);
     evas::object_size_hint_weight_set(ent,
                                       evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
@@ -97,7 +96,7 @@ fn main() {
                                      evas::EVAS_HINT_FILL);
     evas::object_show(ent);
     elementary::box_pack_end(ebox, ent);
-    elementary::object_focus_set(ent, eina::EINA_TRUE);
+    elementary::object_focus_set(ent, true);
 
     let l: &evas::EvasObject = lab;
     evas::object_smart_callback_add(ent, ~"activated", on_enter, ~Some(l));

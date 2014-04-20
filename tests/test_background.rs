@@ -9,7 +9,6 @@ use std::os;
 use efl::ecore;
 use efl::evas;
 use efl::elementary;
-use efl::eina;
 
 
 fn main() {
@@ -32,7 +31,7 @@ fn main() {
 
     let win = elementary::win_add(&None, ~"Rust Logo", elementary::ElmWinBasic);
     elementary::win_title_set(win, ~"Background Rust");
-    elementary::win_autodel_set(win, eina::EINA_TRUE);
+    elementary::win_autodel_set(win, true);
 
     let bg = elementary::bg_add(win);
     elementary::bg_load_size_set(bg, (128, 128));
