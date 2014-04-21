@@ -18,6 +18,7 @@
 
 extern crate libc;
 
+use std::str::raw::from_c_str;
 use emotion::libc::c_char;
 use evas;
 use eina;
@@ -27,6 +28,7 @@ use eseful;
 extern "C" {
     fn emotion_object_add(evas: *evas::Evas) -> *evas::EvasObject;
     fn emotion_object_init(obj: *evas::EvasObject, module_filename: *c_char) -> u8;
+    fn emotion_object_file_get(obj: *evas::EvasObject) -> *c_char;
     fn emotion_object_file_set(obj: *evas::EvasObject, filename: *c_char) -> u8;
     fn emotion_object_play_set(obj: *evas::EvasObject, play: eina::EinaBool);
 }
@@ -37,14 +39,21 @@ pub fn object_add(evas: &evas::Evas) -> ~evas::EvasObject {
 }
 
 /// Initializes an emotion object with the specified module.
-pub fn object_init(obj: &evas::EvasObject, module_filename: ~str) -> eina::EinaBool {
+pub fn object_init(obj: &evas::EvasObject, module_filename: &str) -> eina::EinaBool {
     module_filename.with_c_str(|c_mf| unsafe {
         emotion_object_init(obj, c_mf) as eina::EinaBool
     })
 }
 
+/// Get the filename of the file associated with the emotion object.
+pub fn object_file_get(obj: &evas::EvasObject) -> ~str {
+    unsafe {
+        from_c_str(emotion_object_file_get(obj))
+    }
+}
+
 /// Set the file to be played in the Emotion object.
-pub fn object_file_set(obj: &evas::EvasObject, filename: ~str) -> eina::EinaBool {
+pub fn object_file_set(obj: &evas::EvasObject, filename: &str) -> eina::EinaBool {
     filename.with_c_str(|c_filename| unsafe {
         emotion_object_file_set(obj, c_filename) as eina::EinaBool
     })

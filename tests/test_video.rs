@@ -16,7 +16,7 @@ static WIDTH: int = 360;
 static HEIGHT: int = 285;
 
 
-fn playback_started(data: &Option<~str>,
+fn playback_started(data: &Option<&str>,
                     e: &evas::EvasObject,
                     event_info: &EventInfo) {
     match *data {
@@ -30,7 +30,7 @@ fn playback_started(data: &Option<~str>,
 fn main() {    
     let args: ~[~str] = os::args();
 
-    let video_file =
+    let video_file: &str =
         if args.len() > 1 {
             args[1]
         } else {
@@ -56,9 +56,9 @@ fn main() {
 
     /* Set the media module to use */
     let em: ~evas::EvasObject = emotion::object_add(e);
-    emotion::object_init(em, ~"gstreamer1");
+    emotion::object_init(em, "gstreamer1");
 
-    let data: Option<~str> = Some(video_file.clone());
+    let data: Option<&str> = Some(video_file);
     evas::object_smart_callback_add(em, ~"playback_started", 
                                     playback_started, &data);
     emotion::object_file_set(em, video_file);
