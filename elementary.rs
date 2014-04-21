@@ -43,7 +43,7 @@ pub enum ElmWinType {
     /// The window is used as a dock or panel. Usually would
     /// be kept on top of any other window by the Window Manager.
     ElmWinDock, 
-    ////The window is used to hold a floating toolbar, or similar.
+    /// The window is used to hold a floating toolbar, or similar.
     ElmWinToolbar,
     /// Similar to #ElmWin_TOOLBAR.
     ElmWinMenu,
@@ -55,17 +55,17 @@ pub enum ElmWinType {
     /// entry in a menubar is clicked.
     ElmWinDropdownMenu,
     /// Like #ElmWin_DROPDOWN_MENU, but for the menu
-    // triggered by right-clicking an object. 
+    /// triggered by right-clicking an object.
     ElmWinPopupMenu,
     /// The window is a tooltip.
     ElmWinTooltip,
-    //// A notification window, like a warning about
+    /// A notification window, like a warning about
     /// battery life or a new E-Mail received.
     ElmWinNotification, 
-    //// A window holding the contents of a combo box. Not
+    /// A window holding the contents of a combo box. Not
     /// usually used in the EFL.
     ElmWinCombo,
-    //// Used to indicate the window is a representation of an
+    /// Used to indicate the window is a representation of an
     /// object being dragged across different windows, or even
     /// applications.
     ElmWinDnd,
@@ -97,15 +97,15 @@ pub enum ElmLabelSlideMode {
 }
 
 pub enum ElmBgOption {
-    // Center the background image.
+    /// Center the background image.
     ElmBgOptionCenter,
-    // Scale the background image, retaining aspect ratio.
+    /// Scale the background image, retaining aspect ratio.
     ElmBgOptionScalse,
-    // Stretch the background image to fill the widget's area
+    /// Stretch the background image to fill the widget's area
     ElmBgOptionStretch,
-    // Tile background image at its original size
+    /// Tile background image at its original size
     ElmBgOptionTile,
-    // Sentinel value, also used to indicate errors
+    /// Sentinel value, also used to indicate errors
     ElmBgOptionLast
 }
 
@@ -266,17 +266,17 @@ pub fn win_autodel_set(obj: &evas::EvasObject, autodel: bool) {
     }
 }
 
-// Add 'subobj' as a resize object of window 'obj'.
+/// Add 'subobj' as a resize object of window 'obj'.
 pub fn win_resize_object_add(obj: &evas::EvasObject, subobj: &evas::EvasObject) {
     unsafe { elm_win_resize_object_add(obj, subobj) }
 }
 
-// Get the title window.
+/// Get the title window.
 pub fn win_title_get(obj: &evas::EvasObject) -> ~str {
     unsafe { from_c_str(elm_win_title_get(obj)) }
 }
 
-// Set the title of the window.
+/// Set the title of the window.
 pub fn win_title_set(obj: &evas::EvasObject, title: ~str) {
     title.with_c_str(|c_buf| unsafe {
         elm_win_title_set(obj, c_buf)
@@ -284,89 +284,89 @@ pub fn win_title_set(obj: &evas::EvasObject, title: ~str) {
 }
 
 /* Box methods */
-// Add a new box to the parent.
+/// Add a new box to the parent.
 pub fn box_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
     unsafe { evas::cast_to_evas_obj(elm_box_add(parent)) }
 }
 
-// Add an object to the beginning of the pack list.
+/// Add an object to the beginning of the pack list.
 pub fn box_pack_start(obj: &evas::EvasObject, subobj: &evas::EvasObject) {
     unsafe { elm_box_pack_start(obj, subobj) }
 }
 
-// Add an object at the end of the pack list.
+/// Add an object at the end of the pack list.
 pub fn box_pack_end(obj: &evas::EvasObject, subobj: &evas::EvasObject) {
     unsafe { elm_box_pack_end(obj, subobj) }
 }
 
-// Set the box to arrange its children homogeneously.
+/// Set the box to arrange its children homogeneously.
 pub fn box_homogeneous_set(obj: &evas::EvasObject, homogeneous: bool) {
     unsafe {
         elm_box_homogeneous_set(obj, eseful::from_bool_to_eina(homogeneous))
     }
 }
 
-// Set the space (padding) between the box's elements.
+/// Set the space (padding) between the box's elements.
 pub fn box_padding_set(obj: &evas::EvasObject, p: evas::Coord) {
     let (x, y) = p;
     unsafe { elm_box_padding_set(obj, x as c_int, y as c_int) }
 }
 
 /* Button methods */
-// Add a new button to the parent's canvas.
+/// Add a new button to the parent's canvas.
 pub fn button_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
     unsafe { evas::cast_to_evas_obj(elm_button_add(parent)) }
 }
 
 /* Check methods */
-// Add a new Check object.
+/// Add a new Check object.
 pub fn check_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
     unsafe { evas::cast_to_evas_obj(elm_check_add(parent)) }
 }
 
-// Set the on/off state of the check object.
+/// Set the on/off state of the check object.
 pub fn check_state_set(obj: &evas::EvasObject, state: bool) {
     unsafe {
         elm_check_state_set(obj, eseful::from_bool_to_eina(state))
     }
 }
 
-// Get the state of the check object.
+/// Get the state of the check object.
 pub fn check_state_get(obj: &evas::EvasObject) -> bool {
     unsafe { eseful::from_eina_to_bool(elm_check_state_get(obj)) }
 }
 
 /* Entry methods */
-// This adds an entry to parent object.
+/// This adds an entry to parent object.
 pub fn entry_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
     unsafe { evas::cast_to_evas_obj(elm_entry_add(parent)) }
 }
 
-// Get whether the entry is empty.
+/// Get whether the entry is empty.
 pub fn entry_is_empty(obj: &evas::EvasObject) -> eina::EinaBool {
     unsafe { elm_entry_is_empty(obj) as eina::EinaBool }
 }
 
-// Enable or disable scrolling in entry.
+/// Enable or disable scrolling in entry.
 pub fn entry_scrollable_set(obj: &evas::EvasObject, scroll: bool) {
     unsafe {
         elm_entry_scrollable_set(obj, eseful::from_bool_to_eina(scroll))
     }
 }
 
-// Sets the entry to single line mode.
+/// Sets the entry to single line mode.
 pub fn entry_single_line_set(obj: &evas::EvasObject, single_line: bool) {
     unsafe {
         elm_entry_single_line_set(obj, eseful::from_bool_to_eina(single_line))
     }
 }
 
-// This returns the text currently shown in object entry.
+/// This returns the text currently shown in object entry.
 pub fn entry_entry_get(obj: &evas::EvasObject) -> ~str {
     unsafe { from_c_str(elm_entry_entry_get(obj)) }
 }
 
-// This sets the text displayed within the entry to 'entry'.
+/// This sets the text displayed within the entry to 'entry'.
 pub fn entry_entry_set(obj: &evas::EvasObject, entry: ~str) {
     entry.with_c_str(|c_buf| unsafe {
         elm_entry_entry_set(obj, c_buf);
@@ -374,25 +374,25 @@ pub fn entry_entry_set(obj: &evas::EvasObject, entry: ~str) {
 }
 
 /* Label methods */
-// Add a new label to the parent.
+/// Add a new label to the parent.
 pub fn label_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
     unsafe { evas::cast_to_evas_obj(elm_label_add(parent)) }
 }
 
-// Set the slide mode of the label widget.
-// ELM_LABEL_SLIDE_MODE_NONE - no slide effect
-// ELM_LABEL_SLIDE_MODE_AUTO - slide only if the label area is bigger than the text width length
-// ELM_LABEL_SLIDE_MODE_ALWAYS -slide always
+/// Set the slide mode of the label widget.
+/// ELM_LABEL_SLIDE_MODE_NONE - no slide effect
+/// ELM_LABEL_SLIDE_MODE_AUTO - slide only if the label area is bigger than the text width length
+/// ELM_LABEL_SLIDE_MODE_ALWAYS -slide always
 pub fn label_slide_mode_set(obj: &evas::EvasObject, mode: ElmLabelSlideMode) {
     unsafe { elm_label_slide_mode_set(obj, mode as c_uint) }
 }
 
-// Set the slide duration of the label.
+/// Set the slide duration of the label.
 pub fn label_slide_duration_set(obj: &evas::EvasObject, duration: f64) {
     unsafe { elm_label_slide_duration_set(obj, duration) }
 }
 
-// Start slide effect.
+/// Start slide effect.
 pub fn label_slide_go(obj: &evas::EvasObject) {
     unsafe { elm_label_slide_go(obj) }
 }

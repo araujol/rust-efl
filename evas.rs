@@ -144,19 +144,19 @@ pub fn object_show(e: &EvasObject) {
     unsafe { evas_object_show(e) } 
 }
 
-// Creates a new image object on the given Evas e canvas.
+/// Creates a new image object on the given Evas e canvas.
 pub fn object_image_add(e: &Evas) -> ~EvasObject {
     unsafe { cast_to_evas_obj(evas_object_image_add(e)) }
 }
 
-// Creates a new image object that automatically scales its bound image to
-// the object's area, on both axis.
+/// Creates a new image object that automatically scales its bound image to
+/// the object's area, on both axis.
 pub fn object_image_filled_add(e: &Evas) -> ~EvasObject {
     unsafe { cast_to_evas_obj(evas_object_image_filled_add(e)) }
 }
 
-// Set how to fill an image object's drawing rectangle given the (real)
-// image bound to it.
+/// Set how to fill an image object's drawing rectangle given the (real)
+/// image bound to it.
 pub fn object_image_fill_set(obj: *EvasObject, xy: Coord, wh: Coord) {
     let (x, y) = xy;
     let (w, h) = wh;
@@ -167,8 +167,8 @@ pub fn object_image_fill_set(obj: *EvasObject, xy: Coord, wh: Coord) {
     }
 }
 
-// Set the source file from where an image object must fetch the real
-// image data (it may be an Eet file, besides pure image ones).
+/// Set the source file from where an image object must fetch the real
+/// image data (it may be an Eet file, besides pure image ones).
 pub fn object_image_file_set(obj: &EvasObject, file: ~str, key: Option<~str>) {
     file.with_c_str(|c_file| unsafe {
         match key {
@@ -180,19 +180,19 @@ pub fn object_image_file_set(obj: &EvasObject, file: ~str, key: Option<~str>) {
     })
 }
 
-// Sets the size of the given image object.
+/// Sets the size of the given image object.
 pub fn object_image_size_set(obj: &EvasObject, w: int, h: int) {
     unsafe { evas_object_image_size_set(obj, w as c_int, h as c_int) }
 }
 
-// Set whether the image object's fill property should track the object's size.
+/// Set whether the image object's fill property should track the object's size.
 pub fn object_image_filled_set(obj: &EvasObject, setting: bool) {
     unsafe {
         evas_object_image_filled_set(obj, eseful::from_bool_to_eina(setting))
     }
 }
 
-// Preload an image object's image data in the background.
+/// Preload an image object's image data in the background.
 pub fn object_image_preload(obj: &EvasObject, cancel: bool) {
     unsafe {
         evas_object_image_preload(obj, eseful::from_bool_to_eina(cancel))
