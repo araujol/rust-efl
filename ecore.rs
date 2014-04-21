@@ -158,6 +158,10 @@ pub fn evas_shutdown() -> int {
     unsafe { ecore_evas_shutdown() as int }
 }
 
+// Creates a new Ecore_Evas based on engine name and common parameters.
+// If 'engine_name' is None, it  use environment variable ECORE_EVAS_ENGINE,
+// that can be undefined and in this case this call will try to find the
+// first working engine.
 pub fn evas_new(engine_name: Option<~str>, 
                 x: int, y: int, 
                 w: int, h: int,

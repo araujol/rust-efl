@@ -21,9 +21,10 @@ extern crate libc;
 use evas::libc::{c_int, c_char, c_void};
 use std::cast::transmute;
 use std::option::{Option};
+use std::ptr;
 
 use eina;
-use eseful::EventInfo;
+use eseful;
 
 pub static EVAS_HINT_EXPAND: f64 = 1.0f64;
 pub static EVAS_HINT_FILL: f64 = -1.0f64;
@@ -36,7 +37,7 @@ pub type EvasObject = Eo;
 pub type Coord = (int, int);
 
 /* High level callback notation */
-pub type EvasSmartCb<T> = fn (&Option<T>, &EvasObject, &EventInfo) -> ();
+pub type EvasSmartCb<T> = fn (&Option<T>, &EvasObject, &eseful::EventInfo) -> ();
 /* C level callback notation */
 type CEvasSmartCb = fn (*c_void, *EvasObject, *c_void) -> c_void;
 
@@ -61,6 +62,15 @@ extern "C"  {
     fn evas_object_size_hint_weight_set(e: *EvasObject, x: f64, y: f64);
     fn evas_object_size_hint_align_set(e: *EvasObject, x: f64, y: f64);
     fn evas_object_focus_set(obj: *EvasObject, focus: eina::EinaBool);
+    fn evas_object_image_add(e: *Evas) -> *EvasObject;
+    fn evas_object_image_filled_add(e: *Evas) -> *EvasObject;
+    fn evas_object_image_fill_set(obj: *EvasObject,
+                                  x: c_int, y: c_int,
+                                  w: c_int, h: c_int);
+    fn evas_object_image_file_set(obj: *EvasObject, file: *c_char, key: *c_char);
+    fn evas_object_image_size_set(obj: *EvasObject, w: c_int, h: c_int);
+    fn evas_object_image_filled_set(obj: *EvasObject, setting: eina::EinaBool);
+    fn evas_object_image_preload(obj: *EvasObject, cancel: eina::EinaBool);
     fn evas_object_smart_callback_add(e: *EvasObject, event: *c_char,
                                       cb: CEvasSmartCb, data: *c_void);
 }
@@ -132,6 +142,61 @@ pub fn object_focus_set(obj: &EvasObject, focus: eina::EinaBool) {
 
 pub fn object_show(e: &EvasObject) {
     unsafe { evas_object_show(e) } 
+}
+
+// Creates a new image object on the given Evas e canvas.
+pub fn object_image_add(e: &Evas) -> ~EvasObject {
+    unsafe { cast_to_evas_obj(evas_object_image_add(e)) }
+}
+
+// Creates a new image object that automatically scales its bound image to
+// the object's area, on both axis.
+pub fn object_image_filled_add(e: &Evas) -> ~EvasObject {
+    unsafe { cast_to_evas_obj(evas_object_image_filled_add(e)) }
+}
+
+// Set how to fill an image object's drawing rectangle given the (real)
+// image bound to it.
+pub fn object_image_fill_set(obj: *EvasObject, xy: Coord, wh: Coord) {
+    let (x, y) = xy;
+    let (w, h) = wh;
+    unsafe {
+        evas_object_image_fill_set(obj,
+                                   x as c_int, y as c_int,
+                                   w as c_int, h as c_int)
+    }
+}
+
+// Set the source file from where an image object must fetch the real
+// image data (it may be an Eet file, besides pure image ones).
+pub fn object_image_file_set(obj: &EvasObject, file: ~str, key: Option<~str>) {
+    file.with_c_str(|c_file| unsafe {
+        match key {
+            None => evas_object_image_file_set(obj, c_file, ptr::null()),
+            Some(ref k) =>
+                k.with_c_str(|c_key|
+                             evas_object_image_file_set(obj, c_file, c_key))
+        }
+    })
+}
+
+// Sets the size of the given image object.
+pub fn object_image_size_set(obj: &EvasObject, w: int, h: int) {
+    unsafe { evas_object_image_size_set(obj, w as c_int, h as c_int) }
+}
+
+// Set whether the image object's fill property should track the object's size.
+pub fn object_image_filled_set(obj: &EvasObject, setting: bool) {
+    unsafe {
+        evas_object_image_filled_set(obj, eseful::from_bool_to_eina(setting))
+    }
+}
+
+// Preload an image object's image data in the background.
+pub fn object_image_preload(obj: &EvasObject, cancel: bool) {
+    unsafe {
+        evas_object_image_preload(obj, eseful::from_bool_to_eina(cancel))
+    }
 }
 
 pub fn object_smart_callback_add<T>(e: &EvasObject, event: ~str,
