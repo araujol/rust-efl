@@ -9,10 +9,10 @@ use std::cast::transmute;
 use std::option::{Option};
 
 use efl::ecore;
-use efl::eina;
+use efl::eina::EinaBool;
 use efl::eseful::{EventInfo, Empty};
 
-fn timer(data: &Option<f64>) -> eina::EinaBool {
+fn timer(data: &Option<f64>) -> EinaBool {
     match *data {
         None => (),
         Some(stime) =>
@@ -23,7 +23,7 @@ fn timer(data: &Option<f64>) -> eina::EinaBool {
 
 fn exit_func<T>(data: &Option<T>,
                 htype: int,
-                event: &EventInfo) -> eina::EinaBool {
+                event: &EventInfo) -> bool {
     let e: &ecore::EcoreEventSignalExit = unsafe { transmute(event) };
 
     if (*e).quit == 1 {
@@ -35,7 +35,7 @@ fn exit_func<T>(data: &Option<T>,
     }
 
     ecore::main_loop_quit();
-    return eina::EINA_TRUE;
+    return true;
 }
 
 fn main() {

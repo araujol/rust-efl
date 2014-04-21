@@ -67,7 +67,7 @@ pub type EcoreTaskCb<T> = fn (&Option<T>) -> eina::EinaBool;
 type CEcoreTaskCb = fn (*c_void) -> u8;
 
 /* High level callback notation */
-pub type EcoreEventHandlerCb<T> = fn (&Option<T>, int, &EventInfo) -> eina::EinaBool;
+pub type EcoreEventHandlerCb<T> = fn (&Option<T>, int, &EventInfo) -> bool;
 /* C level callback notation */
 type CEcoreEventHandlerCb = fn (*c_void, c_int, *c_void) -> u8;
 
