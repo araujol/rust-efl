@@ -39,7 +39,7 @@ fn main() {
         elementary::win_util_standard_add(~"Enlightenment", ~"Rust EFL");
     let data: Option<bool> = Some(true);
     evas::object_smart_callback_add(win, ~"delete,request",
-                                    on_done, ~data);
+                                    on_done, &data);
     evas::object_move(win, (200, 100));
 
     /* Box Container */

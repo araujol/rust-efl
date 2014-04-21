@@ -68,7 +68,7 @@ fn main() {
     let win: ~evas::EvasObject =
         elementary::win_util_standard_add(~"Rust EFL", ~"Rust EFL");
     evas::object_move(win, (200, 100));
-    evas::object_smart_callback_add(win, ~"delete,request", on_done, ~Empty);
+    evas::object_smart_callback_add(win, ~"delete,request", on_done, &Empty);
 
     /* Box Container */
     let ebox: ~evas::EvasObject = elementary::box_add(win);
@@ -99,7 +99,7 @@ fn main() {
     elementary::object_focus_set(ent, true);
 
     let l: &evas::EvasObject = lab;
-    evas::object_smart_callback_add(ent, ~"activated", on_enter, ~Some(l));
+    evas::object_smart_callback_add(ent, ~"activated", on_enter, &Some(l));
 
     /* Button */
     let btn = elementary::button_add(win);
@@ -115,12 +115,12 @@ fn main() {
 
     /* Share both the 'label' and 'entry' objects with the button callback */
     let e: &evas::EvasObject = ent;
-    let onclicked_data: ~Option<~OnClickedData> = 
-        ~Some(~OnClickedData {
+    let onclicked_data: Option<~OnClickedData> = 
+        Some(~OnClickedData {
             label: l,
             entry: e
         });
-    evas::object_smart_callback_add(btn, ~"clicked", on_clicked, onclicked_data);
+    evas::object_smart_callback_add(btn, ~"clicked", on_clicked, &onclicked_data);
 
     /* Set main window size and show */
     evas::object_resize(win, 200, 50);

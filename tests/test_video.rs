@@ -12,8 +12,8 @@ use efl::emotion;
 use efl::eseful::EventInfo;
 use std::option::Option;
 
-static WIDTH: int = 460;
-static HEIGHT: int = 370;
+static WIDTH: int = 360;
+static HEIGHT: int = 285;
 
 
 fn playback_started(data: &Option<~str>,
@@ -60,7 +60,7 @@ fn main() {
 
     let data: Option<~str> = Some(video_file.clone());
     evas::object_smart_callback_add(em, ~"playback_started", 
-                                    playback_started, ~data);
+                                    playback_started, &data);
     emotion::object_file_set(em, video_file);
     
     evas::object_move(em, (0, 0));

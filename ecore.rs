@@ -100,7 +100,7 @@ extern "C" {
 
 pub fn event_handler_add<T>(htype: EcoreEvent, 
                             func: EcoreEventHandlerCb<T>, 
-                            data: ~Option<T>) -> ~EcoreEventHandler {
+                            data: &Option<T>) -> ~EcoreEventHandler {
     /* Transmute both data and Callback into the C representation */
     let c_data: *c_void = unsafe { transmute(data) };
     let c_func: CEcoreEventHandlerCb = unsafe { transmute(func) };
@@ -144,7 +144,7 @@ pub fn time_unix_get() -> f64 {
     unsafe { ecore_time_unix_get() }
 }
 
-pub fn timer_add<T>(inv: f64, func: EcoreTaskCb<T>, data: ~Option<T>) {
+pub fn timer_add<T>(inv: f64, func: EcoreTaskCb<T>, data: &Option<T>) {
     let c_data: *c_void = unsafe { transmute(data) };
     let c_func: CEcoreTaskCb = unsafe { transmute(func) };
     unsafe { ecore_timer_add(inv, c_func, c_data) }
@@ -162,8 +162,8 @@ pub fn evas_shutdown() -> int {
 // If 'engine_name' is None, it  use environment variable ECORE_EVAS_ENGINE,
 // that can be undefined and in this case this call will try to find the
 // first working engine.
-pub fn evas_new(engine_name: Option<~str>, 
-                x: int, y: int, 
+pub fn evas_new(engine_name: Option<~str>,
+                x: int, y: int,
                 w: int, h: int,
                 extra_options: ~str) -> ~EcoreEvas {
 

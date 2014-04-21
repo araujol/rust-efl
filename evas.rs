@@ -200,7 +200,7 @@ pub fn object_image_preload(obj: &EvasObject, cancel: bool) {
 }
 
 pub fn object_smart_callback_add<T>(e: &EvasObject, event: ~str,
-                                    cb: EvasSmartCb<T>, data: ~Option<T>) {
+                                    cb: EvasSmartCb<T>, data: &Option<T>) {
     /* Transmute both Data and Callback into the C representation */
     let c_data: *c_void = unsafe { transmute(data) };
     let c_cb: CEvasSmartCb = unsafe { transmute(cb) };

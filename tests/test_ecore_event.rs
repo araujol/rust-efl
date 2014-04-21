@@ -49,8 +49,8 @@ fn main() {
     /* Add timer and handler */
     /* TODO: Create enum for signals */
     ecore::event_handler_add(ecore::EcoreEventSignalExit, 
-                             exit_func, ~Empty);
-    ecore::timer_add(1.0, timer, ~Some(start_time));
+                             exit_func, &Empty);
+    ecore::timer_add(1.0, timer, &Some(start_time));
 
     /* Start main event loop */
     ecore::main_loop_begin();
