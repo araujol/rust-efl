@@ -29,7 +29,7 @@ fn main() {
     elementary::policy_set(elementary::ElmPolicyQuit,
                            elementary::ElmPolicyQuitLastWindowClosed as int);
 
-    let win = elementary::win_add(&None, "Rust Logo", elementary::ElmWinBasic);
+    let win = elementary::win_add(None, "Rust Logo", elementary::ElmWinBasic);
     elementary::win_title_set(win, "Background Rust");
     elementary::win_autodel_set(win, true);
 

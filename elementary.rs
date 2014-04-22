@@ -238,10 +238,10 @@ pub fn object_style_set(obj: &evas::EvasObject, style: &str) -> bool {
 /* Window methods */
 /// Add a window object.
 /// If obj is None this is the first window created.
-pub fn win_add(obj: &Option<&evas::EvasObject>, name: &str,
+pub fn win_add(obj: Option<&evas::EvasObject>, name: &str,
                wtype: ElmWinType) -> ~evas::EvasObject {
     name.with_c_str(|c_buf| unsafe {
-        match *obj {
+        match obj {
             /* Null pointer */
             None => evas::cast_to_evas_obj(elm_win_add(ptr::null(), c_buf, wtype as c_int)),
             /* Add win to eobj parent */
