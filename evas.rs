@@ -104,7 +104,7 @@ pub fn object_move(e: &EvasObject, c: Coord) {
     unsafe { evas_object_move(e, x as c_int, y as c_int) }
 }
 
-pub fn object_name_set(obj: &EvasObject, name: ~str) {
+pub fn object_name_set(obj: &EvasObject, name: &str) {
     name.with_c_str(|c_name| unsafe {
         evas_object_name_set(obj, c_name)
     })
@@ -112,11 +112,11 @@ pub fn object_name_set(obj: &EvasObject, name: ~str) {
 
 pub fn object_color_set(obj: &EvasObject, r: int, g: int, b: int, a: int) {
     unsafe { 
-        evas_object_color_set(obj, 
-                              r as c_int, 
-                              g as c_int, 
-                              b as c_int, 
-                              a as c_int) 
+        evas_object_color_set(obj,
+                              r as c_int,
+                              g as c_int,
+                              b as c_int,
+                              a as c_int)
     }
 }
 
@@ -169,7 +169,7 @@ pub fn object_image_fill_set(obj: *EvasObject, xy: Coord, wh: Coord) {
 
 /// Set the source file from where an image object must fetch the real
 /// image data (it may be an Eet file, besides pure image ones).
-pub fn object_image_file_set(obj: &EvasObject, file: ~str, key: Option<~str>) {
+pub fn object_image_file_set(obj: &EvasObject, file: &str, key: Option<&str>) {
     file.with_c_str(|c_file| unsafe {
         match key {
             None => evas_object_image_file_set(obj, c_file, ptr::null()),
@@ -199,7 +199,7 @@ pub fn object_image_preload(obj: &EvasObject, cancel: bool) {
     }
 }
 
-pub fn object_smart_callback_add<T>(e: &EvasObject, event: ~str,
+pub fn object_smart_callback_add<T>(e: &EvasObject, event: &str,
                                     cb: EvasSmartCb<T>, data: &Option<T>) {
     /* Transmute both Data and Callback into the C representation */
     let c_data: *c_void = unsafe { transmute(data) };

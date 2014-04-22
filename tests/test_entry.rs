@@ -38,7 +38,7 @@ fn on_enter(data: &Option<&evas::EvasObject>,
         Some(eobj) => {
             elementary::object_text_set(eobj, elementary::entry_entry_get(e));
             /* Reset text entry */
-            elementary::entry_entry_set(e, ~"");
+            elementary::entry_entry_set(e, "");
         }
     }
 }
@@ -52,7 +52,7 @@ fn on_clicked(data: &Option<~OnClickedData>,
             let txt = elementary::entry_entry_get(onclicked.entry);
             elementary::object_text_set(onclicked.label, txt);
             /* Reset text entry */
-            elementary::entry_entry_set(onclicked.entry, ~"");
+            elementary::entry_entry_set(onclicked.entry, "");
         }
     }
 }
@@ -66,9 +66,9 @@ fn main() {
 
     /* Main Window */
     let win: ~evas::EvasObject =
-        elementary::win_util_standard_add(~"Rust EFL", ~"Rust EFL");
+        elementary::win_util_standard_add("Rust EFL", "Rust EFL");
     evas::object_move(win, (200, 100));
-    evas::object_smart_callback_add(win, ~"delete,request", on_done, &Empty);
+    evas::object_smart_callback_add(win, "delete,request", on_done, &Empty);
 
     /* Box Container */
     let ebox: ~evas::EvasObject = elementary::box_add(win);
@@ -80,7 +80,7 @@ fn main() {
 
     /* Label */
     let lab: ~evas::EvasObject = elementary::label_add(win);
-    elementary::object_text_set(lab, ~" -- Enter Text --");
+    elementary::object_text_set(lab, " -- Enter Text --");
     elementary::box_pack_end(ebox, lab);
     evas::object_show(lab);
 
@@ -99,7 +99,7 @@ fn main() {
     elementary::object_focus_set(ent, true);
 
     let l: &evas::EvasObject = lab;
-    evas::object_smart_callback_add(ent, ~"activated", on_enter, &Some(l));
+    evas::object_smart_callback_add(ent, "activated", on_enter, &Some(l));
 
     /* Button */
     let btn = elementary::button_add(win);
@@ -109,7 +109,7 @@ fn main() {
     evas::object_size_hint_align_set(btn, 
                                      evas::EVAS_HINT_FILL,
                                      evas::EVAS_HINT_FILL);
-    elementary::object_text_set(btn, ~"Ok");
+    elementary::object_text_set(btn, "Ok");
     evas::object_show(btn);
     elementary::box_pack_end(ebox, btn);
 
@@ -120,7 +120,7 @@ fn main() {
             label: l,
             entry: e
         });
-    evas::object_smart_callback_add(btn, ~"clicked", on_clicked, &onclicked_data);
+    evas::object_smart_callback_add(btn, "clicked", on_clicked, &onclicked_data);
 
     /* Set main window size and show */
     evas::object_resize(win, 200, 50);

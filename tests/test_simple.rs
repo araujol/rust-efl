@@ -36,9 +36,9 @@ fn main() {
 
     /* Main Window */
     let win: ~evas::EvasObject =
-        elementary::win_util_standard_add(~"Enlightenment", ~"Rust EFL");
+        elementary::win_util_standard_add("Enlightenment", "Rust EFL");
     let data: Option<bool> = Some(true);
-    evas::object_smart_callback_add(win, ~"delete,request",
+    evas::object_smart_callback_add(win, "delete,request",
                                     on_done, &data);
     evas::object_move(win, (200, 100));
 
@@ -52,7 +52,7 @@ fn main() {
 
     /* Label */
     let lab: ~evas::EvasObject = elementary::label_add(win);
-    elementary::object_text_set(lab, ~"Hello <b>Rust Enlightenment!</b>");
+    elementary::object_text_set(lab, "Hello <b>Rust Enlightenment!</b>");
     elementary::box_pack_end(ebox, lab);
     evas::object_show(lab);
 

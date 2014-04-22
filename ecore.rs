@@ -162,29 +162,27 @@ pub fn evas_shutdown() -> int {
 // If 'engine_name' is None, it  use environment variable ECORE_EVAS_ENGINE,
 // that can be undefined and in this case this call will try to find the
 // first working engine.
-pub fn evas_new(engine_name: Option<~str>,
+pub fn evas_new(engine_name: Option<&str>,
                 x: int, y: int,
                 w: int, h: int,
-                extra_options: ~str) -> ~EcoreEvas {
-
-    let ee: *EcoreEvas = 
-        match engine_name {
+                extra_options: &str) -> ~EcoreEvas {
+    unsafe {
+        transmute::<*EcoreEvas, ~EcoreEvas>(match engine_name {
             /* Null pointer */
             None =>
-                extra_options.with_c_str(|c_extra_options| unsafe {
+                extra_options.with_c_str(|c_extra_options| {
                     ecore_evas_new(ptr::null(), x as c_int, y as c_int, 
                                    w as c_int, h as c_int, c_extra_options)
                 }),
             Some(ename) =>
-                ename.with_c_str(|c_engine_name| unsafe {
+                ename.with_c_str(|c_engine_name| {
                     extra_options.with_c_str(|c_extra_options| {
                         ecore_evas_new(c_engine_name, x as c_int, y as c_int, 
                                        w as c_int, h as c_int, c_extra_options)
                     })
                 })
-        };
-    unsafe { transmute::<*EcoreEvas, ~EcoreEvas>(ee) }
-
+        })
+    }
 }
 
 pub fn evas_show(ee: &EcoreEvas) {

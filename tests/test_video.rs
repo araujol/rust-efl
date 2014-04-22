@@ -39,8 +39,7 @@ fn main() {
         };
 
     ecore::evas_init();
-    let ee: ~ecore::EcoreEvas = ecore::evas_new(None, 10, 10, 
-                                                WIDTH, HEIGHT, ~"");
+    let ee: ~ecore::EcoreEvas = ecore::evas_new(None, 10, 10, WIDTH, HEIGHT, "");
     ecore::evas_show(ee);
 
     /* Get the canvas */
@@ -48,7 +47,7 @@ fn main() {
 
     /* Add a white background */
     let bg: ~evas::EvasObject  = evas::object_rectangle_add(e);
-    evas::object_name_set(bg, ~"video rectangle");
+    evas::object_name_set(bg, "video-rectangle");
     evas::object_color_set(bg, 255, 255, 255, 255);
     evas::object_move(bg, (0, 0));
     evas::object_resize(bg, WIDTH, HEIGHT);
@@ -59,7 +58,7 @@ fn main() {
     emotion::object_init(em, "gstreamer1");
 
     let data: Option<&str> = Some(video_file);
-    evas::object_smart_callback_add(em, ~"playback_started", 
+    evas::object_smart_callback_add(em, "playback_started",
                                     playback_started, &data);
     emotion::object_file_set(em, video_file);
     

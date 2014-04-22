@@ -15,7 +15,7 @@ fn main() {
     let args: ~[~str] = os::args();
     let argc: uint = args.len();
 
-    let logo_file =
+    let logo_file: &str =
         if args.len() > 1 {
             args[1].clone()
         } else {
@@ -29,14 +29,14 @@ fn main() {
     elementary::policy_set(elementary::ElmPolicyQuit,
                            elementary::ElmPolicyQuitLastWindowClosed as int);
 
-    let win = elementary::win_add(&None, ~"Rust Logo", elementary::ElmWinBasic);
-    elementary::win_title_set(win, ~"Background Rust");
+    let win = elementary::win_add(&None, "Rust Logo", elementary::ElmWinBasic);
+    elementary::win_title_set(win, "Background Rust");
     elementary::win_autodel_set(win, true);
 
     let bg = elementary::bg_add(win);
     elementary::bg_load_size_set(bg, (128, 128));
     elementary::bg_option_set(bg, elementary::ElmBgOptionCenter);
-    elementary::bg_file_set(bg, logo_file, ~"");
+    elementary::bg_file_set(bg, logo_file, "");
     evas::object_size_hint_weight_set(bg, evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
 

@@ -215,7 +215,7 @@ pub fn object_text_get(obj: &evas::EvasObject) -> ~str {
     }
 }
 
-pub fn object_text_set(obj: &evas::EvasObject, text: ~str) {
+pub fn object_text_set(obj: &evas::EvasObject, text: &str) {
     text.with_c_str(|c_text| unsafe {
         elm_object_part_text_set(obj, ptr::null(), c_text);
     })
@@ -229,7 +229,7 @@ pub fn object_focus_set(obj: &evas::EvasObject, focus: bool) {
     unsafe { elm_object_focus_set(obj, eseful::from_bool_to_eina(focus)) }
 }
 
-pub fn object_style_set(obj: &evas::EvasObject, style: ~str) -> bool {
+pub fn object_style_set(obj: &evas::EvasObject, style: &str) -> bool {
     style.with_c_str(|c_style| unsafe {
         eseful::from_eina_to_bool(elm_object_style_set(obj, c_style))
     })
@@ -238,7 +238,7 @@ pub fn object_style_set(obj: &evas::EvasObject, style: ~str) -> bool {
 /* Window methods */
 /// Add a window object.
 /// If obj is None this is the first window created.
-pub fn win_add(obj: &Option<&evas::EvasObject>, name: ~str, 
+pub fn win_add(obj: &Option<&evas::EvasObject>, name: &str,
                wtype: ElmWinType) -> ~evas::EvasObject {
     name.with_c_str(|c_buf| unsafe {
         match *obj {
@@ -251,7 +251,7 @@ pub fn win_add(obj: &Option<&evas::EvasObject>, name: ~str,
     })
 }
 
-pub fn win_util_standard_add(name: ~str, title: ~str) -> ~evas::EvasObject {
+pub fn win_util_standard_add(name: &str, title: &str) -> ~evas::EvasObject {
     name.with_c_str(|c_name| unsafe {
         title.with_c_str(|c_title| {
             evas::cast_to_evas_obj(elm_win_util_standard_add(c_name, c_title))
@@ -277,7 +277,7 @@ pub fn win_title_get(obj: &evas::EvasObject) -> ~str {
 }
 
 /// Set the title of the window.
-pub fn win_title_set(obj: &evas::EvasObject, title: ~str) {
+pub fn win_title_set(obj: &evas::EvasObject, title: &str) {
     title.with_c_str(|c_buf| unsafe {
         elm_win_title_set(obj, c_buf)
     })
@@ -367,7 +367,7 @@ pub fn entry_entry_get(obj: &evas::EvasObject) -> ~str {
 }
 
 /// This sets the text displayed within the entry to 'entry'.
-pub fn entry_entry_set(obj: &evas::EvasObject, entry: ~str) {
+pub fn entry_entry_set(obj: &evas::EvasObject, entry: &str) {
     entry.with_c_str(|c_buf| unsafe {
         elm_entry_entry_set(obj, c_buf);
     })
@@ -429,7 +429,7 @@ pub fn bg_option_set(obj: &evas::EvasObject, option: ElmBgOption) {
     unsafe { elm_bg_option_set(obj, option as c_uint) }
 }
 
-pub fn bg_file_set(obj: &evas::EvasObject, file: ~str, group: ~str) -> eina::EinaBool {
+pub fn bg_file_set(obj: &evas::EvasObject, file: &str, group: &str) -> eina::EinaBool {
     file.with_c_str(|c_file| unsafe {
         group.with_c_str(|c_group| {
             elm_bg_file_set(obj, c_file, c_group) as eina::EinaBool
