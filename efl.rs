@@ -23,5 +23,6 @@ pub mod ecore;
 pub mod evas;
 pub mod eina;
 pub mod eio;
+pub mod eet;
 pub mod emotion;
 pub mod elementary;
