@@ -43,7 +43,7 @@ fn main() {
     // Read string
     let retS: ~c_char = eet::read(ef, "String", &mut size);
     // Get a proper &str to show
-    unsafe { 
+    unsafe {
         match CString::new(transmute::<_,*c_char>(retS), true).as_str() {
             None => println!("Not valid"),
             Some(s) => println!("String: {}", s)
