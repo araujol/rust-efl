@@ -185,17 +185,19 @@ pub fn evas_new(engine_name: Option<&str>,
     }
 }
 
+/// Show an Ecore_Evas' window.
 pub fn evas_show(ee: &EcoreEvas) {
     unsafe { ecore_evas_show(ee) }
 }
 
+/// Get an Ecore_Evas's Evas.
 pub fn evas_get(ee: &EcoreEvas) -> ~evas::Evas {
     unsafe {
-        let ee = ecore_evas_get(ee);
-        transmute::<*evas::Evas, ~evas::Evas>(ee)
+        transmute::<*evas::Evas, ~evas::Evas>(ecore_evas_get(ee))
     }
 }
 
+/// Free an Ecore_Evas.
 pub fn evas_free(ee: &EcoreEvas) {
     unsafe { ecore_evas_free(ee) }
 }

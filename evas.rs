@@ -53,6 +53,7 @@ extern "C"  {
     fn evas_object_rectangle_add(e: *Evas) -> *EvasObject;
     fn evas_object_show(e: *EvasObject);
     fn evas_object_resize(e: *EvasObject, w: c_int, h: c_int);
+    fn evas_object_del(obj: *EvasObject);	
     fn evas_object_move(e: *EvasObject, x: c_int, y: c_int);
     fn evas_object_name_set(obj: *EvasObject, name: *c_char); 
     fn evas_object_color_set(obj: *EvasObject,
@@ -122,6 +123,11 @@ pub fn object_color_set(obj: &EvasObject, r: int, g: int, b: int, a: int) {
 
 pub fn object_resize(e: &EvasObject, w: int, h: int) {
     unsafe { evas_object_resize(e, w as c_int, h as c_int) }
+}
+
+/// Marks the given Evas object for deletion (when Evas will free its memory).
+pub fn object_del(obj: &EvasObject) {
+    unsafe { evas_object_del(obj) }
 }
 
 pub fn object_size_hint_min_set(e: &EvasObject, w: int, h: int) {

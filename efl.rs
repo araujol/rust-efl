@@ -26,6 +26,7 @@ pub mod evas;
 pub mod eina;
 pub mod eio;
 pub mod eet;
+pub mod edje;
 pub mod eldbus;
 pub mod emotion;
 pub mod elementary;
