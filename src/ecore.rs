@@ -86,6 +86,10 @@ extern "C" {
     fn ecore_timer_add(inv: f64, func: CEcoreTaskCb, data: *c_void);
     fn ecore_event_handler_add(htype: c_int, func: CEcoreEventHandlerCb, 
                                data: *c_void) -> *EcoreEventHandler;
+}
+
+#[link(name = "ecore_evas")]
+extern "C" {
     fn ecore_evas_init() -> c_int;
     fn ecore_evas_shutdown() -> c_int;
     fn ecore_evas_new(engine_name: *c_char, 
@@ -94,12 +98,13 @@ extern "C" {
                       extra_options: *c_char) -> *EcoreEvas;
     fn ecore_evas_show(ee: *EcoreEvas);
     fn ecore_evas_get(ee: *EcoreEvas) -> *evas::Evas;
-}
-
-#[link(name = "ecore_evas")]
-extern "C" {
+    fn ecore_evas_data_set(ee: *EcoreEvas, key: *c_char, data: *c_void);
+    fn ecore_evas_data_get(ee: *EcoreEvas, key: *c_char) -> *c_void;
     fn ecore_evas_free(ee: *EcoreEvas);
     fn ecore_evas_callback_resize_set(ee: *EcoreEvas, func: _CEcoreEvasEventCb);
+    fn ecore_evas_geometry_get(ee: *EcoreEvas,
+                               x: *c_int, y: *c_int,
+                               w: *c_int, h: *c_int);
 }
 
 pub fn event_handler_add<T>(htype: EcoreEvent, 
@@ -206,10 +211,31 @@ pub fn evas_free(ee: &EcoreEvas) {
     unsafe { ecore_evas_free(ee) }
 }
 
+/// Get the geometry of an Ecore_Evas.
+pub fn evas_geometry_get(ee: &EcoreEvas, x: &int, y: &int, w: &int, h: &int) {
+    unsafe {
+        ecore_evas_geometry_get(ee, transmute(x), transmute(y),
+                                transmute(w), transmute(h))
+    }
+}
+
 /// Set a callback for Ecore_Evas resize events.
 pub fn evas_callback_resize_set(ee: &EcoreEvas, func: EcoreEvasEventCb) {
     unsafe {
-        let c_cb: _CEcoreEvasEventCb = transmute(func);
-        ecore_evas_callback_resize_set(ee, c_cb)
+        ecore_evas_callback_resize_set(ee, transmute(func))
     }
+}
+
+/// Store user data in an Ecore_Evas structure.
+pub fn evas_data_set<T>(ee: &EcoreEvas, key: &str, data: &T) {
+    key.with_c_str(|c_key| unsafe {
+        ecore_evas_data_set(ee, c_key, transmute(data))
+    })
+}
+
+/// Retrieve user data associated with an Ecore_Evas.
+pub fn evas_data_get<T>(ee: &EcoreEvas, key: &str) -> ~T {
+    key.with_c_str(|c_key| unsafe {
+        transmute(ecore_evas_data_get(ee, c_key))
+    })
 }
