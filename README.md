@@ -21,7 +21,7 @@ Requirements:
 
 In the top level directory of this source code:
 
-    $ rustc efl.rs --crate-type=lib
+    $ rustc src/efl.rs --crate-type=lib
 
 Now you can build programs using the rust-efl library bindings:
 
