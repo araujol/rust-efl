@@ -71,6 +71,9 @@ pub type EcoreEventHandlerCb<T> = fn (&Option<T>, int, &EventInfo) -> bool;
 /* C level callback notation */
 type CEcoreEventHandlerCb = fn (*c_void, c_int, *c_void) -> u8;
 
+pub type EcoreEvasEventCb = fn (&EcoreEvas);
+type _CEcoreEvasEventCb = fn (*EcoreEvas);
+
 #[link(name = "ecore")]
 extern "C" {
     fn ecore_init() -> c_int;
@@ -96,6 +99,7 @@ extern "C" {
 #[link(name = "ecore_evas")]
 extern "C" {
     fn ecore_evas_free(ee: *EcoreEvas);
+    fn ecore_evas_callback_resize_set(ee: *EcoreEvas, func: _CEcoreEvasEventCb);
 }
 
 pub fn event_handler_add<T>(htype: EcoreEvent, 
@@ -200,4 +204,12 @@ pub fn evas_get(ee: &EcoreEvas) -> ~evas::Evas {
 /// Free an Ecore_Evas.
 pub fn evas_free(ee: &EcoreEvas) {
     unsafe { ecore_evas_free(ee) }
+}
+
+/// Set a callback for Ecore_Evas resize events.
+pub fn evas_callback_resize_set(ee: &EcoreEvas, func: EcoreEvasEventCb) {
+    unsafe {
+        let c_cb: _CEcoreEvasEventCb = transmute(func);
+        ecore_evas_callback_resize_set(ee, c_cb)
+    }
 }
