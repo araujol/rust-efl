@@ -18,7 +18,7 @@
 
 extern crate libc;
 
-use evas::libc::{c_int, c_char, c_void};
+use evas::libc::{c_int, c_uint, c_char, c_void};
 use std::cast::transmute;
 use std::option::Option;
 use std::ptr;
@@ -32,9 +32,86 @@ pub static EVAS_HINT_FILL: f64 = -1.0f64;
 pub enum Eo {}
 pub enum Evas {}
 
+/// The types of events triggering a callback.
+pub enum EvasCallbackType {
+    /// Mouse In Event
+    EvasCallbackMouseIn,
+    /// Mouse Out Event
+    EvasCallbackMouseOut,
+    /// Mouse Button Down Event
+    EvasCallbackMouseDown,
+    /// Mouse Button Up Event
+    EvasCallbackMouseUp,
+    /// Mouse Move Event
+    EvasCallbackMouseMove,
+    /// Mouse Wheel Event
+    EvasCallbackMouseWheel,
+    /// Multi-touch Down Event
+    EvasCallbackMultiDown,
+    /// Multi-touch Up Event
+    EvasCallbackMultiUp,
+    /// Multi-touch Move Event
+    EvasCallbackMultiMove,
+    /// Object Being Freed (Called after Del)
+    EvasCallbackFree,
+    /// Key Press Event
+    EvasCallbackKeyDown,
+    /// Key Release Event
+    EvasCallbackKeyUp,
+    /// Focus In Event
+    EvasCallbackFocusIn,
+    /// Focus Out Event
+    EvasCallbackFocusOut,
+    /// Show Event
+    EvasCallbackShow,
+    /// Hide Event
+    EvasCallbackHide,
+    /// Move Event
+    EvasCallbackMove,
+    /// Resize Event
+    EvasCallbackResize,
+    /// Restack Event
+    EvasCallbackRestack,
+    /// Object Being Deleted (called before Free)
+    EvasCallbackDel,
+    /// Events go on/off hold
+    EvasCallbackHold,
+    /// Size hints changed event
+    EvasCallbackChangedSizeHints,
+    /// Image has been preloaded
+    EvasCallbackImagePrealoaded,
+    /// Canvas got focus as a whole
+    EvasCallbackCanvasFocusIn,
+    /// Canvas lost focus as a whole
+    EvasCallbackCanvasFocusOut,
+    /// Called just before rendering is updated on the canvas target
+    EvasCallbackRenderFlushPre,
+    /// Called just after rendering is updated on the canvas target
+    EvasCallbackRenderFlushPost,
+    /// Canvas object got focus
+    EvasCallbackCanvasObjectFocusIn,
+    /// Canvas object lost focus
+    EvasCallbackCanvasObjectFocusOut,
+    /// Image data has been unloaded (by some mechanism in Evas that throw out original image data)
+    EvasCallbackImageUnloaded,
+    /// Called just before rendering starts on the canvas target
+    EvasCallbackRenderPre,
+    /// Called just after rendering stops on the canvas target
+    EvasCallbackRenderPost,
+    /// Image size is changed
+    EvasCallbackImageResize,
+    /// Devices added, removed or changed on canvas
+    EvasCallbackDeviceChanged,
+    /// kept as last element/sentinel -- not really an event
+    EvasCallbackLast
+}
+
 pub type EvasObject = Eo;
 
 pub type Coord = (int, int);
+
+pub type EvasObjectEventCb<T> = fn (&T, &Evas, &EvasObject, &eseful::EventInfo);
+type _CEvasObjectEventCb = fn (*c_void, *Evas, *EvasObject, *c_void);
 
 /* High level callback notation */
 pub type EvasSmartCb<T> = fn (&Option<T>, &EvasObject, &eseful::EventInfo) -> ();
@@ -72,6 +149,8 @@ extern "C"  {
     fn evas_object_image_size_set(obj: *EvasObject, w: c_int, h: c_int);
     fn evas_object_image_filled_set(obj: *EvasObject, setting: eina::EinaBool);
     fn evas_object_image_preload(obj: *EvasObject, cancel: eina::EinaBool);
+    fn evas_object_event_callback_add(obj: *EvasObject, cbtype: c_uint,
+                                      func: _CEvasObjectEventCb, data: *c_void);
     fn evas_object_smart_callback_add(e: *EvasObject, event: *c_char,
                                       cb: CEvasSmartCb, data: *c_void);
 }
@@ -202,6 +281,15 @@ pub fn object_image_filled_set(obj: &EvasObject, setting: bool) {
 pub fn object_image_preload(obj: &EvasObject, cancel: bool) {
     unsafe {
         evas_object_image_preload(obj, eseful::from_bool_to_eina(cancel))
+    }
+}
+
+/// Add (register) a callback function to a given Evas object event.
+pub fn object_event_callback_add<T>(obj: &EvasObject, cbtype: EvasCallbackType,
+                                    func: EvasObjectEventCb<T>, data: &T) {
+    unsafe {
+        evas_object_event_callback_add(obj, cbtype as c_uint,
+                                       transmute(func), transmute(data))
     }
 }
 

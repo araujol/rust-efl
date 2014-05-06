@@ -30,6 +30,7 @@ extern "C" {
     fn emotion_object_init(obj: *evas::EvasObject, module_filename: *c_char) -> u8;
     fn emotion_object_file_get(obj: *evas::EvasObject) -> *c_char;
     fn emotion_object_file_set(obj: *evas::EvasObject, filename: *c_char) -> u8;
+    fn emotion_object_play_get(obj: *evas::EvasObject) -> eina::EinaBool;
     fn emotion_object_play_set(obj: *evas::EvasObject, play: eina::EinaBool);
 }
 
@@ -57,6 +58,11 @@ pub fn object_file_set(obj: &evas::EvasObject, filename: &str) -> eina::EinaBool
     filename.with_c_str(|c_filename| unsafe {
         emotion_object_file_set(obj, c_filename) as eina::EinaBool
     })
+}
+
+/// Get play/pause state of the media file.
+pub fn object_play_get(obj: &evas::EvasObject) -> bool {
+    unsafe { eseful::from_eina_to_bool(emotion_object_play_get(obj)) }
 }
 
 /// Set play/pause state of the media file.
