@@ -11,18 +11,18 @@ fn main() {
     eina::init();
 
     let mut strlst: *mut eina::EinaList<&'static str> = 
-        eina::list_append(None, &&"Rust");
+        eina::list_append(None, &("Rust"));
 
     println!("Last Value? {}", eina::list_last_data_get(strlst));
     println!("Next Value? {}", eina::list_next(strlst));
     println!("Previous Value? {}", eina::list_prev(strlst));
 
     // Prepend a new node
-    strlst = eina::list_prepend(Some(strlst), &&"rust-efl");
+    strlst = eina::list_prepend(Some(strlst), &("rust-efl"));
     println!("First Value: {}", eina::list_data_get(strlst));
 
-    strlst = eina::list_append(Some(strlst), &&"EFL");
-    strlst = eina::list_append(Some(strlst), &&"Rust EFL!");
+    strlst = eina::list_append(Some(strlst), &("EFL"));
+    strlst = eina::list_append(Some(strlst), &("Rust EFL!"));
 
     let next =
         match eina::list_next(strlst) {
@@ -46,10 +46,10 @@ fn main() {
         };
 
     // Change first value
-    let v: &&'static str = &&"Rust Enlightenment";
+    let v: &&'static str = &("Rust Enlightenment");
     eina::list_data_set(strlst, v);
     // Change last value
-    let n: &&'static str = &&"EnLiGhTeNmEnT";
+    let n: &&'static str = &("EnLiGhTeNmEnT");
     eina::list_data_set(last, n);
 
     println!("First New Value: {}", eina::list_data_get(strlst));
@@ -57,13 +57,13 @@ fn main() {
     println!("Last New Value: {}", eina::list_last_data_get(strlst));
 
     // Change next value
-    let t = &&"Enlightenment through Rust!";
+    let t = &("Enlightenment through Rust!");
     println!("Old next: {}, changing!", eina::list_data_set(next, t));
     println!("Next value changed to: {}", eina::list_data_get(next));
 
     println!("List count: {}", eina::list_count(strlst));
     // Add new node
-    strlst = eina::list_append(Some(strlst), &&"e rust");
+    strlst = eina::list_append(Some(strlst), &("e rust"));
     println!("List new count: {}", eina::list_count(strlst));
     println!("New added value {}", eina::list_last_data_get(strlst));
 
