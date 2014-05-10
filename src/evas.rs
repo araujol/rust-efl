@@ -163,8 +163,8 @@ pub fn shutdown() -> int {
     unsafe { evas_shutdown() as int }
 }
 
-pub fn new() -> ~Evas {
-    unsafe { transmute::<*Evas, ~Evas>(evas_new()) }
+pub fn new() -> Box<Evas> {
+    unsafe { transmute(evas_new()) }
 }
 
 pub fn free(e: &Evas) {
@@ -230,14 +230,14 @@ pub fn object_show(e: &EvasObject) {
 }
 
 /// Creates a new image object on the given Evas e canvas.
-pub fn object_image_add(e: &Evas) -> ~EvasObject {
-    unsafe { cast_to_evas_obj(evas_object_image_add(e)) }
+pub fn object_image_add(e: &Evas) -> Box<EvasObject> {
+    unsafe { transmute(evas_object_image_add(e)) }
 }
 
 /// Creates a new image object that automatically scales its bound image to
 /// the object's area, on both axis.
-pub fn object_image_filled_add(e: &Evas) -> ~EvasObject {
-    unsafe { cast_to_evas_obj(evas_object_image_filled_add(e)) }
+pub fn object_image_filled_add(e: &Evas) -> Box<EvasObject> {
+    unsafe { transmute(evas_object_image_filled_add(e)) }
 }
 
 /// Set how to fill an image object's drawing rectangle given the (real)
@@ -304,11 +304,6 @@ pub fn object_smart_callback_add<T>(e: &EvasObject, event: &str,
     })
 }
 
-pub fn object_rectangle_add(e: &Evas) -> ~EvasObject {
-    unsafe { cast_to_evas_obj(evas_object_rectangle_add(e)) }
-}
-
-/* Utility functions */
-pub fn cast_to_evas_obj(ptr: *EvasObject) -> ~EvasObject {
-    unsafe { transmute::<*EvasObject, ~EvasObject>(ptr) }
+pub fn object_rectangle_add(e: &Evas) -> Box<EvasObject> {
+    unsafe { transmute(evas_object_rectangle_add(e)) }
 }

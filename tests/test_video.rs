@@ -28,25 +28,26 @@ fn playback_started(data: &Option<&str>,
 
 
 fn main() {    
-    let args: ~[~str] = os::args();
+    let args: Vec<~str> = os::args();
 
     let video_file: &str =
         if args.len() > 1 {
-            args[1]
+            args.get(1).clone()
         } else {
-            println!("No video file. Usage: {} <file>", args[0]);
+            println!("No video file. Usage: {} <file>", args.get(0));
             fail!()
         };
 
     ecore::evas_init();
-    let ee: ~ecore::EcoreEvas = ecore::evas_new(None, 10, 10, WIDTH, HEIGHT, "");
+    let ee: Box<ecore::EcoreEvas> =
+        ecore::evas_new(None, 10, 10, WIDTH, HEIGHT, "");
     ecore::evas_show(ee);
 
     /* Get the canvas */
-    let e: ~evas::Evas = ecore::evas_get(ee);
+    let e: Box<evas::Evas> = ecore::evas_get(ee);
 
     /* Add a white background */
-    let bg: ~evas::EvasObject  = evas::object_rectangle_add(e);
+    let bg: Box<evas::EvasObject>  = evas::object_rectangle_add(e);
     evas::object_name_set(bg, "video-rectangle");
     evas::object_color_set(bg, 255, 255, 255, 255);
     evas::object_move(bg, (0, 0));
@@ -54,7 +55,7 @@ fn main() {
     evas::object_show(bg);
 
     /* Set the media module to use */
-    let em: ~evas::EvasObject = emotion::object_add(e);
+    let em: Box<evas::EvasObject> = emotion::object_add(e);
     emotion::object_init(em, "gstreamer1");
 
     let data: Option<&str> = Some(video_file);

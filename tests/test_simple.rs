@@ -28,14 +28,14 @@ fn on_done(data: &Option<bool>,
 }
 
 fn main() {
-    let args: ~[~str] = os::args();
+    let args: Vec<~str> = os::args();
     let argc: uint = args.len();
 
     elementary::startup_time(ecore::time_unix_get());
     elementary::init(argc, args);
 
     /* Main Window */
-    let win: ~evas::EvasObject =
+    let win: Box<evas::EvasObject> =
         elementary::win_util_standard_add("Enlightenment", "Rust EFL");
     let data: Option<bool> = Some(true);
     evas::object_smart_callback_add(win, "delete,request",
@@ -43,7 +43,7 @@ fn main() {
     evas::object_move(win, (200, 100));
 
     /* Box Container */
-    let ebox: ~evas::EvasObject = elementary::box_add(win);
+    let ebox: Box<evas::EvasObject> = elementary::box_add(win);
     evas::object_size_hint_weight_set(ebox,
                                       evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
@@ -51,7 +51,7 @@ fn main() {
     evas::object_show(ebox);
 
     /* Label */
-    let lab: ~evas::EvasObject = elementary::label_add(win);
+    let lab: Box<evas::EvasObject> = elementary::label_add(win);
     elementary::object_text_set(lab, "Hello <b>Rust Enlightenment!</b>");
     elementary::box_pack_end(ebox, lab);
     evas::object_show(lab);

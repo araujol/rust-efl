@@ -101,7 +101,7 @@ pub fn shutdown() -> int {
 /// List contents of a directory without locking your app.
 pub fn file_ls<T>(dir: &str, filter_cb: EioFilterCb<T>,
                   main_cb: EioMainCb<T>, done_cb: EioDoneCb<T>,
-                  error_cb: EioErrorCb<T>, data: &T) -> ~EioFile {
+                  error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
     dir.with_c_str(|c_dir| unsafe {
         let c_filter_cb: _CEioFilterCb = transmute(filter_cb);
         let c_main_cb: _CEioMainCb = transmute(main_cb);
@@ -109,29 +109,27 @@ pub fn file_ls<T>(dir: &str, filter_cb: EioFilterCb<T>,
         let c_error_cb: _CEioErrorCb = transmute(error_cb);
         let c_data: *c_void = transmute(data);
 
-        transmute::<*EioFile,~EioFile>(
-            eio_file_ls(c_dir, c_filter_cb, c_main_cb,
-                        c_done_cb, c_error_cb, c_data))
+        transmute(eio_file_ls(c_dir, c_filter_cb, c_main_cb,
+                              c_done_cb, c_error_cb, c_data))
     })
 }
 
 /// Create a new directory.
 pub fn file_mkdir<T>(path: &str, mode: mode_t, done_cb: EioDoneCb<T>,
-                     error_cb: EioErrorCb<T>, data: &T) -> ~EioFile {
+                     error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
     path.with_c_str(|c_path| unsafe {
         let c_done_cb: _CEioDoneCb = transmute(done_cb);
         let c_error_cb: _CEioErrorCb = transmute(error_cb);
         let c_data: *c_void = transmute(data);
 
-        transmute::<*EioFile,~EioFile>(
-            eio_file_mkdir(c_path, mode, c_done_cb, c_error_cb, c_data))
+        transmute(eio_file_mkdir(c_path, mode, c_done_cb, c_error_cb, c_data))
     })
 }
 
 /// Move a file asynchronously.
 pub fn file_move<T>(source: &str, dest: &str, 
                     progress_cb: EioProgressCb<T>, done_cb: EioDoneCb<T>, 
-                    error_cb: EioErrorCb<T>, data: &T) -> ~EioFile {
+                    error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
     source.with_c_str(|c_source| unsafe {
         dest.with_c_str(|c_dest| {
             let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
@@ -139,9 +137,8 @@ pub fn file_move<T>(source: &str, dest: &str,
             let c_error_cb: _CEioErrorCb = transmute(error_cb);
             let c_data: *c_void = transmute(data);
 
-            transmute::<*EioFile,~EioFile>(
-                eio_file_move(c_source, c_dest, c_progress_cb, 
-                              c_done_cb, c_error_cb, c_data))
+            transmute(eio_file_move(c_source, c_dest, c_progress_cb,
+                                    c_done_cb, c_error_cb, c_data))
         })
     })
 }
@@ -149,7 +146,7 @@ pub fn file_move<T>(source: &str, dest: &str,
 /// Copy a file asynchronously.
 pub fn file_copy<T>(source: &str, dest: &str, 
                     progress_cb: EioProgressCb<T>, done_cb: EioDoneCb<T>, 
-                    error_cb: EioErrorCb<T>, data: &T) -> ~EioFile {
+                    error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
     source.with_c_str(|c_source| unsafe {
         dest.with_c_str(|c_dest| {
             let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
@@ -157,9 +154,8 @@ pub fn file_copy<T>(source: &str, dest: &str,
             let c_error_cb: _CEioErrorCb = transmute(error_cb);
             let c_data: *c_void = transmute(data);
 
-            transmute::<*EioFile,~EioFile>(
-                eio_file_copy(c_source, c_dest, c_progress_cb, 
-                              c_done_cb, c_error_cb, c_data))
+            transmute(eio_file_copy(c_source, c_dest, c_progress_cb,
+                                    c_done_cb, c_error_cb, c_data))
         })
     })
 }

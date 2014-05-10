@@ -48,10 +48,8 @@ pub fn shutdown() -> int {
 }
 
 /// Instantiate a new Edje object.
-pub fn object_add(evas: &evas::Evas) -> ~evas::EvasObject {
-    unsafe {
-        transmute::<*evas::EvasObject,~evas::EvasObject>(edje_object_add(evas))
-    }
+pub fn object_add(evas: &evas::Evas) -> Box<evas::EvasObject> {
+    unsafe { transmute(edje_object_add(evas)) }
 }
 
 /// Sets the EDJ file (and group within it) to load an Edje object's contents from.

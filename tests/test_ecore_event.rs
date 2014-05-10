@@ -39,7 +39,7 @@ fn exit_func<T>(data: &Option<T>,
 }
 
 fn main() {
-    let args: ~[~str] = os::args();
+    let args: Vec<~str> = os::args();
     let argc: uint = args.len();
 
     ecore::init();

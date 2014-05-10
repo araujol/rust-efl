@@ -8,7 +8,7 @@ use std::os;
 use efl::ecore;
 
 fn main() {
-    let args: ~[~str] = os::args();
+    let args: Vec<~str> = os::args();
     let argc: uint = args.len();
 
     ecore::init();

@@ -19,6 +19,7 @@
 extern crate libc;
 
 use std::str::raw::from_c_str;
+use std::cast::transmute;
 use emotion::libc::c_char;
 use evas;
 use eina;
@@ -35,8 +36,8 @@ extern "C" {
 }
 
 /// Add an emotion object to the canvas.
-pub fn object_add(evas: &evas::Evas) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(emotion_object_add(evas)) }
+pub fn object_add(evas: &evas::Evas) -> Box<evas::EvasObject> {
+    unsafe { transmute(emotion_object_add(evas)) }
 }
 
 /// Initializes an emotion object with the specified module.

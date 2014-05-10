@@ -20,7 +20,7 @@ extern crate libc;
 
 use std::str::raw::from_c_str;
 use std::ptr;
-use std::cast::forget;
+use std::cast::{forget, transmute};
 
 use elementary::libc::{c_int, c_uint, c_char};
 use evas;
@@ -175,7 +175,7 @@ extern "C" {
     fn elm_fileselector_entry_add(parent: *evas::EvasObject) -> *evas::EvasObject;
 }
 
-pub fn init(argc: uint, argv: ~[~str]) -> uint {
+pub fn init(argc: uint, argv: Vec<~str>) -> uint {
     let vchars_ptr: **c_char = eseful::get_c_args(argv);
 
     let ret = unsafe {
@@ -239,22 +239,21 @@ pub fn object_style_set(obj: &evas::EvasObject, style: &str) -> bool {
 /// Add a window object.
 /// If obj is None this is the first window created.
 pub fn win_add(obj: Option<&evas::EvasObject>, name: &str,
-               wtype: ElmWinType) -> ~evas::EvasObject {
+               wtype: ElmWinType) -> Box<evas::EvasObject> {
     name.with_c_str(|c_buf| unsafe {
         match obj {
             /* Null pointer */
-            None => evas::cast_to_evas_obj(elm_win_add(ptr::null(), c_buf, wtype as c_int)),
+            None => transmute(elm_win_add(ptr::null(), c_buf, wtype as c_int)),
             /* Add win to eobj parent */
-            Some(eobj) =>
-                evas::cast_to_evas_obj(elm_win_add(eobj, c_buf, wtype as c_int))
+            Some(eobj) => transmute(elm_win_add(eobj, c_buf, wtype as c_int))
         }
     })
 }
 
-pub fn win_util_standard_add(name: &str, title: &str) -> ~evas::EvasObject {
+pub fn win_util_standard_add(name: &str, title: &str) -> Box<evas::EvasObject> {
     name.with_c_str(|c_name| unsafe {
         title.with_c_str(|c_title| {
-            evas::cast_to_evas_obj(elm_win_util_standard_add(c_name, c_title))
+            transmute(elm_win_util_standard_add(c_name, c_title))
         })
     })
 }
@@ -285,8 +284,8 @@ pub fn win_title_set(obj: &evas::EvasObject, title: &str) {
 
 /* Box methods */
 /// Add a new box to the parent.
-pub fn box_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(elm_box_add(parent)) }
+pub fn box_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
+    unsafe { transmute(elm_box_add(parent)) }
 }
 
 /// Add an object to the beginning of the pack list.
@@ -314,14 +313,14 @@ pub fn box_padding_set(obj: &evas::EvasObject, p: evas::Coord) {
 
 /* Button methods */
 /// Add a new button to the parent's canvas.
-pub fn button_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(elm_button_add(parent)) }
+pub fn button_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
+    unsafe { transmute(elm_button_add(parent)) }
 }
 
 /* Check methods */
 /// Add a new Check object.
-pub fn check_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(elm_check_add(parent)) }
+pub fn check_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
+    unsafe { transmute(elm_check_add(parent)) }
 }
 
 /// Set the on/off state of the check object.
@@ -338,8 +337,8 @@ pub fn check_state_get(obj: &evas::EvasObject) -> bool {
 
 /* Entry methods */
 /// This adds an entry to parent object.
-pub fn entry_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(elm_entry_add(parent)) }
+pub fn entry_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
+    unsafe { transmute(elm_entry_add(parent)) }
 }
 
 /// Get whether the entry is empty.
@@ -375,8 +374,8 @@ pub fn entry_entry_set(obj: &evas::EvasObject, entry: &str) {
 
 /* Label methods */
 /// Add a new label to the parent.
-pub fn label_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(elm_label_add(parent)) }
+pub fn label_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
+    unsafe { transmute(elm_label_add(parent)) }
 }
 
 /// Set the slide mode of the label widget.
@@ -398,8 +397,8 @@ pub fn label_slide_go(obj: &evas::EvasObject) {
 }
 
 /* Date/Calendar methods */
-pub fn datetime_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(elm_datetime_add(parent)) }
+pub fn datetime_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
+    unsafe { transmute(elm_datetime_add(parent)) }
 }
 
 pub fn calendar_add(parent: &evas::EvasObject) -> *evas::EvasObject {
@@ -416,8 +415,8 @@ pub fn layout_sizing_eval(obj: &evas::EvasObject) {
 }
 
 /// Add a new background to the parent.
-pub fn bg_add(parent: &evas::EvasObject) -> ~evas::EvasObject {
-    unsafe { evas::cast_to_evas_obj(elm_bg_add(parent)) }
+pub fn bg_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
+    unsafe { transmute(elm_bg_add(parent)) }
 }
 
 pub fn bg_load_size_set(parent: &evas::EvasObject, c: evas::Coord) {

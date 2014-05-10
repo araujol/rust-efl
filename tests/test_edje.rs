@@ -125,12 +125,13 @@ fn main() {
     ecore::evas_init();
     edje::init();
 
-    let window: ~ecore::EcoreEvas = ecore::evas_new(None, 0, 0, WIDTH, HEIGHT, "");
+    let window: Box<ecore::EcoreEvas> =
+        ecore::evas_new(None, 0, 0, WIDTH, HEIGHT, "");
 
     let canvas = ecore::evas_get(window);
     
     /* Instantiate edje object */
-    let edje: ~evas::EvasObject = edje::object_add(canvas);
+    let edje: Box<evas::EvasObject> = edje::object_add(canvas);
 
     edje::object_file_set(edje, "./edje_example.edj", "my_example");
 

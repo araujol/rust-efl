@@ -34,7 +34,7 @@ pub static Empty: Option<()> = None;
 // Callbacks event.
 pub struct EventInfo;
 
-pub fn get_c_args(argv: ~[~str]) -> **c_char {
+pub fn get_c_args(argv: Vec<~str>) -> **c_char {
     let mut vcstrs: Vec<CString> = Vec::new();
     let mut vchars: Vec<*c_char> = Vec::new();
 

@@ -12,14 +12,14 @@ use efl::elementary;
 
 
 fn main() {
-    let args: ~[~str] = os::args();
+    let args: Vec<~str> = os::args();
     let argc: uint = args.len();
 
     let logo_file: &str =
         if args.len() > 1 {
-            args[1].clone()
+            args.get(1).clone()
         } else {
-            println!("No logo file. Usage: {} <file>", args[0]);
+            println!("No logo file. Usage: {} <file>", args.get(0));
             fail!()
         };
 

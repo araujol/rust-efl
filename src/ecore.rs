@@ -109,14 +109,9 @@ extern "C" {
 
 pub fn event_handler_add<T>(htype: EcoreEvent, 
                             func: EcoreEventHandlerCb<T>, 
-                            data: &Option<T>) -> ~EcoreEventHandler {
-    /* Transmute both data and Callback into the C representation */
-    let c_data: *c_void = unsafe { transmute(data) };
-    let c_func: CEcoreEventHandlerCb = unsafe { transmute(func) };
-
+                            data: &Option<T>) -> Box<EcoreEventHandler> {
     unsafe { 
-        let eh = ecore_event_handler_add(htype as c_int, c_func, c_data); 
-        transmute::<*EcoreEventHandler,~EcoreEventHandler>(eh)
+        transmute(ecore_event_handler_add(htype as c_int, transmute(func), transmute(data)))
     }
 }
 
@@ -124,7 +119,7 @@ pub fn init() -> i32 {
     unsafe { ecore_init() as i32 }
 }
 
-pub fn app_args_set(argc: uint, argv: ~[~str]) {
+pub fn app_args_set(argc: uint, argv: Vec<~str>) {
     let vchars_ptr: **c_char = get_c_args(argv);
     unsafe {
         ecore_app_args_set(argc as c_int, vchars_ptr);
@@ -174,9 +169,9 @@ pub fn evas_shutdown() -> int {
 pub fn evas_new(engine_name: Option<&str>,
                 x: int, y: int,
                 w: int, h: int,
-                extra_options: &str) -> ~EcoreEvas {
+                extra_options: &str) -> Box<EcoreEvas> {
     unsafe {
-        transmute::<*EcoreEvas, ~EcoreEvas>(match engine_name {
+        transmute(match engine_name {
             /* Null pointer */
             None =>
                 extra_options.with_c_str(|c_extra_options| {
@@ -200,10 +195,8 @@ pub fn evas_show(ee: &EcoreEvas) {
 }
 
 /// Get an Ecore_Evas's Evas.
-pub fn evas_get(ee: &EcoreEvas) -> ~evas::Evas {
-    unsafe {
-        transmute::<*evas::Evas, ~evas::Evas>(ecore_evas_get(ee))
-    }
+pub fn evas_get(ee: &EcoreEvas) -> Box<evas::Evas> {
+    unsafe { transmute(ecore_evas_get(ee)) }
 }
 
 /// Free an Ecore_Evas.
@@ -234,7 +227,7 @@ pub fn evas_data_set<T>(ee: &EcoreEvas, key: &str, data: &T) {
 }
 
 /// Retrieve user data associated with an Ecore_Evas.
-pub fn evas_data_get<T>(ee: &EcoreEvas, key: &str) -> ~T {
+pub fn evas_data_get<T>(ee: &EcoreEvas, key: &str) -> Box<T> {
     key.with_c_str(|c_key| unsafe {
         transmute(ecore_evas_data_get(ee, c_key))
     })

@@ -105,16 +105,16 @@ pub fn shutdown() -> int { unsafe { eet_shutdown() as int } }
 pub fn clearcache() { unsafe { eet_clearcache() } }
 
 /// Open an eet file on disk, and returns a handle to it.
-pub fn open(file: &str, mode: EetFileMode) -> ~EetFile {
+pub fn open(file: &str, mode: EetFileMode) -> Box<EetFile> {
     file.with_c_str(|c_file| unsafe {
-        transmute::<*EetFile,~EetFile>(eet_open(c_file, mode as c_uint))
+        transmute(eet_open(c_file, mode as c_uint))
     })
 }
 
 /// Read a specified entry from an eet file and return data.
-pub fn read<T>(ef: &EetFile, name: &str, size_ret: &mut i32) -> ~T {
+pub fn read<T>(ef: &EetFile, name: &str, size_ret: &mut i32) -> Box<T> {
     name.with_c_str(|c_name| unsafe {
-        transmute::<*c_void,~T>(eet_read(ef, c_name, size_ret))
+        transmute::<*c_void,Box<T>>(eet_read(ef, c_name, size_ret))
     })
 }
 

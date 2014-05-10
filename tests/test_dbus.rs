@@ -44,12 +44,12 @@ fn main() {
     ecore::init();
     eldbus::init();
 
-    let conn: ~eldbus::EldbusConnection =
+    let conn: Box<eldbus::EldbusConnection> =
         eldbus::connection_get(eldbus::EldbusConnectionTypeSystem);
 
-    let obj: ~eldbus::EldbusObject =
+    let obj: Box<eldbus::EldbusObject> =
         eldbus::object_get(conn, "org.freedesktop.DBus", "/");
-    //let obj: ~eldbus::EldbusObject =
+    //let obj: Box<eldbus::EldbusObject> =
     //    eldbus::object_get(conn, "org.freedesktop.Avahi", "/");
 
     let manager: &eldbus::EldbusProxy = eldbus::proxy_get(obj, "org.freedesktop.DBus.Introspectable");

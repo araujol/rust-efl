@@ -43,7 +43,7 @@ fn on_enter(data: &Option<&evas::EvasObject>,
     }
 }
 
-fn on_clicked(data: &Option<~OnClickedData>,
+fn on_clicked(data: &Option<Box<OnClickedData>>,
               e: &evas::EvasObject,
               event_info: &EventInfo) {
     match *data {
@@ -58,20 +58,20 @@ fn on_clicked(data: &Option<~OnClickedData>,
 }
 
 fn main() {
-    let args: ~[~str] = os::args();
+    let args: Vec<~str> = os::args();
     let argc: uint = args.len();
 
     elementary::startup_time(ecore::time_unix_get());
     elementary::init(argc, args);
 
     /* Main Window */
-    let win: ~evas::EvasObject =
+    let win: Box<evas::EvasObject> =
         elementary::win_util_standard_add("Rust EFL", "Rust EFL");
     evas::object_move(win, (200, 100));
     evas::object_smart_callback_add(win, "delete,request", on_done, &Empty);
 
     /* Box Container */
-    let ebox: ~evas::EvasObject = elementary::box_add(win);
+    let ebox: Box<evas::EvasObject> = elementary::box_add(win);
     evas::object_size_hint_weight_set(ebox,
                                       evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
@@ -79,13 +79,13 @@ fn main() {
     evas::object_show(ebox);
 
     /* Label */
-    let lab: ~evas::EvasObject = elementary::label_add(win);
+    let lab: Box<evas::EvasObject> = elementary::label_add(win);
     elementary::object_text_set(lab, " -- Enter Text --");
     elementary::box_pack_end(ebox, lab);
     evas::object_show(lab);
 
     /* Entry */
-    let ent: ~evas::EvasObject = elementary::entry_add(win);
+    let ent: Box<evas::EvasObject> = elementary::entry_add(win);
     elementary::entry_scrollable_set(ent, true);
     elementary::entry_single_line_set(ent, true);
     evas::object_size_hint_weight_set(ent,
@@ -115,8 +115,8 @@ fn main() {
 
     /* Share both the 'label' and 'entry' objects with the button callback */
     let e: &evas::EvasObject = ent;
-    let onclicked_data: Option<~OnClickedData> = 
-        Some(~OnClickedData {
+    let onclicked_data: Option<Box<OnClickedData>> =
+        Some(box OnClickedData {
             label: l,
             entry: e
         });

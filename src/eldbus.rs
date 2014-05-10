@@ -88,27 +88,25 @@ pub fn init() -> int { unsafe { eldbus_init() as int } }
 pub fn shutdown() -> int { unsafe { eldbus_shutdown() as int } }
 
 /// Establish a connection to bus and integrate it with the ecore main loop.
-pub fn connection_get(conn_type: EldbusConnectionType) -> ~EldbusConnection {
+pub fn connection_get(conn_type: EldbusConnectionType) -> Box<EldbusConnection> {
     unsafe { 
-        transmute::<*EldbusConnection,~EldbusConnection>(
-            eldbus_connection_get(conn_type as c_uint)) 
+        transmute(eldbus_connection_get(conn_type as c_uint))
     }
 }
 
 /// Get an object of the given bus and path.
-pub fn object_get(conn: &EldbusConnection, bus: &str, path: &str) -> ~EldbusObject {
+pub fn object_get(conn: &EldbusConnection, bus: &str, path: &str) -> Box<EldbusObject> {
     bus.with_c_str(|c_bus| unsafe {
         path.with_c_str(|c_path| {
-            transmute::<*EldbusObject,~EldbusObject>(
-                eldbus_object_get(conn, c_bus, c_path))
+            transmute(eldbus_object_get(conn, c_bus, c_path))
         })
     })
 }
 
 /// Get a proxy of the following interface name in a EldbusObject.
-pub fn proxy_get(obj: &EldbusObject, interface: &str) -> ~EldbusProxy {
+pub fn proxy_get(obj: &EldbusObject, interface: &str) -> Box<EldbusProxy> {
     interface.with_c_str(|c_interface| unsafe {
-        transmute::<*EldbusProxy,~EldbusProxy>(eldbus_proxy_get(obj, c_interface))
+        transmute(eldbus_proxy_get(obj, c_interface))
     })
 }
 
@@ -132,15 +130,12 @@ pub fn connection_unref(conn: &EldbusConnection) {
 /// To send data values, use the proxy_call! macro.
 pub fn proxy_call<T>(proxy: &EldbusProxy, member: &str,
                      cb: EldbusMessageCb<T>, cb_data: &T,
-                     timeout: f64, signature: &str) -> ~EldbusPending {
+                     timeout: f64, signature: &str) -> Box<EldbusPending> {
     member.with_c_str(|c_member| unsafe {
         signature.with_c_str(|c_signature| {
-            let c_cb: _CEldbusMessageCb = transmute(cb);
-            let c_cb_data: *c_void = transmute(cb_data);
-            transmute::<*EldbusPending,~EldbusPending>(
-                eldbus_proxy_call(transmute::<&EldbusProxy,*EldbusProxy>(proxy),
-                                  c_member, c_cb, c_cb_data, timeout as c_double,
-                                  c_signature))
+            transmute(eldbus_proxy_call(proxy, c_member,
+                                        transmute(cb), transmute(cb_data),
+                                        timeout as c_double, c_signature))
         })
     })
 }
@@ -212,12 +207,12 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut ~str>, text: Opt
 macro_rules! proxy_call(
     ($proxy:ident, $member:ident, $cb:ident, $cb_data:ident, $timeout:ident, $signature:ident $(, $obj:ident)*) => (
         $member.with_c_str(|c_member| unsafe {
-            use std::cast;
+            use std::cast::transmute;
             use efl::eldbus;
             $signature.with_c_str(|c_signature| {
-                let c_cb: eldbus::_CEldbusMessageCb = cast::transmute($cb);
-                let c_cb_data: *eldbus::c_void = cast::transmute($cb_data);
-                cast::transmute::<*eldbus::EldbusPending,~eldbus::EldbusPending>(eldbus::eldbus_proxy_call(cast::transmute::<&eldbus::EldbusProxy,*eldbus::EldbusProxy>($proxy), c_member, c_cb, c_cb_data, $timeout as eldbus::c_double, c_signature $(, $obj)*))
+                let c_cb: eldbus::_CEldbusMessageCb = transmute($cb);
+                let c_cb_data: *eldbus::c_void = transmute($cb_data);
+                transmute::<*eldbus::EldbusPending,Box<eldbus::EldbusPending>>(eldbus::eldbus_proxy_call(transmute::<&eldbus::EldbusProxy,*eldbus::EldbusProxy>($proxy), c_member, c_cb, c_cb_data, $timeout as eldbus::c_double, c_signature $(, $obj)*))
             })
         })
     );
