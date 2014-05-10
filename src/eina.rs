@@ -16,11 +16,14 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 extern crate libc;
+extern crate core;
 
 use std::cast::transmute;
 use std::ptr;
-use std::option::{Option};
+use std::option::Option;
+use eina::core::mem::uninit;
 use eina::libc::{c_void, c_int, c_uint};
+
 
 pub type EinaBool = u8;
 pub static EINA_FALSE: EinaBool = 0u8;
@@ -63,6 +66,20 @@ struct _CEinaListAccounting {
     __magic: _CEinaMagic
 }
 
+/// Inlined list type.
+pub struct EinaInlist {
+    _eo: *_EinaInlist
+}
+
+pub struct _EinaInlist {
+    /// Next node
+    next: *_EinaInlist,
+    /// Previous node
+    prev: *_EinaInlist,
+    /// Last node
+    last: *_EinaInlist
+}
+
 #[link(name = "eina")]
 extern "C" {
     fn eina_init() -> c_int;
@@ -70,6 +87,12 @@ extern "C" {
     fn eina_list_free(list: *_CEinaList) -> *_CEinaList;
     fn eina_list_append(list: *_CEinaList, data: *c_void) -> *_CEinaList;
     fn eina_list_prepend(list: *_CEinaList, data: *c_void) -> *_CEinaList;
+    /* Inline list type */
+    fn eina_inlist_append(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
+    fn eina_inlist_prepend(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
+    fn eina_inlist_promote(list: *_EinaInlist, item: *_EinaInlist) -> *_EinaInlist;
+    fn eina_inlist_demote(list: *_EinaInlist, item: *_EinaInlist) -> *_EinaInlist;
+    fn eina_inlist_remove(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
 }
 
 /// Initialize the Eina library.
@@ -178,3 +201,80 @@ pub fn list_last_data_get<'r, T>(list: *mut EinaList<'r, T>) -> Option<&'r T> {
         Some(last) => list_data_get(last)
     }
 }
+
+/* Inline list functions */
+
+/// Add a new node to end of a list.
+pub fn inlist_append(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+    EinaInlist {
+        _eo: unsafe {
+            match in_list {
+                None => eina_inlist_append(ptr::null(), in_item),
+                Some(lst) => eina_inlist_append(lst._eo, in_item)
+            }
+        }
+    }
+}
+
+/// Add a new node to beginning of list.
+pub fn inlist_prepend(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+    EinaInlist {
+        _eo: unsafe {
+            match in_list {
+                None => eina_inlist_prepend(ptr::null(), in_item),
+                Some(lst) => eina_inlist_prepend(lst._eo, in_item)
+            }
+        }
+    }
+}
+
+/// Move existing node to beginning of list.
+pub fn inlist_promote(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+    EinaInlist {
+        _eo: unsafe {
+            match in_list {
+                None => eina_inlist_promote(ptr::null(), in_item),
+                Some(lst) => eina_inlist_promote(lst._eo, in_item)
+            }
+        }
+    }
+}
+
+/// Move existing node to end of list.
+pub fn inlist_demote(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+    EinaInlist {
+        _eo: unsafe {
+            match in_list {
+                None => eina_inlist_demote(ptr::null(), in_item),
+                Some(lst) => eina_inlist_demote(lst._eo, in_item)
+            }
+        }
+    }
+}
+
+/// Remove node from list.
+pub fn inlist_remove(in_list: EinaInlist, in_item: *_EinaInlist) -> EinaInlist {
+    EinaInlist {
+        _eo: unsafe { eina_inlist_remove(in_list._eo, in_item) }
+    }
+}
+
+/// Get the container object of an in_list.
+pub fn inlist_container_get<T>(in_list: EinaInlist) -> &T {
+    unsafe { transmute(in_list._eo) }
+}
+
+/// Convenient function for object allocation.
+#[inline]
+pub fn object<T>() -> T {
+    unsafe { uninit::<T>() }
+}
+
+/// Macro to get the inlist object of a struct.
+#[macro_export]
+macro_rules! inlist_get(
+    ($inlist:ident) => (unsafe {
+        use std::cast::transmute;
+        transmute(&($inlist.__in_list))
+    })
+)
