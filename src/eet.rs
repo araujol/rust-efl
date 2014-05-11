@@ -17,8 +17,10 @@
 
 
 extern crate libc;
+extern crate core;
 
 use eet::libc::{c_int, c_uint, c_char, c_void};
+use eet::core::num::FromPrimitive;
 use std::cast::transmute;
 
 
@@ -34,52 +36,27 @@ pub enum EetFileMode {
     EetFileModeReadWrite	
 }
 
-#[deriving(Show)]
+#[deriving(Show, FromPrimitive)]
 pub enum EetError {
-  EetErrorNone, 
-  EetErrorBadObject,
-  EetErrorEmpty,
-  EetErrorNotWritable,
-  EetErrorOutOfMemory,
-  EetErrorWriteError,
-  EetErrorWriteErrorFileTooBig,
-  EetErrorWriteErrorIOError,
-  EetErrorWriteErrorOutOfSpace,
-  EetErrorWriteErrorFileClosed,
-  EetErrorMmapFailed,
-  EetErrorX509EncodingFailed,
-  EetErrorSignatureFailed,
-  EetErrorInvalidSignature,
-  EetErrorNotSigned,
-  EetErrorNotImplemented,
-  EetErrorPrngNotSeeded,
-  EetErrorEncryptFailed,
-  EetErrorDecryptFailed
-}
-
-fn return_eet_error(c: u32) -> EetError {
-    match c {
-        0 => EetErrorNone, 
-        1 => EetErrorBadObject,
-        2 => EetErrorEmpty,
-        3 => EetErrorNotWritable,
-        4 => EetErrorOutOfMemory,
-        5 => EetErrorWriteError,
-        6 => EetErrorWriteErrorFileTooBig,
-        7 => EetErrorWriteErrorIOError,
-        8 => EetErrorWriteErrorOutOfSpace,
-        9 => EetErrorWriteErrorFileClosed,
-        10 => EetErrorMmapFailed,
-        11 => EetErrorX509EncodingFailed,
-        12 => EetErrorSignatureFailed,
-        13 => EetErrorInvalidSignature,
-        14 => EetErrorNotSigned,
-        15 => EetErrorNotImplemented,
-        16 => EetErrorPrngNotSeeded,
-        17 => EetErrorEncryptFailed,
-        18 => EetErrorDecryptFailed,
-        _ => fail!("Not valid EetError")
-    }
+    EetErrorNone,
+    EetErrorBadObject,
+    EetErrorEmpty,
+    EetErrorNotWritable,
+    EetErrorOutOfMemory,
+    EetErrorWriteError,
+    EetErrorWriteErrorFileTooBig,
+    EetErrorWriteErrorIOError,
+    EetErrorWriteErrorOutOfSpace,
+    EetErrorWriteErrorFileClosed,
+    EetErrorMmapFailed,
+    EetErrorX509EncodingFailed,
+    EetErrorSignatureFailed,
+    EetErrorInvalidSignature,
+    EetErrorNotSigned,
+    EetErrorNotImplemented,
+    EetErrorPrngNotSeeded,
+    EetErrorEncryptFailed,
+    EetErrorDecryptFailed
 }
 
 #[link(name = "eet")]
@@ -118,20 +95,22 @@ pub fn read<T>(ef: &EetFile, name: &str, size_ret: &mut i32) -> Box<T> {
     })
 }
 
+/// Write a specified entry to an eet file handle.
 pub fn write<T>(ef: &EetFile, name: &str, data: &T,
                 size: uint, compress: int) -> int {
     name.with_c_str(|c_name| unsafe {
-        let c_data: *c_void = transmute(data);
-        eet_write(ef, c_name, c_data, size as c_uint, compress as c_int) as int
+        eet_write(ef, c_name, transmute(data), size as c_uint, compress as c_int) as int
     })
 }
 
 //// Close an eet file handle and flush pending writes.
 pub fn close(ef: &EetFile) -> EetError {
-    unsafe { return_eet_error(eet_close(ef)) }
+    let v: Option<EetError> = FromPrimitive::from_u32(unsafe { eet_close(ef) });
+    v.unwrap()
 }
 
 /// Sync content of an eet file handle, flushing pending writes.
 pub fn sync(ef: &EetFile) -> EetError {
-    unsafe { return_eet_error(eet_sync(ef)) }
+    let v: Option<EetError> = FromPrimitive::from_u32(unsafe { eet_sync(ef) });
+    v.unwrap()
 }
