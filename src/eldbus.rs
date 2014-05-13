@@ -18,7 +18,7 @@
 
 extern crate libc;
 
-use std::cast::transmute;
+use std::mem::transmute;
 use std::c_str::CString;
 use std::option::Option;
 use std::ptr;
@@ -207,7 +207,7 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut ~str>, text: Opt
 macro_rules! proxy_call(
     ($proxy:ident, $member:ident, $cb:ident, $cb_data:ident, $timeout:ident, $signature:ident $(, $obj:ident)*) => (
         $member.with_c_str(|c_member| unsafe {
-            use std::cast::transmute;
+            use std::mem::transmute;
             use efl::eldbus;
             $signature.with_c_str(|c_signature| {
                 let c_cb: eldbus::_CEldbusMessageCb = transmute($cb);

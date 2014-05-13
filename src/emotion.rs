@@ -19,7 +19,7 @@
 extern crate libc;
 
 use std::str::raw::from_c_str;
-use std::cast::transmute;
+use std::mem::transmute;
 use emotion::libc::c_char;
 use evas;
 use eina;

@@ -18,8 +18,8 @@
 extern crate libc;
 extern crate core;
 
-use std::cast::transmute;
 use std::ptr;
+use std::mem::transmute;
 use std::option::Option;
 use eina::core::mem::uninit;
 use eina::libc::{c_void, c_int, c_uint};
@@ -29,28 +29,33 @@ pub type EinaBool = u8;
 pub static EINA_FALSE: EinaBool = 0u8;
 pub static EINA_TRUE:  EinaBool = 1u8;
 
-type EinaMagic = uint;
+type _EinaMagic = uint;
 type _CEinaMagic = c_uint;
 
-/// Rust 'higher-level' representation of an Eina_List.
+/// EinaList object
 pub struct EinaList<'r, T> {
-    pub data: &'r T,
-    pub next: *mut EinaList<'r, T>,
-    pub prev: *mut EinaList<'r, T>,
-    pub accounting: *EinaListAccounting<'r, T>,
-
-    __magic: EinaMagic
+    _eo: *mut _EinaList<'r, T>
 }
 
-pub struct EinaListAccounting<'r, T> {
-    pub last: *mut EinaList<'r, T>,
-    pub count: uint,
+/// Representation of an Eina_List.
+pub struct _EinaList<'r, T> {
+    data: &'r T,
+    next: *mut _EinaList<'r, T>,
+    prev: *mut _EinaList<'r, T>,
+    accounting: *_EinaListAccounting<'r, T>,
 
-    __magic: EinaMagic
+    __magic: _EinaMagic
+}
+
+pub struct _EinaListAccounting<'r, T> {
+    last: *mut _EinaList<'r, T>,
+    count: uint,
+
+    __magic: _EinaMagic
 }
 
 /// C representation of an Eina_List.
-struct _CEinaList {
+pub struct _CEinaList {
     data: *c_void,
     next: *_CEinaList,
     prev: *_CEinaList,
@@ -59,7 +64,7 @@ struct _CEinaList {
     __magic: _CEinaMagic
 }
 
-struct _CEinaListAccounting {
+pub struct _CEinaListAccounting {
     last: *_CEinaList,
     count: c_uint,
 
@@ -95,6 +100,28 @@ extern "C" {
     fn eina_inlist_remove(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
 }
 
+impl<'r, T> EinaList<'r, T> {
+    /// Create high level EinaList object
+    pub fn new(el: *mut _EinaList<'r, T>) -> EinaList<'r, T> {
+        EinaList { _eo: el }
+    }
+
+}
+
+/// EinaList implements the Iterator trait
+impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
+
+    fn next(&mut self) -> Option<&'r T> {
+        let v = list_data_get(self._eo);
+        *self = match list_next(self._eo) {
+            None => EinaList { _eo: ptr::mut_null() },
+            Some(l) => EinaList { _eo: l }
+        };
+        return v
+    }
+
+}
+
 /// Initialize the Eina library.
 pub fn init() -> int { unsafe { eina_init() as int } }
 
@@ -102,51 +129,51 @@ pub fn init() -> int { unsafe { eina_init() as int } }
 pub fn shutdown() -> int { unsafe { eina_shutdown() as int } }
 
 /// Free an entire list and all the nodes, ignoring the data contained.
-pub fn list_free<T>(list: *mut EinaList<T>) -> *mut EinaList<T> {
+pub fn list_free<T>(list: *mut _EinaList<T>) -> *mut _EinaList<T> {
     unsafe {
-        transmute::<*_CEinaList,*mut EinaList<T>>(
-            eina_list_free(transmute::<*mut EinaList<T>,*_CEinaList>(list)))
+        transmute::<*_CEinaList,*mut _EinaList<T>>(
+            eina_list_free(transmute::<*mut _EinaList<T>,*_CEinaList>(list)))
     }
 }
 
 /// Append the given data to the given linked list.
 /// This function appends data to list. If list is 'None', a new list is returned.
-pub fn list_append<T>(list: Option<*mut EinaList<T>>, data: &T) -> *mut EinaList<T> {
+pub fn list_append<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
     unsafe {
         let c_data: *c_void = transmute(data);
         match list {
-            None => transmute::<*_CEinaList,*mut EinaList<T>>(
+            None => transmute::<*_CEinaList,*mut _EinaList<T>>(
                 eina_list_append(ptr::null(), c_data)),
-            Some(l) => transmute::<*_CEinaList,*mut EinaList<T>>(
-                eina_list_append(transmute::<*mut EinaList<T>,*_CEinaList>(l), c_data))
+            Some(l) => transmute::<*_CEinaList,*mut _EinaList<T>>(
+                eina_list_append(transmute::<*mut _EinaList<T>,*_CEinaList>(l), c_data))
         }
     }
 }
 
 /// Prepends the given data to the given linked list.
 /// This function prepends data to list. If list is 'None', a new list is returned.
-pub fn list_prepend<T>(list: Option<*mut EinaList<T>>, data: &T) -> *mut EinaList<T> {
+pub fn list_prepend<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
     unsafe {
         let c_data: *c_void = transmute(data);
         match list {
-            None => transmute::<*_CEinaList,*mut EinaList<T>>(
+            None => transmute::<*_CEinaList,*mut _EinaList<T>>(
                 eina_list_prepend(ptr::null(), c_data)),
-            Some(l) => transmute::<*_CEinaList,*mut EinaList<T>>(
-                eina_list_prepend(transmute::<*mut EinaList<T>,*_CEinaList>(l), c_data))
+            Some(l) => transmute::<*_CEinaList,*mut _EinaList<T>>(
+                eina_list_prepend(transmute::<*mut _EinaList<T>,*_CEinaList>(l), c_data))
         }
     }
 }
 
 /// Get the list node data member.
 #[inline]
-pub fn list_data_get<'r, T>(list: *mut EinaList<'r, T>) -> Option<&'r T> {
+pub fn list_data_get<'r, T>(list: *mut _EinaList<'r, T>) -> Option<&'r T> {
     if list.is_null() { return None }
     unsafe { Some((*list).data) }
 }
 
 /// Set the list node data member.
 #[inline]
-pub fn list_data_set<'r, T>(list: *mut EinaList<'r, T>, new_data: &'r T) -> Option<&'r T> {
+pub fn list_data_set<'r, T>(list: *mut _EinaList<'r, T>, new_data: &'r T) -> Option<&'r T> {
     if list.is_null() { return None }
     unsafe {
         let olddata = (*list).data;
@@ -157,14 +184,14 @@ pub fn list_data_set<'r, T>(list: *mut EinaList<'r, T>, new_data: &'r T) -> Opti
 
 /// Get the last list node in the list.
 #[inline]
-pub fn list_last<'a, T>(list: *mut EinaList<'a, T>) -> Option<*mut EinaList<'a, T>> {
+pub fn list_last<'a, T>(list: *mut _EinaList<'a, T>) -> Option<*mut _EinaList<'a, T>> {
     if list.is_null() { return None }
     unsafe { Some((*(*list).accounting).last) }
 }
 
 /// Get the next list node after the specified list node.
 #[inline]
-pub fn list_next<'a, T>(list: *mut EinaList<'a, T>) -> Option<*mut EinaList<'a, T>> {
+pub fn list_next<'a, T>(list: *mut _EinaList<'a, T>) -> Option<*mut _EinaList<'a, T>> {
     if list.is_null() { return None }
     unsafe {
         // Let's be nice and return None for nullable next
@@ -175,7 +202,7 @@ pub fn list_next<'a, T>(list: *mut EinaList<'a, T>) -> Option<*mut EinaList<'a, 
 
 /// Get the previous list node before the specified list node.
 #[inline]
-pub fn list_prev<'a, T>(list: *mut EinaList<'a, T>) -> Option<*mut EinaList<'a, T>> {
+pub fn list_prev<'a, T>(list: *mut _EinaList<'a, T>) -> Option<*mut _EinaList<'a, T>> {
     if list.is_null() { return None }
     unsafe {
         // Let's be nice and return None for nullable prev
@@ -186,7 +213,7 @@ pub fn list_prev<'a, T>(list: *mut EinaList<'a, T>) -> Option<*mut EinaList<'a, 
 
 /// Get the count of the number of items in a list.
 #[inline]
-pub fn list_count<'r, T>(list: *mut EinaList<'r, T>) -> uint {
+pub fn list_count<'r, T>(list: *mut _EinaList<'r, T>) -> uint {
     if list.is_null() { return 0 }
     unsafe {
         (*(*list).accounting).count
@@ -195,7 +222,7 @@ pub fn list_count<'r, T>(list: *mut EinaList<'r, T>) -> uint {
 
 /// Convenient function to get the last list node data member.
 #[inline]
-pub fn list_last_data_get<'r, T>(list: *mut EinaList<'r, T>) -> Option<&'r T> {
+pub fn list_last_data_get<'r, T>(list: *mut _EinaList<'r, T>) -> Option<&'r T> {
     match list_last(list) {
         None => None,
         Some(last) => list_data_get(last)
@@ -274,7 +301,7 @@ pub fn object<T>() -> T {
 #[macro_export]
 macro_rules! inlist_get(
     ($inlist:ident) => (unsafe {
-        use std::cast::transmute;
+        use std::mem::transmute;
         transmute(&($inlist.__in_list))
     })
 )

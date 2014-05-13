@@ -23,7 +23,7 @@
 extern crate libc;
 
 use std::c_str::{CString};
-use std::cast::forget;
+use std::mem::forget;
 
 use eseful::libc::c_char;
 use eina;

@@ -10,7 +10,7 @@ fn main() {
 
     eina::init();
 
-    let mut strlst: *mut eina::EinaList<&'static str> = 
+    let mut strlst: *mut eina::_EinaList<&'static str> =
         eina::list_append(None, &("Rust"));
 
     println!("Last Value? {}", eina::list_last_data_get(strlst));

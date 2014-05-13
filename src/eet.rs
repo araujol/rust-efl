@@ -21,7 +21,7 @@ extern crate core;
 
 use eet::libc::{c_int, c_uint, c_char, c_void};
 use eet::core::num::FromPrimitive;
-use std::cast::transmute;
+use std::mem::transmute;
 
 
 pub enum EetFile {}

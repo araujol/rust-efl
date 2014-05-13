@@ -5,7 +5,7 @@
 extern crate efl;
 
 use std::os;
-use std::cast::transmute;
+use std::mem::transmute;
 use std::option::{Option};
 
 use efl::ecore;

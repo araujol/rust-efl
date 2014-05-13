@@ -20,7 +20,7 @@ extern crate libc;
 
 use std::str::raw::from_c_str;
 use std::ptr;
-use std::cast::{forget, transmute};
+use std::mem::{forget, transmute};
 
 use elementary::libc::{c_int, c_uint, c_char};
 use evas;

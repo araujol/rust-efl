@@ -6,12 +6,9 @@ extern crate libc;
 extern crate efl;
 
 use libc::c_char;
-use std::cast::transmute;
+use std::mem::{transmute, size_of_val};
 use std::c_str::CString;
-use std::mem::size_of_val;
-
 use efl::eet;
-
 
 fn main() {
 

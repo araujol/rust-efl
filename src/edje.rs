@@ -18,7 +18,7 @@
 extern crate libc;
 
 use edje::libc::{c_int, c_char};
-use std::cast::transmute;
+use std::mem::transmute;
 
 use evas;
 use eina;

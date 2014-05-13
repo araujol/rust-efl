@@ -18,10 +18,9 @@
 
 extern crate libc;
 
-use std::cast::forget;
-use std::cast::transmute;
 use std::ptr;
 use std::option::{Option};
+use std::mem::{transmute, forget};
 
 use ecore::libc::{c_int, c_char, c_void};
 use eseful::{get_c_args, EventInfo};

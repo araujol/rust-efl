@@ -19,7 +19,7 @@
 extern crate libc;
 
 use evas::libc::{c_int, c_uint, c_char, c_void};
-use std::cast::transmute;
+use std::mem::transmute;
 use std::option::Option;
 use std::ptr;
 
