@@ -36,7 +36,7 @@ pub struct EetValue<T> {
 }
 
 impl<T> EetValue<T> {
-    pub fn getVal(&self) -> *T { unsafe { self._value } }
+    pub fn getVal(&self) -> *T { self._value }
 }
 
 #[unsafe_destructor]
