@@ -16,7 +16,7 @@ fn main() {
     eet::init();
     
     // Open and write
-    let mut ef: Box<eet::EetFile> = eet::open("test.eet", eet::EetFileModeWrite);
+    let mut ef: eet::EetFile = eet::open("test.eet", eet::EetFileModeWrite);
     // Write compressed string
     let s = "Hello Eet!";
     // Apply some magic for proper C string conversion
@@ -38,19 +38,17 @@ fn main() {
     ef = eet::open("test.eet", eet::EetFileModeRead);
     let mut size = 0;
     // Read string
-    let retS: Box<c_char> = eet::read(ef, "String", &mut size);
+    let retS: eet::EetValue<c_char> = eet::read(ef, "String", &mut size);
     // Get a proper &str to show
-    unsafe {
-        match CString::new(transmute::<_,*c_char>(retS), true).as_str() {
-            None => println!("Not valid"),
-            Some(s) => println!("String: {}", s)
-        }
+    match unsafe { CString::new(retS.getVal(), false).as_str() } {
+        None => println!("Not valid"),
+        Some(s) => println!("String: {}", s)
     }
     // Read integer
-    let retI: Box<int> = eet::read(ef, "Integer", &mut size);
+    let retI: eet::EetValue<int> = eet::read(ef, "Integer", &mut size);
     println!("Integer: {}", retI);
     // Read float
-    let retF: Box<f32> = eet::read(ef, "Float", &mut size);
+    let retF: eet::EetValue<f32> = eet::read(ef, "Float", &mut size);
     println!("Float: {}", retF);
 
     // Close eet file and shutdown eet
