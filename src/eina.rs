@@ -23,7 +23,7 @@ use std::mem::transmute;
 use std::option::Option;
 use eina::core::mem::uninit;
 use eina::libc::{c_void, c_int, c_uint};
-
+use eseful;
 
 pub type EinaBool = u8;
 pub static EINA_FALSE: EinaBool = 0u8;
@@ -85,6 +85,65 @@ pub struct _EinaInlist {
     last: *_EinaInlist
 }
 
+/// Type for a generic hash table.
+pub struct _EinaHash<T> {
+    key_length_cb: EinaKeyLength<T>,
+    key_cmp_cb: EinaKeyCmp<T>,
+    key_hash_cb: EinaKeyHash<T>,
+    data_free_cb: EinaFreeCb<T>,
+
+    buckets: **EinaRbtree,
+    size: int,
+    mask: int,
+
+    population: int,
+
+    buckets_power_size: int,
+
+    __magic: _EinaMagic
+}
+
+pub struct _CEinaHash {
+    key_length_cb: _CEinaKeyLength,
+    key_cmp_cb: _CEinaKeyCmp,
+    key_hash_cb: _CEinaKeyHash,
+    data_free_cb: _CEinaFreeCb,
+
+    buckets: **EinaRbtree,
+    size: c_int,
+    mask: c_int,
+
+    population: c_int,
+
+    buckets_power_size: c_int,
+
+    __magic: _CEinaMagic
+}
+
+/// Type for a function to determine the length of a hash key.
+pub type EinaKeyLength<T> = fn (&T) -> int;
+type _CEinaKeyLength = fn (*c_void) -> c_int;
+
+/// Type for a function to compare two hash keys.
+pub type EinaKeyCmp<T> = fn (&T, int, &T, int) -> c_int;
+type _CEinaKeyCmp = fn (*c_void, c_int, *c_void, c_int) -> c_int;
+
+/// Type for a function to create a hash key.
+pub type EinaKeyHash<T> = fn (&T, int) -> int;
+type _CEinaKeyHash = fn (*c_void, c_int) -> c_int;
+
+/// A callback type used to free data when iterating over a container.
+pub type EinaFreeCb<T> = fn (&T);
+type _CEinaFreeCb = fn (*c_void);
+
+/// Type for a Red-Black tree node. It should be inlined into user's type.
+pub struct EinaRbtree {
+    son: *[EinaRbtree, ..2],
+
+    color: uint
+}
+
+
 #[link(name = "eina")]
 extern "C" {
     fn eina_init() -> c_int;
@@ -98,6 +157,13 @@ extern "C" {
     fn eina_inlist_promote(list: *_EinaInlist, item: *_EinaInlist) -> *_EinaInlist;
     fn eina_inlist_demote(list: *_EinaInlist, item: *_EinaInlist) -> *_EinaInlist;
     fn eina_inlist_remove(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
+    /* Hash type */
+    fn eina_hash_stringshared_new(data_free_cb: _CEinaFreeCb) -> *_CEinaHash;
+    fn eina_hash_string_superfast_new(data_free_cb: _CEinaFreeCb) -> *_CEinaHash;
+    fn eina_hash_add(hash: *_CEinaHash, key: *c_void, data: *c_void) -> EinaBool;
+    fn eina_hash_find(hash: *_CEinaHash, key: *c_void) -> *c_void;
+    fn eina_hash_population(hash: *_CEinaHash) -> c_int;
+    fn eina_hash_free(hash: *_CEinaHash);
 }
 
 impl<'r, T> EinaList<'r, T> {
@@ -305,3 +371,37 @@ macro_rules! inlist_get(
         transmute(&($inlist.__in_list))
     })
 )
+
+/* Hash type functions */
+
+/// Create a new hash table optimized for stringshared values.
+pub fn hash_stringshared_new<T>(data_free_cb: EinaFreeCb<T>) -> *mut _EinaHash<T> {
+    unsafe { transmute(eina_hash_stringshared_new(transmute(data_free_cb))) }
+}
+
+/// Create a new hash table for use with strings.
+pub fn hash_string_superfast_new<T>(data_free_cb: EinaFreeCb<T>) -> *mut _EinaHash<T> {
+    unsafe { transmute(eina_hash_string_superfast_new(transmute(data_free_cb))) }
+}
+
+/// Add an entry to the given hash table.
+pub fn hash_add<T>(hash: *mut _EinaHash<T>, key: &T, data: &T) -> bool {
+    eseful::from_eina_to_bool(unsafe {
+        eina_hash_add(transmute(hash), transmute(key), transmute(data))
+    })
+}
+
+/// Retrieve a specific entry in the given hash table.
+pub fn hash_find<T>(hash: *mut _EinaHash<T>, key: &T) -> &T {
+    unsafe { transmute(eina_hash_find(transmute(hash), transmute(key))) }
+}
+
+/// Returns the number of entries in the given hash table.
+pub fn hash_population<T>(hash: *mut _EinaHash<T>) -> int {
+    unsafe { eina_hash_population(transmute(hash)) as int }
+}
+
+/// Free the given hash table resources.
+pub fn hash_free<T>(hash: *mut _EinaHash<T>) {
+    unsafe { eina_hash_free(transmute(hash)) }
+}
