@@ -24,6 +24,7 @@ use eet::core::num::FromPrimitive;
 use std::mem::transmute;
 use std::fmt::{Show, Formatter, Result};
 
+
 /// EetFile object.
 pub struct EetFile {
     _eo: *_EetFile
@@ -48,7 +49,7 @@ impl<T> Drop for EetValue<T> {
 
 impl<T: Show> Show for EetValue<T> {
     fn fmt(&self, _fmt: &mut Formatter) -> Result {
-        unsafe { write!(_fmt.buf, "{}", *((*self)._value)) }
+        unsafe { write!(_fmt, "{}", *((*self)._value)) }
     }
 }
 
