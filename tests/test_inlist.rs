@@ -45,12 +45,21 @@ fn main() {
     list = eina::inlist_append(Some(list), inlist_get!(x));
 
     let mut val: &Data = eina::inlist_container_get(list);
-    println!("a: {}, b: {}, c: {}, greet: {}", val.a, val.b, val.c, val.greet);
+    println!("First value => a: {}, b: {}, c: {}, greet: {}",
+             val.a, val.b, val.c, val.greet);
 
-    /* Demote current first value */
+    /* Place 't' at the end of the list */
     list = eina::inlist_demote(Some(list), inlist_get!(t));
     val = eina::inlist_container_get(list);
-    println!("a: {}, b: {}, c: {}, greet: {}", val.a, val.b, val.c, val.greet);
+    println!("New first value => a: {}, b: {}, c: {}, greet: {}",
+             val.a, val.b, val.c, val.greet);
+
+    /* Iterate over the list elements */
+    println!("Iterating =>");
+    for e in list {
+        let elm: &Data = e;
+        println!("a: {}, b: {}, c: {}, greet: {}", elm.a, elm.b, elm.c, elm.greet);
+    }
 
     eina::shutdown();
 }

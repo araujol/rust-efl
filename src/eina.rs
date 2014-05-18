@@ -188,6 +188,21 @@ impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
 
 }
 
+impl<'r, T> Iterator<&'r T> for EinaInlist {
+    fn next(&mut self) -> Option<&'r T> {
+        let v = if self._eo.is_null() {
+            None
+        } else {
+            let elm: &T = inlist_container_get(*self);
+            Some(elm)
+        };
+        // Get next value if current value is valid (Some).
+        if v.is_some() { self._eo = unsafe { (*self._eo).next } };
+        return v
+    }
+}
+
+
 /// Initialize the Eina library.
 pub fn init() -> int { unsafe { eina_init() as int } }
 
