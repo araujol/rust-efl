@@ -28,7 +28,7 @@ fn on_done(data: &Option<bool>,
 }
 
 fn main() {
-    let args: Vec<~str> = os::args();
+    let args: Vec<StrBuf> = os::args();
     let argc: uint = args.len();
 
     elementary::startup_time(ecore::time_unix_get());

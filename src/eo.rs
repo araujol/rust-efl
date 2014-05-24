@@ -1,4 +1,4 @@
-// Enlightenment Foundation Libraries Rust bindings.
+// Eo Rust bindings for EFL.
 // Copyright (C) 2014  Luis Araujo <araujoc.luisf@gmail.com>
 
 // This library is free software; you can redistribute it and/or
@@ -15,19 +15,33 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-#![crate_id="efl#1.10.0-beta2-0.0.1.99"]
-#![crate_type="lib"]
+extern crate libc;
 
-#![feature(macro_rules)]
+use eo::libc::{c_char, c_int};
+use eina;
+use eseful;
 
-pub mod eo;
-pub mod ecore;
-pub mod evas;
-pub mod eina;
-pub mod eio;
-pub mod eet;
-pub mod edje;
-pub mod eldbus;
-pub mod emotion;
-pub mod elementary;
-pub mod eseful;
+
+pub enum Eo {}
+pub type EoClass = Eo;
+
+
+#[link(name = "eo")]
+extern "C" {
+    fn _eo_do_start(obj: *Eo, cur_klass: *EoClass, is_super: eina::EinaBool,
+                    file: *c_char, func: *c_char, line: c_int) -> eina::EinaBool;
+    fn _eo_do_end(obj: **Eo);
+}
+
+pub fn _do_start(obj: *Eo, cur_klass: *EoClass, is_super: bool,
+                 file: &str, func: &str, line: int) -> bool {
+    file.with_c_str(|c_file| unsafe {
+        func.with_c_str(|c_func| {
+            eseful::from_eina_to_bool(_eo_do_start(obj, cur_klass, eseful::from_bool_to_eina(is_super),c_file, c_func, line as c_int))
+        })
+    })
+}
+
+pub fn _do_end(obj: **Eo) {
+    unsafe { _eo_do_end(obj) }
+}

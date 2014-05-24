@@ -23,13 +23,14 @@ use std::mem::transmute;
 use std::option::Option;
 use std::ptr;
 
+use eo;
 use eina;
 use eseful;
+
 
 pub static EVAS_HINT_EXPAND: f64 = 1.0f64;
 pub static EVAS_HINT_FILL: f64 = -1.0f64;
 
-pub enum Eo {}
 pub enum Evas {}
 
 /// The types of events triggering a callback.
@@ -106,7 +107,7 @@ pub enum EvasCallbackType {
     EvasCallbackLast
 }
 
-pub type EvasObject = Eo;
+pub type EvasObject = eo::Eo;
 
 pub type Coord = (int, int);
 
@@ -154,6 +155,7 @@ extern "C"  {
     fn evas_object_smart_callback_add(e: *EvasObject, event: *c_char,
                                       cb: CEvasSmartCb, data: *c_void);
 }
+
 
 pub fn init() -> int {
     unsafe { evas_init() as int }

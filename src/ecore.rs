@@ -19,13 +19,15 @@
 extern crate libc;
 
 use std::ptr;
-use std::option::{Option};
-use std::mem::{transmute, forget};
+use std::option::Option;
+use std::mem::transmute;
 
 use ecore::libc::{c_int, c_char, c_void};
-use eseful::{get_c_args, EventInfo};
+use eseful::{to_c_args, EventInfo};
+use eo;
 use eina;
 use evas;
+
 
 pub enum EcoreEvas {}
 
@@ -56,7 +58,7 @@ pub struct EcoreEventSignalExit {
     pub data: SigInfo
 }
 
-type EcoreTimer = evas::Eo;
+type EcoreTimer = eo::Eo;
 
 pub static ECORE_CALLBACK_RENEW: eina::EinaBool = eina::EINA_TRUE;
 
@@ -118,13 +120,9 @@ pub fn init() -> i32 {
     unsafe { ecore_init() as i32 }
 }
 
-pub fn app_args_set(argc: uint, argv: Vec<~str>) {
-    let vchars_ptr: **c_char = get_c_args(argv);
-    unsafe {
-        ecore_app_args_set(argc as c_int, vchars_ptr);
-        // Forget this value so it can be stored statically from C
-        forget(vchars_ptr); 
-    }
+pub fn app_args_set(argc: uint, argv: Vec<StrBuf>) {
+    let vchars_ptr: **c_char = to_c_args(argv);
+    unsafe { ecore_app_args_set(argc as c_int, vchars_ptr) }
 }
 
 pub fn main_loop_begin() {

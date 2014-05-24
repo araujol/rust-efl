@@ -12,19 +12,19 @@ use efl::elementary;
 
 
 fn main() {
-    let args: Vec<~str> = os::args();
+    let args: Vec<StrBuf> = os::args();
     let argc: uint = args.len();
 
     let logo_file: &str =
         if args.len() > 1 {
-            args.get(1).clone()
+            args.get(1).as_slice()
         } else {
             println!("No logo file. Usage: {} <file>", args.get(0));
             fail!()
         };
 
     elementary::startup_time(ecore::time_unix_get());
-    elementary::init(argc, args);
+    elementary::init(argc, args.clone());
 
     elementary::policy_set(elementary::ElmPolicyQuit,
                            elementary::ElmPolicyQuitLastWindowClosed as int);

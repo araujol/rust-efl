@@ -152,7 +152,7 @@ pub fn message_arguments_get<T>(msg: &EldbusMessage, signature: &str,
 }
 
 /// Get the error text and name from a Eldbus_Message.
-pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut ~str>, text: Option<&mut ~str>) -> bool {
+pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut StrBuf>, text: Option<&mut StrBuf>) -> bool {
     unsafe {
         let errname: *mut c_char = ptr::mut_null();
         let errmsg: *mut c_char = ptr::mut_null();
@@ -179,6 +179,7 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut ~str>, text: Opt
                 *_name = match name_cstr.as_str() {
                     None => fail!("Not valid string"), Some(s) => s.to_owned()
                 };
+
             } else {
                 fail!("Null CString");
             }

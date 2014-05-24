@@ -18,9 +18,9 @@
 
 extern crate libc;
 
-use std::str::raw::from_c_str;
+use std::c_str::CString;
+use std::mem::transmute;
 use std::ptr;
-use std::mem::{forget, transmute};
 
 use elementary::libc::{c_int, c_uint, c_char};
 use evas;
@@ -175,17 +175,9 @@ extern "C" {
     fn elm_fileselector_entry_add(parent: *evas::EvasObject) -> *evas::EvasObject;
 }
 
-pub fn init(argc: uint, argv: Vec<~str>) -> uint {
-    let vchars_ptr: **c_char = eseful::get_c_args(argv);
-
-    let ret = unsafe {
-        elm_init(argc as c_int, vchars_ptr)
-    };
-
-    // Forget this value so it can be stored statically from C
-    unsafe { forget(vchars_ptr); }
-
-    return ret as uint;
+pub fn init(argc: uint, argv: Vec<StrBuf>) -> uint {
+    let vchars_ptr: **c_char = eseful::to_c_args(argv);
+    unsafe { elm_init(argc as c_int, vchars_ptr) as uint }
 }
 
 pub fn startup_time(t: f64) {
@@ -209,9 +201,11 @@ pub fn policy_set(policy: ElmPolicy, value: int) {
 }
 
 /* Object methods */
-pub fn object_text_get(obj: &evas::EvasObject) -> ~str {
+pub fn object_text_get(obj: &evas::EvasObject) -> StrBuf {
     unsafe {
-        from_c_str(elm_object_part_text_get(obj, ptr::null()))
+        (match CString::new(elm_object_part_text_get(obj, ptr::null()), false).as_str() {
+            None => "", Some(s) => s
+        }).to_owned()
     }
 }
 
@@ -271,8 +265,12 @@ pub fn win_resize_object_add(obj: &evas::EvasObject, subobj: &evas::EvasObject) 
 }
 
 /// Get the title window.
-pub fn win_title_get(obj: &evas::EvasObject) -> ~str {
-    unsafe { from_c_str(elm_win_title_get(obj)) }
+pub fn win_title_get(obj: &evas::EvasObject) -> StrBuf {
+    unsafe {
+        (match CString::new(elm_win_title_get(obj), false).as_str() {
+            None => "", Some(s) => s
+        }).to_owned()
+    }
 }
 
 /// Set the title of the window.
@@ -361,8 +359,12 @@ pub fn entry_single_line_set(obj: &evas::EvasObject, single_line: bool) {
 }
 
 /// This returns the text currently shown in object entry.
-pub fn entry_entry_get(obj: &evas::EvasObject) -> ~str {
-    unsafe { from_c_str(elm_entry_entry_get(obj)) }
+pub fn entry_entry_get(obj: &evas::EvasObject) -> StrBuf {
+    unsafe {
+        (match CString::new(elm_entry_entry_get(obj), false).as_str() {
+            None => "", Some(s) => s
+        }).to_owned()
+    }
 }
 
 /// This sets the text displayed within the entry to 'entry'.

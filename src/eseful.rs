@@ -22,9 +22,7 @@
 
 extern crate libc;
 
-use std::c_str::{CString};
 use std::mem::forget;
-
 use eseful::libc::c_char;
 use eina;
 
@@ -34,21 +32,17 @@ pub static Empty: Option<()> = None;
 // Callbacks event.
 pub struct EventInfo;
 
-pub fn get_c_args(argv: Vec<~str>) -> **c_char {
-    let mut vcstrs: Vec<CString> = Vec::new();
+pub fn to_c_args(argv: Vec<StrBuf>) -> **c_char {
     let mut vchars: Vec<*c_char> = Vec::new();
 
-    for s in argv.iter() { vcstrs.push(s.to_c_str()); }
-        
-    for c_s in vcstrs.iter() {
-        c_s.with_ref(|c_buf| { vchars.push(c_buf);  });
+    for s in argv.iter() {
+        let cchar = unsafe { s.to_c_str().unwrap() };
+        vchars.push(cchar);
     }
-    
-    let vchars_ptr = vchars.as_ptr();
 
+    let vchars_ptr = vchars.as_ptr();
     unsafe {
-        // Forget all these values so they can be stored statically from C 
-        forget(vcstrs);
+        // Forget the vector of chars so it can be stored statically from C.
         forget(vchars);
     }
     return vchars_ptr;

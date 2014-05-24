@@ -36,7 +36,7 @@ fn on_enter(data: &Option<&evas::EvasObject>,
     match *data {
         None => (),
         Some(eobj) => {
-            elementary::object_text_set(eobj, elementary::entry_entry_get(e));
+            elementary::object_text_set(eobj, elementary::entry_entry_get(e).as_slice());
             /* Reset text entry */
             elementary::entry_entry_set(e, "");
         }
@@ -50,7 +50,7 @@ fn on_clicked(data: &Option<Box<OnClickedData>>,
         None => (),
         Some(ref onclicked) => {
             let txt = elementary::entry_entry_get(onclicked.entry);
-            elementary::object_text_set(onclicked.label, txt);
+            elementary::object_text_set(onclicked.label, txt.as_slice());
             /* Reset text entry */
             elementary::entry_entry_set(onclicked.entry, "");
         }
@@ -58,7 +58,7 @@ fn on_clicked(data: &Option<Box<OnClickedData>>,
 }
 
 fn main() {
-    let args: Vec<~str> = os::args();
+    let args: Vec<StrBuf> = os::args();
     let argc: uint = args.len();
 
     elementary::startup_time(ecore::time_unix_get());
@@ -80,7 +80,7 @@ fn main() {
 
     /* Label */
     let lab: Box<evas::EvasObject> = elementary::label_add(win);
-    elementary::object_text_set(lab, " -- Enter Text --");
+    elementary::object_text_set(lab, "[Enter Text]");
     elementary::box_pack_end(ebox, lab);
     evas::object_show(lab);
 

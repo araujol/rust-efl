@@ -9,8 +9,8 @@ extern crate efl;
 
 extern crate libc;
 
-use libc::c_char;
 use std::c_str::CString;
+use libc::c_char;
 use efl::ecore;
 use efl::eldbus;
 use std::ptr;
@@ -18,9 +18,9 @@ use std::ptr;
 
 fn _on_method_call(data: &int,
                    msg: &eldbus::EldbusMessage,
-                   pending: &eldbus::EldbusPending) {    
-    let mut errname: ~str = "".to_owned();
-    let mut errmsg: ~str = "".to_owned();
+                   pending: &eldbus::EldbusPending) {
+    let mut errname: StrBuf = StrBuf::new();
+    let mut errmsg: StrBuf = StrBuf::new();
 
     if eldbus::message_error_get(msg, Some(&mut errname), Some(&mut errmsg)) {
         println!("Error: {}, {}", errname, errmsg);

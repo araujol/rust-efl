@@ -28,11 +28,11 @@ fn playback_started(data: &Option<&str>,
 
 
 fn main() {    
-    let args: Vec<~str> = os::args();
+    let args: Vec<StrBuf> = os::args();
 
     let video_file: &str =
         if args.len() > 1 {
-            args.get(1).clone()
+            args.get(1).as_slice()
         } else {
             println!("No video file. Usage: {} <file>", args.get(0));
             fail!()

@@ -25,6 +25,7 @@ use eina::core::mem::uninit;
 use eina::libc::{c_void, c_int, c_uint};
 use eseful;
 
+
 pub type EinaBool = u8;
 pub static EINA_FALSE: EinaBool = 0u8;
 pub static EINA_TRUE:  EinaBool = 1u8;
@@ -32,7 +33,10 @@ pub static EINA_TRUE:  EinaBool = 1u8;
 type _EinaMagic = uint;
 type _CEinaMagic = c_uint;
 
-/// EinaList object
+/*
+ * EinaList object.
+ */
+/// EinaList object.
 pub struct EinaList<'r, T> {
     _eo: *mut _EinaList<'r, T>
 }
@@ -71,6 +75,9 @@ pub struct _CEinaListAccounting {
     __magic: _CEinaMagic
 }
 
+/*
+ * Inlined list type (EinaInlist).
+ */
 /// Inlined list type.
 pub struct EinaInlist {
     _eo: *_EinaInlist
@@ -85,6 +92,9 @@ pub struct _EinaInlist {
     last: *_EinaInlist
 }
 
+/*
+ * EinaHash type.
+ */
 /// Type for a generic hash table.
 pub struct _EinaHash<T> {
     key_length_cb: EinaKeyLength<T>,
@@ -166,15 +176,17 @@ extern "C" {
     fn eina_hash_free(hash: *_CEinaHash);
 }
 
+
+/* Implementations for EinaList type */
 impl<'r, T> EinaList<'r, T> {
-    /// Create high level EinaList object
+    /// Create high level EinaList object.
     pub fn new(el: *mut _EinaList<'r, T>) -> EinaList<'r, T> {
         EinaList { _eo: el }
     }
 
 }
 
-/// EinaList implements the Iterator trait
+/// EinaList implements the Iterator trait.
 impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
 
     fn next(&mut self) -> Option<&'r T> {
@@ -186,6 +198,13 @@ impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
         return v
     }
 
+}
+
+/* Implementations for EinaInlist type */
+impl EinaInlist {
+    pub fn new(el: *_EinaInlist) -> EinaInlist {
+        EinaInlist { _eo: el }
+    }
 }
 
 impl<'r, T> Iterator<&'r T> for EinaInlist {
@@ -311,7 +330,6 @@ pub fn list_last_data_get<'r, T>(list: *mut _EinaList<'r, T>) -> Option<&'r T> {
 }
 
 /* Inline list functions */
-
 /// Add a new node to end of a list.
 pub fn inlist_append(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
     EinaInlist {
@@ -388,7 +406,6 @@ macro_rules! inlist_get(
 )
 
 /* Hash type functions */
-
 /// Create a new hash table optimized for stringshared values.
 pub fn hash_stringshared_new<T>(data_free_cb: EinaFreeCb<T>) -> *mut _EinaHash<T> {
     unsafe { transmute(eina_hash_stringshared_new(transmute(data_free_cb))) }
