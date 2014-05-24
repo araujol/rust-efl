@@ -1,6 +1,6 @@
 #  Rust EFL 
 
-Rust bindings for the Enlightenment Foundation Libraries (version 1.10.0-beta2-0.0.1.99).
+Rust bindings for the Enlightenment Foundation Libraries (version 1.10.0-beta3-0.0.1.99).
 
 These versions of the bindings currently correspond to the latest code base
 both for EFL (1.10.x) and the Rust language, so it is required to fetch and 
