@@ -26,7 +26,7 @@ fn add_to_hash(hash: *mut eina::_EinaHash<c_char>, key: &str, data: &str) -> boo
     })
 }
 
-fn find_value(hash: *mut eina::_EinaHash<c_char>, key: &str) -> StrBuf {
+fn find_value(hash: *mut eina::_EinaHash<c_char>, key: &str) -> String {
     key.with_c_str(|c_key| unsafe {
         let value: &c_char = eina::hash_find(hash, transmute(c_key));
         let cstr = CString::new(value, false);

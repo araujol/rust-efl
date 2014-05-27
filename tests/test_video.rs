@@ -28,7 +28,7 @@ fn playback_started(data: &Option<&str>,
 
 
 fn main() {    
-    let args: Vec<StrBuf> = os::args();
+    let args: Vec<String> = os::args();
 
     let video_file: &str =
         if args.len() > 1 {

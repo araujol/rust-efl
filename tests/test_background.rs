@@ -12,7 +12,7 @@ use efl::elementary;
 
 
 fn main() {
-    let args: Vec<StrBuf> = os::args();
+    let args: Vec<String> = os::args();
     let argc: uint = args.len();
 
     let logo_file: &str =

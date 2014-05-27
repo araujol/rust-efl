@@ -48,7 +48,7 @@ pub fn object_init(obj: &evas::EvasObject, module_filename: &str) -> eina::EinaB
 }
 
 /// Get the filename of the file associated with the emotion object.
-pub fn object_file_get(obj: &evas::EvasObject) -> StrBuf {
+pub fn object_file_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(emotion_object_file_get(obj), false).as_str() {
             None => "", Some(s) => s

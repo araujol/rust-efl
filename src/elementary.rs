@@ -175,7 +175,7 @@ extern "C" {
     fn elm_fileselector_entry_add(parent: *evas::EvasObject) -> *evas::EvasObject;
 }
 
-pub fn init(argc: uint, argv: Vec<StrBuf>) -> uint {
+pub fn init(argc: uint, argv: Vec<String>) -> uint {
     let vchars_ptr: **c_char = eseful::to_c_args(argv);
     unsafe { elm_init(argc as c_int, vchars_ptr) as uint }
 }
@@ -201,7 +201,7 @@ pub fn policy_set(policy: ElmPolicy, value: int) {
 }
 
 /* Object methods */
-pub fn object_text_get(obj: &evas::EvasObject) -> StrBuf {
+pub fn object_text_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(elm_object_part_text_get(obj, ptr::null()), false).as_str() {
             None => "", Some(s) => s
@@ -265,7 +265,7 @@ pub fn win_resize_object_add(obj: &evas::EvasObject, subobj: &evas::EvasObject) 
 }
 
 /// Get the title window.
-pub fn win_title_get(obj: &evas::EvasObject) -> StrBuf {
+pub fn win_title_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(elm_win_title_get(obj), false).as_str() {
             None => "", Some(s) => s
@@ -359,7 +359,7 @@ pub fn entry_single_line_set(obj: &evas::EvasObject, single_line: bool) {
 }
 
 /// This returns the text currently shown in object entry.
-pub fn entry_entry_get(obj: &evas::EvasObject) -> StrBuf {
+pub fn entry_entry_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(elm_entry_entry_get(obj), false).as_str() {
             None => "", Some(s) => s

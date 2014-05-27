@@ -21,7 +21,7 @@ extern crate core;
 use std::ptr;
 use std::mem::transmute;
 use std::option::Option;
-use eina::core::mem::uninit;
+use eina::core::mem::uninitialized;
 use eina::libc::{c_void, c_int, c_uint};
 use eseful;
 
@@ -393,7 +393,7 @@ pub fn inlist_container_get<T>(in_list: EinaInlist) -> &T {
 /// Convenient function for object allocation.
 #[inline]
 pub fn object<T>() -> T {
-    unsafe { uninit::<T>() }
+    unsafe { uninitialized::<T>() }
 }
 
 /// Macro to get the inlist object of a struct.

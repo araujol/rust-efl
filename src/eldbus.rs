@@ -152,7 +152,7 @@ pub fn message_arguments_get<T>(msg: &EldbusMessage, signature: &str,
 }
 
 /// Get the error text and name from a Eldbus_Message.
-pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut StrBuf>, text: Option<&mut StrBuf>) -> bool {
+pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: Option<&mut String>) -> bool {
     unsafe {
         let errname: *mut c_char = ptr::mut_null();
         let errmsg: *mut c_char = ptr::mut_null();

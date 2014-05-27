@@ -32,7 +32,7 @@ pub static Empty: Option<()> = None;
 // Callbacks event.
 pub struct EventInfo;
 
-pub fn to_c_args(argv: Vec<StrBuf>) -> **c_char {
+pub fn to_c_args(argv: Vec<String>) -> **c_char {
     let mut vchars: Vec<*c_char> = Vec::new();
 
     for s in argv.iter() {

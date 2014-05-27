@@ -58,7 +58,7 @@ fn on_clicked(data: &Option<Box<OnClickedData>>,
 }
 
 fn main() {
-    let args: Vec<StrBuf> = os::args();
+    let args: Vec<String> = os::args();
     let argc: uint = args.len();
 
     elementary::startup_time(ecore::time_unix_get());

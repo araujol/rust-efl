@@ -19,8 +19,8 @@ use std::ptr;
 fn _on_method_call(data: &int,
                    msg: &eldbus::EldbusMessage,
                    pending: &eldbus::EldbusPending) {
-    let mut errname: StrBuf = StrBuf::new();
-    let mut errmsg: StrBuf = StrBuf::new();
+    let mut errname: String = String::new();
+    let mut errmsg: String = String::new();
 
     if eldbus::message_error_get(msg, Some(&mut errname), Some(&mut errmsg)) {
         println!("Error: {}, {}", errname, errmsg);
