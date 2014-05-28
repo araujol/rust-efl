@@ -17,7 +17,7 @@
 
 extern crate libc;
 
-use eo::libc::{c_char, c_int};
+use eo::libc::{c_char, c_uint};
 use eina;
 use eseful;
 
@@ -28,16 +28,29 @@ pub type EoClass = Eo;
 
 #[link(name = "eo")]
 extern "C" {
+    fn eo_init() -> eina::EinaBool;
+    fn eo_shutdown() -> eina::EinaBool;
     fn _eo_do_start(obj: *Eo, cur_klass: *EoClass, is_super: eina::EinaBool,
-                    file: *c_char, func: *c_char, line: c_int) -> eina::EinaBool;
+                    file: *c_char, func: *c_char, line: c_uint) -> eina::EinaBool;
     fn _eo_do_end(obj: **Eo);
 }
 
+
+/// Init the eo subsystem.
+pub fn init() -> eina::EinaBool {
+    unsafe { eo_init() }
+}
+
+/// Shutdown the eo subsystem.
+pub fn shutdown() -> eina::EinaBool {
+    unsafe { eo_shutdown() }
+}
+
 pub fn _do_start(obj: *Eo, cur_klass: *EoClass, is_super: bool,
-                 file: &str, func: &str, line: int) -> bool {
+                 file: &str, func: &str, line: uint) -> bool {
     file.with_c_str(|c_file| unsafe {
         func.with_c_str(|c_func| {
-            eseful::from_eina_to_bool(_eo_do_start(obj, cur_klass, eseful::from_bool_to_eina(is_super),c_file, c_func, line as c_int))
+            eseful::from_eina_to_bool(_eo_do_start(obj, cur_klass, eseful::from_bool_to_eina(is_super), c_file, c_func, line as c_uint))
         })
     })
 }
