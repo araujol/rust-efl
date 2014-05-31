@@ -40,7 +40,7 @@ fn main() {
     // Read string
     let retS: eet::EetValue<c_char> = eet::read(ef, "String", &mut size);
     // Get a proper &str to show
-    match unsafe { CString::new(retS.getVal(), false).as_str() } {
+    match unsafe { CString::new(retS.get_val(), false).as_str() } {
         None => println!("Not valid"),
         Some(s) => println!("String: {}", s)
     }

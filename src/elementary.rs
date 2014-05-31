@@ -205,7 +205,7 @@ pub fn object_text_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(elm_object_part_text_get(obj, ptr::null()), false).as_str() {
             None => "", Some(s) => s
-        }).to_owned()
+        }).to_string()
     }
 }
 
@@ -269,7 +269,7 @@ pub fn win_title_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(elm_win_title_get(obj), false).as_str() {
             None => "", Some(s) => s
-        }).to_owned()
+        }).to_string()
     }
 }
 
@@ -363,7 +363,7 @@ pub fn entry_entry_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(elm_entry_entry_get(obj), false).as_str() {
             None => "", Some(s) => s
-        }).to_owned()
+        }).to_string()
     }
 }
 

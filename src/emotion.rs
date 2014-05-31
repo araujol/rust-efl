@@ -52,7 +52,7 @@ pub fn object_file_get(obj: &evas::EvasObject) -> String {
     unsafe {
         (match CString::new(emotion_object_file_get(obj), false).as_str() {
             None => "", Some(s) => s
-        }).to_owned()
+        }).to_string()
     }
 }
 

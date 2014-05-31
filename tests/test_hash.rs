@@ -33,7 +33,7 @@ fn find_value(hash: *mut eina::_EinaHash<c_char>, key: &str) -> String {
         if cstr.is_not_null() {
             match cstr.as_str() {
                 None => fail!("Not valid string"), 
-                Some(s) => s.to_owned()
+                Some(s) => s.to_string()
             }
         } else {
             fail!("Null string!")

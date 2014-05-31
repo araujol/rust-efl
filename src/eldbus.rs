@@ -177,7 +177,7 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: O
             if name_cstr.is_not_null() {
                 let _name = name.unwrap();
                 *_name = match name_cstr.as_str() {
-                    None => fail!("Not valid string"), Some(s) => s.to_owned()
+                    None => fail!("Not valid string"), Some(s) => s.to_string()
                 };
 
             } else {
@@ -190,7 +190,7 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: O
             if text_cstr.is_not_null() {
                 let _text = text.unwrap();
                 *_text = match text_cstr.as_str() {
-                    None => fail!("Not valid string"), Some(s) => s.to_owned()
+                    None => fail!("Not valid string"), Some(s) => s.to_string()
                 };
             } else {
                 fail!("Null CString");
