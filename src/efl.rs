@@ -19,6 +19,7 @@
 #![crate_type="lib"]
 
 #![feature(macro_rules)]
+#![feature(unsafe_destructor)]
 
 pub mod eo;
 pub mod ecore;
