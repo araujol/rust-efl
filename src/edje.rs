@@ -29,12 +29,12 @@ use eseful::from_eina_to_bool;
 extern "C" {
     fn edje_init() -> c_int;
     fn edje_shutdown() -> c_int;
-    fn edje_object_add(evas: *evas::Evas) -> *evas::EvasObject;
-    fn edje_object_file_set(obj: *evas::EvasObject,
-                            file: *c_char,
-                            group: *c_char) -> eina::EinaBool;
-    fn edje_object_part_text_set(obj: *evas::EvasObject, part: *c_char,
-                                 text: *c_char) -> eina::EinaBool;
+    fn edje_object_add(evas: *const evas::Evas) -> *const evas::EvasObject;
+    fn edje_object_file_set(obj: *const evas::EvasObject,
+                            file: *const c_char,
+                            group: *const c_char) -> eina::EinaBool;
+    fn edje_object_part_text_set(obj: *const evas::EvasObject, part: *const c_char,
+                                 text: *const c_char) -> eina::EinaBool;
 }
 
 /// Initialize the Edje library.

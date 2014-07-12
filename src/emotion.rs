@@ -27,12 +27,12 @@ use eseful;
 
 #[link(name = "emotion")]
 extern "C" {
-    fn emotion_object_add(evas: *evas::Evas) -> *evas::EvasObject;
-    fn emotion_object_init(obj: *evas::EvasObject, module_filename: *c_char) -> u8;
-    fn emotion_object_file_get(obj: *evas::EvasObject) -> *c_char;
-    fn emotion_object_file_set(obj: *evas::EvasObject, filename: *c_char) -> u8;
-    fn emotion_object_play_get(obj: *evas::EvasObject) -> eina::EinaBool;
-    fn emotion_object_play_set(obj: *evas::EvasObject, play: eina::EinaBool);
+    fn emotion_object_add(evas: *const evas::Evas) -> *const evas::EvasObject;
+    fn emotion_object_init(obj: *const evas::EvasObject, module_filename: *const c_char) -> u8;
+    fn emotion_object_file_get(obj: *const evas::EvasObject) -> *const c_char;
+    fn emotion_object_file_set(obj: *const evas::EvasObject, filename: *const c_char) -> u8;
+    fn emotion_object_play_get(obj: *const evas::EvasObject) -> eina::EinaBool;
+    fn emotion_object_play_set(obj: *const evas::EvasObject, play: eina::EinaBool);
 }
 
 /// Add an emotion object to the canvas.

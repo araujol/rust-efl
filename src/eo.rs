@@ -30,9 +30,9 @@ pub type EoClass = Eo;
 extern "C" {
     fn eo_init() -> eina::EinaBool;
     fn eo_shutdown() -> eina::EinaBool;
-    fn _eo_do_start(obj: *Eo, cur_klass: *EoClass, is_super: eina::EinaBool,
-                    file: *c_char, func: *c_char, line: c_uint) -> eina::EinaBool;
-    fn _eo_do_end(obj: **Eo);
+    fn _eo_do_start(obj: *const Eo, cur_klass: *const EoClass, is_super: eina::EinaBool,
+                    file: *const c_char, func: *const c_char, line: c_uint) -> eina::EinaBool;
+    fn _eo_do_end(obj: *const *const Eo);
 }
 
 
@@ -46,7 +46,7 @@ pub fn shutdown() -> eina::EinaBool {
     unsafe { eo_shutdown() }
 }
 
-pub fn _do_start(obj: *Eo, cur_klass: *EoClass, is_super: bool,
+pub fn _do_start(obj: *const Eo, cur_klass: *const EoClass, is_super: bool,
                  file: &str, func: &str, line: uint) -> bool {
     file.with_c_str(|c_file| unsafe {
         func.with_c_str(|c_func| {
@@ -55,6 +55,6 @@ pub fn _do_start(obj: *Eo, cur_klass: *EoClass, is_super: bool,
     })
 }
 
-pub fn _do_end(obj: **Eo) {
+pub fn _do_end(obj: *const *const Eo) {
     unsafe { _eo_do_end(obj) }
 }

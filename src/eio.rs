@@ -51,41 +51,41 @@ pub struct EioProgress {
     pub max: c_longlong,
     pub percent: c_float,
 
-    pub source: *c_char,
-    pub dest: *c_char
+    pub source: *const c_char,
+    pub dest: *const c_char
 }
 
-pub type EioFilterCb<T> = fn (&mut T, &EioFile, *c_char) -> bool;
-type _CEioFilterCb = fn (*c_void, *EioFile, *c_char) -> eina::EinaBool;
+pub type EioFilterCb<T> = fn (&mut T, &EioFile, *const c_char) -> bool;
+type _CEioFilterCb = fn (*const c_void, *const EioFile, *const c_char) -> eina::EinaBool;
 
-pub type EioMainCb<T> = fn (&mut T, &EioFile, *c_char);
-type _CEioMainCb = fn (*c_void, *EioFile, *c_char);
+pub type EioMainCb<T> = fn (&mut T, &EioFile, *const c_char);
+type _CEioMainCb = fn (*const c_void, *const EioFile, *const c_char);
 
 pub type EioDoneCb<T> = fn (&mut T, &EioFile);
-type _CEioDoneCb = fn (*c_void, *EioFile);
+type _CEioDoneCb = fn (*const c_void, *const EioFile);
  
 pub type EioErrorCb<T> = fn (&mut T, &EioFile, int);
-type _CEioErrorCb = fn (*c_void, *EioFile, c_int);
+type _CEioErrorCb = fn (*const c_void, *const EioFile, c_int);
 
 pub type EioProgressCb<T> = fn (&mut T, &EioFile, &EioProgress);
-type _CEioProgressCb = fn (*c_void, *EioFile, *EioProgress);
+type _CEioProgressCb = fn (*const c_void, *const EioFile, *const EioProgress);
 
 #[link(name = "eio")]
 extern "C" {
     fn eio_init() -> c_int;
     fn eio_shutdown() -> c_int;
-    fn eio_file_ls(dir: *c_char, filter_cb: _CEioFilterCb,
+    fn eio_file_ls(dir: *const c_char, filter_cb: _CEioFilterCb,
                    main_cb: _CEioMainCb, done_cb: _CEioDoneCb,
-                   error_cb: _CEioErrorCb, data: *c_void) -> *EioFile;
-    fn eio_file_mkdir(path: *c_char, mode: mode_t,
+                   error_cb: _CEioErrorCb, data: *const c_void) -> *const EioFile;
+    fn eio_file_mkdir(path: *const c_char, mode: mode_t,
                       done_cb: _CEioDoneCb, error_cb: _CEioErrorCb,
-                      data: *c_void) -> *EioFile;
-    fn eio_file_move(source: *c_char, dest: *c_char,
+                      data: *const c_void) -> *const EioFile;
+    fn eio_file_move(source: *const c_char, dest: *const c_char,
                      progress_cb: _CEioProgressCb, done_cb: _CEioDoneCb,
-	             error_cb: _CEioErrorCb, data: *c_void) -> *EioFile;
-    fn eio_file_copy(source: *c_char, dest: *c_char,
+	             error_cb: _CEioErrorCb, data: *const c_void) -> *const EioFile;
+    fn eio_file_copy(source: *const c_char, dest: *const c_char,
                      progress_cb: _CEioProgressCb, done_cb: _CEioDoneCb,
-	             error_cb: _CEioErrorCb, data: *c_void) -> *EioFile;
+	             error_cb: _CEioErrorCb, data: *const c_void) -> *const EioFile;
 }
 
 /// Initialize eio and all it's required submodule.
@@ -107,7 +107,7 @@ pub fn file_ls<T>(dir: &str, filter_cb: EioFilterCb<T>,
         let c_main_cb: _CEioMainCb = transmute(main_cb);
         let c_done_cb: _CEioDoneCb = transmute(done_cb);
         let c_error_cb: _CEioErrorCb = transmute(error_cb);
-        let c_data: *c_void = transmute(data);
+        let c_data: *const c_void = transmute(data);
 
         transmute(eio_file_ls(c_dir, c_filter_cb, c_main_cb,
                               c_done_cb, c_error_cb, c_data))
@@ -120,7 +120,7 @@ pub fn file_mkdir<T>(path: &str, mode: mode_t, done_cb: EioDoneCb<T>,
     path.with_c_str(|c_path| unsafe {
         let c_done_cb: _CEioDoneCb = transmute(done_cb);
         let c_error_cb: _CEioErrorCb = transmute(error_cb);
-        let c_data: *c_void = transmute(data);
+        let c_data: *const c_void = transmute(data);
 
         transmute(eio_file_mkdir(c_path, mode, c_done_cb, c_error_cb, c_data))
     })
@@ -135,7 +135,7 @@ pub fn file_move<T>(source: &str, dest: &str,
             let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
             let c_done_cb: _CEioDoneCb = transmute(done_cb);
             let c_error_cb: _CEioErrorCb = transmute(error_cb);
-            let c_data: *c_void = transmute(data);
+            let c_data: *const c_void = transmute(data);
 
             transmute(eio_file_move(c_source, c_dest, c_progress_cb,
                                     c_done_cb, c_error_cb, c_data))
@@ -152,7 +152,7 @@ pub fn file_copy<T>(source: &str, dest: &str,
             let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
             let c_done_cb: _CEioDoneCb = transmute(done_cb);
             let c_error_cb: _CEioErrorCb = transmute(error_cb);
-            let c_data: *c_void = transmute(data);
+            let c_data: *const c_void = transmute(data);
 
             transmute(eio_file_copy(c_source, c_dest, c_progress_cb,
                                     c_done_cb, c_error_cb, c_data))

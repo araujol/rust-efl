@@ -112,71 +112,71 @@ pub enum ElmBgOption {
 #[link(name = "elementary")]
 extern "C" {
     static mut _elm_startup_time: f64;
-    fn elm_init(argc: c_int, argv: **c_char) -> c_int;
+    fn elm_init(argc: c_int, argv: *const *const c_char) -> c_int;
     fn elm_run();
     fn elm_shutdown() -> c_int;
     fn elm_exit();
     fn elm_policy_set(policy: c_int, value: c_int);
-    fn elm_object_part_text_get(obj: *evas::EvasObject, part: *c_char) -> *c_char;
-    fn elm_object_part_text_set(obj: *evas::EvasObject, part: *c_char, text: *c_char);
-    fn elm_object_style_set(obj: *evas::EvasObject, style: *c_char) -> u8;
-    fn elm_object_focus_get(obj: *evas::EvasObject) -> u8;
-    fn elm_object_focus_set(obj: *evas::EvasObject, focus: eina::EinaBool);
+    fn elm_object_part_text_get(obj: *const evas::EvasObject, part: *const c_char) -> *const c_char;
+    fn elm_object_part_text_set(obj: *const evas::EvasObject, part: *const c_char, text: *const c_char);
+    fn elm_object_style_set(obj: *const evas::EvasObject, style: *const c_char) -> u8;
+    fn elm_object_focus_get(obj: *const evas::EvasObject) -> u8;
+    fn elm_object_focus_set(obj: *const evas::EvasObject, focus: eina::EinaBool);
 
     /* elm_win */
-    fn elm_win_add(obj: *evas::EvasObject, name: *c_char, wtype: c_int) -> *evas::EvasObject;
-    fn elm_win_autodel_set(obj: *evas::EvasObject, autodel: u8);
-    fn elm_win_resize_object_add(obj: *evas::EvasObject, 
-                                 subobj: *evas::EvasObject);
-    fn elm_win_title_get(obj: *evas::EvasObject) -> *c_char;
-    fn elm_win_title_set(obj: *evas::EvasObject, title: *c_char);
-    fn elm_win_util_standard_add(name: *c_char, title: *c_char) -> *evas::EvasObject;
+    fn elm_win_add(obj: *const evas::EvasObject, name: *const c_char, wtype: c_int) -> *const evas::EvasObject;
+    fn elm_win_autodel_set(obj: *const evas::EvasObject, autodel: u8);
+    fn elm_win_resize_object_add(obj: *const evas::EvasObject, 
+                                 subobj: *const evas::EvasObject);
+    fn elm_win_title_get(obj: *const evas::EvasObject) -> *const c_char;
+    fn elm_win_title_set(obj: *const evas::EvasObject, title: *const c_char);
+    fn elm_win_util_standard_add(name: *const c_char, title: *const c_char) -> *const evas::EvasObject;
 
     /* elm_box */
-    fn elm_box_add(parent: *evas::EvasObject) -> *evas::EvasObject;
-    fn elm_box_pack_start(obj: *evas::EvasObject, subobj: *evas::EvasObject);
-    fn elm_box_pack_end(obj: *evas::EvasObject, subobj: *evas::EvasObject);
-    fn elm_box_padding_set(obj: *evas::EvasObject, h: c_int, v: c_int);
-    fn elm_box_homogeneous_set(obj: *evas::EvasObject, homogeneous: eina::EinaBool);
+    fn elm_box_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
+    fn elm_box_pack_start(obj: *const evas::EvasObject, subobj: *const evas::EvasObject);
+    fn elm_box_pack_end(obj: *const evas::EvasObject, subobj: *const evas::EvasObject);
+    fn elm_box_padding_set(obj: *const evas::EvasObject, h: c_int, v: c_int);
+    fn elm_box_homogeneous_set(obj: *const evas::EvasObject, homogeneous: eina::EinaBool);
 
     /* elm_button */
-    fn elm_button_add(parent: *evas::EvasObject) -> *evas::EvasObject;
+    fn elm_button_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
 
     /* elm_check */
-    fn elm_check_add(parent: *evas::EvasObject) -> *evas::EvasObject;
-    fn elm_check_state_set(obj: *evas::EvasObject, state: eina::EinaBool);
-    fn elm_check_state_get(obj: *evas::EvasObject) -> eina::EinaBool;
+    fn elm_check_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
+    fn elm_check_state_set(obj: *const evas::EvasObject, state: eina::EinaBool);
+    fn elm_check_state_get(obj: *const evas::EvasObject) -> eina::EinaBool;
 
     /* elm_label */
-    fn elm_label_add(parent: *evas::EvasObject) -> *evas::EvasObject;
-    fn elm_label_slide_mode_set(obj: *evas::EvasObject, mode: c_uint);
-    fn elm_label_slide_duration_set(obj: *evas::EvasObject, duration: f64);
-    fn elm_label_slide_go(obj: *evas::EvasObject);
+    fn elm_label_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
+    fn elm_label_slide_mode_set(obj: *const evas::EvasObject, mode: c_uint);
+    fn elm_label_slide_duration_set(obj: *const evas::EvasObject, duration: f64);
+    fn elm_label_slide_go(obj: *const evas::EvasObject);
 
     /* elm_entry */
-    fn elm_entry_add(parent: *evas::EvasObject) -> *evas::EvasObject;
-    fn elm_entry_entry_get(obj: *evas::EvasObject) -> *c_char;
-    fn elm_entry_entry_set(obj: *evas::EvasObject, entry: *c_char);
-    fn elm_entry_is_empty(obj: *evas::EvasObject) -> eina::EinaBool;
-    fn elm_entry_scrollable_set(obj: *evas::EvasObject, scroll: eina::EinaBool);
-    fn elm_entry_single_line_set(obj: *evas::EvasObject, single_line: eina::EinaBool);
+    fn elm_entry_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
+    fn elm_entry_entry_get(obj: *const evas::EvasObject) -> *const c_char;
+    fn elm_entry_entry_set(obj: *const evas::EvasObject, entry: *const c_char);
+    fn elm_entry_is_empty(obj: *const evas::EvasObject) -> eina::EinaBool;
+    fn elm_entry_scrollable_set(obj: *const evas::EvasObject, scroll: eina::EinaBool);
+    fn elm_entry_single_line_set(obj: *const evas::EvasObject, single_line: eina::EinaBool);
 
     /* elm_bg */
-    fn elm_bg_add(parent: *evas::EvasObject) -> *evas::EvasObject;
-    fn elm_bg_load_size_set(parent: *evas::EvasObject, w: c_int, h: c_int);
-    fn elm_bg_option_set(obj: *evas::EvasObject, option: c_uint);
-    fn elm_bg_file_set(obj: *evas::EvasObject, file: *c_char, group: *c_char) -> u8;
+    fn elm_bg_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
+    fn elm_bg_load_size_set(parent: *const evas::EvasObject, w: c_int, h: c_int);
+    fn elm_bg_option_set(obj: *const evas::EvasObject, option: c_uint);
+    fn elm_bg_file_set(obj: *const evas::EvasObject, file: *const c_char, group: *const c_char) -> u8;
     
     /* elm_datetime/calendar */
-    fn elm_datetime_add(parent: *evas::EvasObject) -> *evas::EvasObject;
-    fn elm_calendar_add(parent: *evas::EvasObject) -> *evas::EvasObject;
+    fn elm_datetime_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
+    fn elm_calendar_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
 
-    fn elm_layout_sizing_eval(obj: *evas::EvasObject);
-    fn elm_fileselector_entry_add(parent: *evas::EvasObject) -> *evas::EvasObject;
+    fn elm_layout_sizing_eval(obj: *const evas::EvasObject);
+    fn elm_fileselector_entry_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
 }
 
 pub fn init(argc: uint, argv: Vec<String>) -> uint {
-    let vchars_ptr: **c_char = eseful::to_c_args(argv);
+    let vchars_ptr: *const *const c_char = eseful::to_c_args(argv);
     unsafe { elm_init(argc as c_int, vchars_ptr) as uint }
 }
 
@@ -403,12 +403,12 @@ pub fn datetime_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
     unsafe { transmute(elm_datetime_add(parent)) }
 }
 
-pub fn calendar_add(parent: &evas::EvasObject) -> *evas::EvasObject {
+pub fn calendar_add(parent: &evas::EvasObject) -> *const evas::EvasObject {
     unsafe { elm_calendar_add(parent) }
 }
 
 /* Fileselector methods */
-pub fn fileselector_entry_add(parent: &evas::EvasObject) -> *evas::EvasObject {
+pub fn fileselector_entry_add(parent: &evas::EvasObject) -> *const evas::EvasObject {
     unsafe { elm_fileselector_entry_add(parent) }
 }
 

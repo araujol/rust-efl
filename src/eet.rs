@@ -27,17 +27,17 @@ use std::fmt::{Show, Formatter, Result};
 
 /// EetFile object.
 pub struct EetFile {
-    _eo: *_EetFile
+    _eo: *const _EetFile
 }
 
 /// EetValue object.
 /// This object is a convenient wrapper around values returned by 'read'.
 pub struct EetValue<T> {
-    _value: *T
+    _value: *const T
 }
 
 impl<T> EetValue<T> {
-    pub fn get_val(&self) -> *T { self._value }
+    pub fn get_val(&self) -> *const T { self._value }
 }
 
 #[unsafe_destructor]
@@ -94,12 +94,12 @@ extern "C" {
     fn eet_init() -> c_int;
     fn eet_shutdown() -> c_int;
     fn eet_clearcache();
-    fn eet_open(file: *c_char, mode: c_uint) -> *_EetFile;
-    fn eet_read(ef: *_EetFile, name: *c_char, size_ret: *mut c_int) -> *c_void;
-    fn eet_write(ef: *_EetFile, name: *c_char, data: *c_void,
+    fn eet_open(file: *const c_char, mode: c_uint) -> *const _EetFile;
+    fn eet_read(ef: *const _EetFile, name: *const c_char, size_ret: *mut c_int) -> *const c_void;
+    fn eet_write(ef: *const _EetFile, name: *const c_char, data: *const c_void,
                  size: c_uint, compress: c_int) -> c_int;
-    fn eet_close(ef: *_EetFile) -> c_uint;
-    fn eet_sync(ef: *_EetFile) -> c_uint;
+    fn eet_close(ef: *const _EetFile) -> c_uint;
+    fn eet_sync(ef: *const _EetFile) -> c_uint;
 }
 
 /// Initialize the EET library.
@@ -122,7 +122,7 @@ pub fn open(file: &str, mode: EetFileMode) -> EetFile {
 pub fn read<T>(ef: EetFile, name: &str, size_ret: &mut i32) -> EetValue<T> {
     name.with_c_str(|c_name| unsafe {
         EetValue {
-            _value: transmute::<*c_void,*T>(eet_read(ef._eo, c_name, size_ret))
+            _value: transmute::<*const c_void,*const T>(eet_read(ef._eo, c_name, size_ret))
         }
     })
 }

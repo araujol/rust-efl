@@ -57,28 +57,28 @@ pub enum EldbusConnectionType
 
 pub type EldbusMessageCb<T> = fn (&T, &EldbusMessage, &EldbusPending);
 /* This C equivalent type needs to be public for proper macro expansion */
-pub type _CEldbusMessageCb = fn (*c_void, *EldbusMessage, *EldbusPending);
+pub type _CEldbusMessageCb = fn (*const c_void, *const EldbusMessage, *const EldbusPending);
 
 #[link(name = "eldbus")]
 extern "C" {
     fn eldbus_init() -> c_int;
     fn eldbus_shutdown() -> c_int;
-    fn eldbus_connection_get(conn_type: c_uint) -> *EldbusConnection;
-    fn eldbus_object_get(conn: *EldbusConnection, 
-                         bus: *c_char,
-                         path: *c_char) -> *EldbusObject;
-    fn eldbus_proxy_get(obj: *EldbusObject, interface: *c_char) -> *EldbusProxy;
-    fn eldbus_proxy_call(proxy: *EldbusProxy, member: *c_char,
-                         cb: _CEldbusMessageCb, cb_data: *c_void,
-                         timeout: c_double, signature: *c_char,
-                         ...) -> *EldbusPending;
-    fn eldbus_message_arguments_get(msg: *EldbusMessage, signature: *c_char,
+    fn eldbus_connection_get(conn_type: c_uint) -> *const EldbusConnection;
+    fn eldbus_object_get(conn: *const EldbusConnection, 
+                         bus: *const c_char,
+                         path: *const c_char) -> *const EldbusObject;
+    fn eldbus_proxy_get(obj: *const EldbusObject, interface: *const c_char) -> *const EldbusProxy;
+    fn eldbus_proxy_call(proxy: *const EldbusProxy, member: *const c_char,
+                         cb: _CEldbusMessageCb, cb_data: *const c_void,
+                         timeout: c_double, signature: *const c_char,
+                         ...) -> *const EldbusPending;
+    fn eldbus_message_arguments_get(msg: *const EldbusMessage, signature: *const c_char,
  	                            ...) -> eina::EinaBool;
-    fn eldbus_proxy_unref(proxy: *EldbusProxy);
-    fn eldbus_object_unref(obj:	*EldbusObject);
-    fn eldbus_connection_unref(conn: *EldbusConnection);
-    fn eldbus_message_error_get(msg: *EldbusMessage, name: **mut c_char,
-                                text: **mut c_char) -> eina::EinaBool;
+    fn eldbus_proxy_unref(proxy: *const EldbusProxy);
+    fn eldbus_object_unref(obj:	*const EldbusObject);
+    fn eldbus_connection_unref(conn: *const EldbusConnection);
+    fn eldbus_message_error_get(msg: *const EldbusMessage, name: *const *mut c_char,
+                                text: *const *mut c_char) -> eina::EinaBool;
 }
 
 /// Initialize eldbus.
@@ -146,7 +146,7 @@ pub fn proxy_call<T>(proxy: &EldbusProxy, member: &str,
 pub fn message_arguments_get<T>(msg: &EldbusMessage, signature: &str,
  	                        arg: &T) -> bool {
     signature.with_c_str(|c_signature| unsafe {
-        let c_arg: *c_char = transmute(arg);
+        let c_arg: *const c_char = transmute(arg);
         from_eina_to_bool(eldbus_message_arguments_get(msg, c_signature, c_arg))
     })
 }
@@ -173,7 +173,7 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: O
             };
 
         if errname.is_not_null() {
-            let name_cstr = CString::new(transmute::<_,*c_char>(errname), false);
+            let name_cstr = CString::new(transmute::<_,*const c_char>(errname), false);
             if name_cstr.is_not_null() {
                 let _name = name.unwrap();
                 *_name = match name_cstr.as_str() {
@@ -186,7 +186,7 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: O
         }
 
         if errmsg.is_not_null() {
-            let text_cstr = CString::new(transmute::<_,*c_char>(errmsg), false);
+            let text_cstr = CString::new(transmute::<_,*const c_char>(errmsg), false);
             if text_cstr.is_not_null() {
                 let _text = text.unwrap();
                 *_text = match text_cstr.as_str() {
@@ -212,8 +212,8 @@ macro_rules! proxy_call(
             use efl::eldbus;
             $signature.with_c_str(|c_signature| {
                 let c_cb: eldbus::_CEldbusMessageCb = transmute($cb);
-                let c_cb_data: *eldbus::c_void = transmute($cb_data);
-                transmute::<*eldbus::EldbusPending,Box<eldbus::EldbusPending>>(eldbus::eldbus_proxy_call(transmute::<&eldbus::EldbusProxy,*eldbus::EldbusProxy>($proxy), c_member, c_cb, c_cb_data, $timeout as eldbus::c_double, c_signature $(, $obj)*))
+                let c_cb_data: *const *const eldbus::c_void = transmute($cb_data);
+                transmute::<*const *const eldbus::EldbusPending,Box<eldbus::EldbusPending>>(eldbus::eldbus_proxy_call(transmute::<&eldbus::EldbusProxy,*const *const eldbus::EldbusProxy>($proxy), c_member, c_cb, c_cb_data, $timeout as eldbus::c_double, c_signature $(, $obj)*))
             })
         })
     );

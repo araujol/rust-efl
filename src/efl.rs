@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-#![crate_id="efl#1.10.0-0.0.1.99"]
+#![crate_name="efl"]
 #![crate_type="lib"]
 
 #![feature(macro_rules)]

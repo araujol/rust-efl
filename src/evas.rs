@@ -112,48 +112,48 @@ pub type EvasObject = eo::Eo;
 pub type Coord = (int, int);
 
 pub type EvasObjectEventCb<T> = fn (&T, &Evas, &EvasObject, &eseful::EventInfo);
-type _CEvasObjectEventCb = fn (*c_void, *Evas, *EvasObject, *c_void);
+type _CEvasObjectEventCb = fn (*const c_void, *const Evas, *const EvasObject, *const c_void);
 
 /* High level callback notation */
 pub type EvasSmartCb<T> = fn (&Option<T>, &EvasObject, &eseful::EventInfo) -> ();
 /* C level callback notation */
-type CEvasSmartCb = fn (*c_void, *EvasObject, *c_void) -> c_void;
+type CEvasSmartCb = fn (*const c_void, *const EvasObject, *const c_void) -> c_void;
 
 
 #[link(name = "evas")]
 extern "C"  {
     fn evas_init() -> c_int;
     fn evas_shutdown() -> c_int;
-    fn evas_new() -> *Evas;
-    fn evas_free(e: *Evas);
-    fn evas_focus_in(e: *Evas);
-    fn evas_focus_out(e: *Evas);
-    fn evas_object_rectangle_add(e: *Evas) -> *EvasObject;
-    fn evas_object_show(e: *EvasObject);
-    fn evas_object_resize(e: *EvasObject, w: c_int, h: c_int);
-    fn evas_object_del(obj: *EvasObject);	
-    fn evas_object_move(e: *EvasObject, x: c_int, y: c_int);
-    fn evas_object_name_set(obj: *EvasObject, name: *c_char); 
-    fn evas_object_color_set(obj: *EvasObject,
+    fn evas_new() -> *const Evas;
+    fn evas_free(e: *const Evas);
+    fn evas_focus_in(e: *const Evas);
+    fn evas_focus_out(e: *const Evas);
+    fn evas_object_rectangle_add(e: *const Evas) -> *const EvasObject;
+    fn evas_object_show(e: *const EvasObject);
+    fn evas_object_resize(e: *const EvasObject, w: c_int, h: c_int);
+    fn evas_object_del(obj: *const EvasObject);	
+    fn evas_object_move(e: *const EvasObject, x: c_int, y: c_int);
+    fn evas_object_name_set(obj: *const EvasObject, name: *const c_char); 
+    fn evas_object_color_set(obj: *const EvasObject,
                              r: c_int, g: c_int,
                              b: c_int, a: c_int);
-    fn evas_object_size_hint_min_set(e: *EvasObject, x: c_int, y: c_int);
-    fn evas_object_size_hint_weight_set(e: *EvasObject, x: f64, y: f64);
-    fn evas_object_size_hint_align_set(e: *EvasObject, x: f64, y: f64);
-    fn evas_object_focus_set(obj: *EvasObject, focus: eina::EinaBool);
-    fn evas_object_image_add(e: *Evas) -> *EvasObject;
-    fn evas_object_image_filled_add(e: *Evas) -> *EvasObject;
-    fn evas_object_image_fill_set(obj: *EvasObject,
+    fn evas_object_size_hint_min_set(e: *const EvasObject, x: c_int, y: c_int);
+    fn evas_object_size_hint_weight_set(e: *const EvasObject, x: f64, y: f64);
+    fn evas_object_size_hint_align_set(e: *const EvasObject, x: f64, y: f64);
+    fn evas_object_focus_set(obj: *const EvasObject, focus: eina::EinaBool);
+    fn evas_object_image_add(e: *const Evas) -> *const EvasObject;
+    fn evas_object_image_filled_add(e: *const Evas) -> *const EvasObject;
+    fn evas_object_image_fill_set(obj: *const EvasObject,
                                   x: c_int, y: c_int,
                                   w: c_int, h: c_int);
-    fn evas_object_image_file_set(obj: *EvasObject, file: *c_char, key: *c_char);
-    fn evas_object_image_size_set(obj: *EvasObject, w: c_int, h: c_int);
-    fn evas_object_image_filled_set(obj: *EvasObject, setting: eina::EinaBool);
-    fn evas_object_image_preload(obj: *EvasObject, cancel: eina::EinaBool);
-    fn evas_object_event_callback_add(obj: *EvasObject, cbtype: c_uint,
-                                      func: _CEvasObjectEventCb, data: *c_void);
-    fn evas_object_smart_callback_add(e: *EvasObject, event: *c_char,
-                                      cb: CEvasSmartCb, data: *c_void);
+    fn evas_object_image_file_set(obj: *const EvasObject, file: *const c_char, key: *const c_char);
+    fn evas_object_image_size_set(obj: *const EvasObject, w: c_int, h: c_int);
+    fn evas_object_image_filled_set(obj: *const EvasObject, setting: eina::EinaBool);
+    fn evas_object_image_preload(obj: *const EvasObject, cancel: eina::EinaBool);
+    fn evas_object_event_callback_add(obj: *const EvasObject, cbtype: c_uint,
+                                      func: _CEvasObjectEventCb, data: *const c_void);
+    fn evas_object_smart_callback_add(e: *const EvasObject, event: *const c_char,
+                                      cb: CEvasSmartCb, data: *const c_void);
 }
 
 
@@ -244,7 +244,7 @@ pub fn object_image_filled_add(e: &Evas) -> Box<EvasObject> {
 
 /// Set how to fill an image object's drawing rectangle given the (real)
 /// image bound to it.
-pub fn object_image_fill_set(obj: *EvasObject, xy: Coord, wh: Coord) {
+pub fn object_image_fill_set(obj: *const EvasObject, xy: Coord, wh: Coord) {
     let (x, y) = xy;
     let (w, h) = wh;
     unsafe {
@@ -298,7 +298,7 @@ pub fn object_event_callback_add<T>(obj: &EvasObject, cbtype: EvasCallbackType,
 pub fn object_smart_callback_add<T>(e: &EvasObject, event: &str,
                                     cb: EvasSmartCb<T>, data: &Option<T>) {
     /* Transmute both Data and Callback into the C representation */
-    let c_data: *c_void = unsafe { transmute(data) };
+    let c_data: *const c_void = unsafe { transmute(data) };
     let c_cb: CEvasSmartCb = unsafe { transmute(cb) };
 
     event.with_c_str(|c_event| unsafe {

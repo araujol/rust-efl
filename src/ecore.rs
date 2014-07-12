@@ -54,7 +54,7 @@ pub struct EcoreEventSignalExit {
     pub interrupt: eina::EinaBool,
     pub quit: eina::EinaBool,
     pub terminate: eina::EinaBool,
-    pub ext_data: *c_void,
+    pub ext_data: *const c_void,
     pub data: SigInfo
 }
 
@@ -65,47 +65,47 @@ pub static ECORE_CALLBACK_RENEW: eina::EinaBool = eina::EINA_TRUE;
 /* High level callback notation */
 pub type EcoreTaskCb<T> = fn (&Option<T>) -> eina::EinaBool;
 /* C level callback notation */
-type CEcoreTaskCb = fn (*c_void) -> u8;
+type CEcoreTaskCb = fn (*const c_void) -> u8;
 
 /* High level callback notation */
 pub type EcoreEventHandlerCb<T> = fn (&Option<T>, int, &EventInfo) -> bool;
 /* C level callback notation */
-type CEcoreEventHandlerCb = fn (*c_void, c_int, *c_void) -> u8;
+type CEcoreEventHandlerCb = fn (*const c_void, c_int, *const c_void) -> u8;
 
 pub type EcoreEvasEventCb = fn (&EcoreEvas);
-type _CEcoreEvasEventCb = fn (*EcoreEvas);
+type _CEcoreEvasEventCb = fn (*const EcoreEvas);
 
 #[link(name = "ecore")]
 extern "C" {
     fn ecore_init() -> c_int;
-    fn ecore_app_args_set(argc: c_int, argv: **c_char);
+    fn ecore_app_args_set(argc: c_int, argv: *const *const c_char);
     fn ecore_main_loop_begin();
     fn ecore_main_loop_quit();
     fn ecore_time_get() -> f64;
     fn ecore_time_unix_get() -> f64;
     fn ecore_shutdown() -> c_int;
-    fn ecore_timer_add(inv: f64, func: CEcoreTaskCb, data: *c_void);
+    fn ecore_timer_add(inv: f64, func: CEcoreTaskCb, data: *const c_void);
     fn ecore_event_handler_add(htype: c_int, func: CEcoreEventHandlerCb, 
-                               data: *c_void) -> *EcoreEventHandler;
+                               data: *const c_void) -> *const EcoreEventHandler;
 }
 
 #[link(name = "ecore_evas")]
 extern "C" {
     fn ecore_evas_init() -> c_int;
     fn ecore_evas_shutdown() -> c_int;
-    fn ecore_evas_new(engine_name: *c_char, 
+    fn ecore_evas_new(engine_name: *const c_char, 
                       x: c_int, y: c_int, 
                       w: c_int, h: c_int,
-                      extra_options: *c_char) -> *EcoreEvas;
-    fn ecore_evas_show(ee: *EcoreEvas);
-    fn ecore_evas_get(ee: *EcoreEvas) -> *evas::Evas;
-    fn ecore_evas_data_set(ee: *EcoreEvas, key: *c_char, data: *c_void);
-    fn ecore_evas_data_get(ee: *EcoreEvas, key: *c_char) -> *c_void;
-    fn ecore_evas_free(ee: *EcoreEvas);
-    fn ecore_evas_callback_resize_set(ee: *EcoreEvas, func: _CEcoreEvasEventCb);
-    fn ecore_evas_geometry_get(ee: *EcoreEvas,
-                               x: *c_int, y: *c_int,
-                               w: *c_int, h: *c_int);
+                      extra_options: *const c_char) -> *const EcoreEvas;
+    fn ecore_evas_show(ee: *const EcoreEvas);
+    fn ecore_evas_get(ee: *const EcoreEvas) -> *const evas::Evas;
+    fn ecore_evas_data_set(ee: *const EcoreEvas, key: *const c_char, data: *const c_void);
+    fn ecore_evas_data_get(ee: *const EcoreEvas, key: *const c_char) -> *const c_void;
+    fn ecore_evas_free(ee: *const EcoreEvas);
+    fn ecore_evas_callback_resize_set(ee: *const EcoreEvas, func: _CEcoreEvasEventCb);
+    fn ecore_evas_geometry_get(ee: *const EcoreEvas,
+                               x: *const c_int, y: *const c_int,
+                               w: *const c_int, h: *const c_int);
 }
 
 pub fn event_handler_add<T>(htype: EcoreEvent, 
@@ -121,7 +121,7 @@ pub fn init() -> i32 {
 }
 
 pub fn app_args_set(argc: uint, argv: Vec<String>) {
-    let vchars_ptr: **c_char = to_c_args(argv);
+    let vchars_ptr: *const *const c_char = to_c_args(argv);
     unsafe { ecore_app_args_set(argc as c_int, vchars_ptr) }
 }
 
@@ -146,7 +146,7 @@ pub fn time_unix_get() -> f64 {
 }
 
 pub fn timer_add<T>(inv: f64, func: EcoreTaskCb<T>, data: &Option<T>) {
-    let c_data: *c_void = unsafe { transmute(data) };
+    let c_data: *const c_void = unsafe { transmute(data) };
     let c_func: CEcoreTaskCb = unsafe { transmute(func) };
     unsafe { ecore_timer_add(inv, c_func, c_data) }
 }

@@ -46,7 +46,7 @@ pub struct _EinaList<'r, T> {
     data: &'r T,
     next: *mut _EinaList<'r, T>,
     prev: *mut _EinaList<'r, T>,
-    accounting: *_EinaListAccounting<'r, T>,
+    accounting: *const _EinaListAccounting<'r, T>,
 
     __magic: _EinaMagic
 }
@@ -60,16 +60,16 @@ pub struct _EinaListAccounting<'r, T> {
 
 /// C representation of an Eina_List.
 pub struct _CEinaList {
-    data: *c_void,
-    next: *_CEinaList,
-    prev: *_CEinaList,
-    accounting: *_CEinaListAccounting,
+    data: *const c_void,
+    next: *const _CEinaList,
+    prev: *const _CEinaList,
+    accounting: *const _CEinaListAccounting,
 
     __magic: _CEinaMagic
 }
 
 pub struct _CEinaListAccounting {
-    last: *_CEinaList,
+    last: *const _CEinaList,
     count: c_uint,
 
     __magic: _CEinaMagic
@@ -80,16 +80,16 @@ pub struct _CEinaListAccounting {
  */
 /// Inlined list type.
 pub struct EinaInlist {
-    _eo: *_EinaInlist
+    _eo: *const _EinaInlist
 }
 
 pub struct _EinaInlist {
     /// Next node
-    next: *_EinaInlist,
+    next: *const _EinaInlist,
     /// Previous node
-    prev: *_EinaInlist,
+    prev: *const _EinaInlist,
     /// Last node
-    last: *_EinaInlist
+    last: *const _EinaInlist
 }
 
 /*
@@ -102,7 +102,7 @@ pub struct _EinaHash<T> {
     key_hash_cb: EinaKeyHash<T>,
     data_free_cb: EinaFreeCb<T>,
 
-    buckets: **EinaRbtree,
+    buckets: *const *const EinaRbtree,
     size: int,
     mask: int,
 
@@ -119,7 +119,7 @@ pub struct _CEinaHash {
     key_hash_cb: _CEinaKeyHash,
     data_free_cb: _CEinaFreeCb,
 
-    buckets: **EinaRbtree,
+    buckets: *const *const EinaRbtree,
     size: c_int,
     mask: c_int,
 
@@ -132,23 +132,23 @@ pub struct _CEinaHash {
 
 /// Type for a function to determine the length of a hash key.
 pub type EinaKeyLength<T> = fn (&T) -> int;
-type _CEinaKeyLength = fn (*c_void) -> c_int;
+type _CEinaKeyLength = fn (*const c_void) -> c_int;
 
 /// Type for a function to compare two hash keys.
 pub type EinaKeyCmp<T> = fn (&T, int, &T, int) -> c_int;
-type _CEinaKeyCmp = fn (*c_void, c_int, *c_void, c_int) -> c_int;
+type _CEinaKeyCmp = fn (*const c_void, c_int, *const c_void, c_int) -> c_int;
 
 /// Type for a function to create a hash key.
 pub type EinaKeyHash<T> = fn (&T, int) -> int;
-type _CEinaKeyHash = fn (*c_void, c_int) -> c_int;
+type _CEinaKeyHash = fn (*const c_void, c_int) -> c_int;
 
 /// A callback type used to free data when iterating over a container.
 pub type EinaFreeCb<T> = fn (&T);
-type _CEinaFreeCb = fn (*c_void);
+type _CEinaFreeCb = fn (*const c_void);
 
 /// Type for a Red-Black tree node. It should be inlined into user's type.
 pub struct EinaRbtree {
-    son: *[EinaRbtree, ..2],
+    son: *const [EinaRbtree, ..2],
 
     color: uint
 }
@@ -158,22 +158,22 @@ pub struct EinaRbtree {
 extern "C" {
     fn eina_init() -> c_int;
     fn eina_shutdown() -> c_int;
-    fn eina_list_free(list: *_CEinaList) -> *_CEinaList;
-    fn eina_list_append(list: *_CEinaList, data: *c_void) -> *_CEinaList;
-    fn eina_list_prepend(list: *_CEinaList, data: *c_void) -> *_CEinaList;
+    fn eina_list_free(list: *const _CEinaList) -> *const _CEinaList;
+    fn eina_list_append(list: *const _CEinaList, data: *const c_void) -> *const _CEinaList;
+    fn eina_list_prepend(list: *const _CEinaList, data: *const c_void) -> *const _CEinaList;
     /* Inline list type */
-    fn eina_inlist_append(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
-    fn eina_inlist_prepend(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
-    fn eina_inlist_promote(list: *_EinaInlist, item: *_EinaInlist) -> *_EinaInlist;
-    fn eina_inlist_demote(list: *_EinaInlist, item: *_EinaInlist) -> *_EinaInlist;
-    fn eina_inlist_remove(in_list: *_EinaInlist, in_item: *_EinaInlist) -> *_EinaInlist;
+    fn eina_inlist_append(in_list: *const _EinaInlist, in_item: *const _EinaInlist) -> *const _EinaInlist;
+    fn eina_inlist_prepend(in_list: *const _EinaInlist, in_item: *const _EinaInlist) -> *const _EinaInlist;
+    fn eina_inlist_promote(list: *const _EinaInlist, item: *const _EinaInlist) -> *const _EinaInlist;
+    fn eina_inlist_demote(list: *const _EinaInlist, item: *const _EinaInlist) -> *const _EinaInlist;
+    fn eina_inlist_remove(in_list: *const _EinaInlist, in_item: *const _EinaInlist) -> *const _EinaInlist;
     /* Hash type */
-    fn eina_hash_stringshared_new(data_free_cb: _CEinaFreeCb) -> *_CEinaHash;
-    fn eina_hash_string_superfast_new(data_free_cb: _CEinaFreeCb) -> *_CEinaHash;
-    fn eina_hash_add(hash: *_CEinaHash, key: *c_void, data: *c_void) -> EinaBool;
-    fn eina_hash_find(hash: *_CEinaHash, key: *c_void) -> *c_void;
-    fn eina_hash_population(hash: *_CEinaHash) -> c_int;
-    fn eina_hash_free(hash: *_CEinaHash);
+    fn eina_hash_stringshared_new(data_free_cb: _CEinaFreeCb) -> *const _CEinaHash;
+    fn eina_hash_string_superfast_new(data_free_cb: _CEinaFreeCb) -> *const _CEinaHash;
+    fn eina_hash_add(hash: *const _CEinaHash, key: *const c_void, data: *const c_void) -> EinaBool;
+    fn eina_hash_find(hash: *const _CEinaHash, key: *const c_void) -> *const c_void;
+    fn eina_hash_population(hash: *const _CEinaHash) -> c_int;
+    fn eina_hash_free(hash: *const _CEinaHash);
 }
 
 
@@ -202,7 +202,7 @@ impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
 
 /* Implementations for EinaInlist type */
 impl EinaInlist {
-    pub fn new(el: *_EinaInlist) -> EinaInlist {
+    pub fn new(el: *const _EinaInlist) -> EinaInlist {
         EinaInlist { _eo: el }
     }
 }
@@ -231,8 +231,8 @@ pub fn shutdown() -> int { unsafe { eina_shutdown() as int } }
 /// Free an entire list and all the nodes, ignoring the data contained.
 pub fn list_free<T>(list: *mut _EinaList<T>) -> *mut _EinaList<T> {
     unsafe {
-        transmute::<*_CEinaList,*mut _EinaList<T>>(
-            eina_list_free(transmute::<*mut _EinaList<T>,*_CEinaList>(list)))
+        transmute::<*const _CEinaList,*mut _EinaList<T>>(
+            eina_list_free(transmute::<*mut _EinaList<T>,*const _CEinaList>(list)))
     }
 }
 
@@ -240,12 +240,12 @@ pub fn list_free<T>(list: *mut _EinaList<T>) -> *mut _EinaList<T> {
 /// This function appends data to list. If list is 'None', a new list is returned.
 pub fn list_append<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
     unsafe {
-        let c_data: *c_void = transmute(data);
+        let c_data: *const c_void = transmute(data);
         match list {
-            None => transmute::<*_CEinaList,*mut _EinaList<T>>(
+            None => transmute::<*const _CEinaList,*mut _EinaList<T>>(
                 eina_list_append(ptr::null(), c_data)),
-            Some(l) => transmute::<*_CEinaList,*mut _EinaList<T>>(
-                eina_list_append(transmute::<*mut _EinaList<T>,*_CEinaList>(l), c_data))
+            Some(l) => transmute::<*const _CEinaList,*mut _EinaList<T>>(
+                eina_list_append(transmute::<*mut _EinaList<T>,*const _CEinaList>(l), c_data))
         }
     }
 }
@@ -254,12 +254,12 @@ pub fn list_append<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaLi
 /// This function prepends data to list. If list is 'None', a new list is returned.
 pub fn list_prepend<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
     unsafe {
-        let c_data: *c_void = transmute(data);
+        let c_data: *const c_void = transmute(data);
         match list {
-            None => transmute::<*_CEinaList,*mut _EinaList<T>>(
+            None => transmute::<*const _CEinaList,*mut _EinaList<T>>(
                 eina_list_prepend(ptr::null(), c_data)),
-            Some(l) => transmute::<*_CEinaList,*mut _EinaList<T>>(
-                eina_list_prepend(transmute::<*mut _EinaList<T>,*_CEinaList>(l), c_data))
+            Some(l) => transmute::<*const _CEinaList,*mut _EinaList<T>>(
+                eina_list_prepend(transmute::<*mut _EinaList<T>,*const _CEinaList>(l), c_data))
         }
     }
 }
@@ -331,7 +331,7 @@ pub fn list_last_data_get<'r, T>(list: *mut _EinaList<'r, T>) -> Option<&'r T> {
 
 /* Inline list functions */
 /// Add a new node to end of a list.
-pub fn inlist_append(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+pub fn inlist_append(in_list: Option<EinaInlist>, in_item: *const _EinaInlist) -> EinaInlist {
     EinaInlist {
         _eo: unsafe {
             match in_list {
@@ -343,7 +343,7 @@ pub fn inlist_append(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> Eina
 }
 
 /// Add a new node to beginning of list.
-pub fn inlist_prepend(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+pub fn inlist_prepend(in_list: Option<EinaInlist>, in_item: *const _EinaInlist) -> EinaInlist {
     EinaInlist {
         _eo: unsafe {
             match in_list {
@@ -355,7 +355,7 @@ pub fn inlist_prepend(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> Ein
 }
 
 /// Move existing node to beginning of list.
-pub fn inlist_promote(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+pub fn inlist_promote(in_list: Option<EinaInlist>, in_item: *const _EinaInlist) -> EinaInlist {
     EinaInlist {
         _eo: unsafe {
             match in_list {
@@ -367,7 +367,7 @@ pub fn inlist_promote(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> Ein
 }
 
 /// Move existing node to end of list.
-pub fn inlist_demote(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> EinaInlist {
+pub fn inlist_demote(in_list: Option<EinaInlist>, in_item: *const _EinaInlist) -> EinaInlist {
     EinaInlist {
         _eo: unsafe {
             match in_list {
@@ -379,7 +379,7 @@ pub fn inlist_demote(in_list: Option<EinaInlist>, in_item: *_EinaInlist) -> Eina
 }
 
 /// Remove node from list.
-pub fn inlist_remove(in_list: EinaInlist, in_item: *_EinaInlist) -> EinaInlist {
+pub fn inlist_remove(in_list: EinaInlist, in_item: *const _EinaInlist) -> EinaInlist {
     EinaInlist {
         _eo: unsafe { eina_inlist_remove(in_list._eo, in_item) }
     }
