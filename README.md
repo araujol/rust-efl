@@ -32,3 +32,4 @@ Now you can build programs using the rust-efl library bindings:
     $ ./test_simple
 
 Enjoy!
+
