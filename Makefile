@@ -3,11 +3,11 @@ libefl.rlib: src/efl.rs
 
 all: libefl.rlib
 
-tests: tests/test_simple.rs
-	rustc tests/test_simple.rs -L .
+examples: examples/test_simple.rs
+	rustc examples/test_simple.rs -L .
 
 clean:
 	rm -f test_*
 	rm -f libefl.rlib
 
-.PHONY: all tests
+.PHONY: all examples
