@@ -207,7 +207,7 @@ impl EinaInlist {
     }
 }
 
-impl<'r, T> Iterator<&'r T> for EinaInlist {
+/*impl<'r, T> Iterator<&'r T> for EinaInlist {
     fn next(&mut self) -> Option<&'r T> {
         let v = if self._eo.is_null() {
             None
@@ -219,7 +219,7 @@ impl<'r, T> Iterator<&'r T> for EinaInlist {
         if v.is_some() { self._eo = unsafe { (*self._eo).next } };
         return v
     }
-}
+}*/
 
 
 /// Initialize the Eina library.
@@ -238,7 +238,7 @@ pub fn list_free<T>(list: *mut _EinaList<T>) -> *mut _EinaList<T> {
 
 /// Append the given data to the given linked list.
 /// This function appends data to list. If list is 'None', a new list is returned.
-pub fn list_append<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
+/*pub fn list_append<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
     unsafe {
         let c_data: *const c_void = transmute(data);
         match list {
@@ -263,7 +263,7 @@ pub fn list_prepend<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaL
         }
     }
 }
-
+*/
 /// Get the list node data member.
 #[inline]
 pub fn list_data_get<'r, T>(list: *mut _EinaList<'r, T>) -> Option<&'r T> {
@@ -386,9 +386,9 @@ pub fn inlist_remove(in_list: EinaInlist, in_item: *const _EinaInlist) -> EinaIn
 }
 
 /// Get the container object of an in_list.
-pub fn inlist_container_get<T>(in_list: EinaInlist) -> &T {
+/*pub fn inlist_container_get<T>(in_list: EinaInlist) -> &T {
     unsafe { transmute(in_list._eo) }
-}
+}*/
 
 /// Convenient function for object allocation.
 #[inline]
@@ -400,8 +400,7 @@ pub fn object<T>() -> T {
 #[macro_export]
 macro_rules! inlist_get(
     ($inlist:ident) => (unsafe {
-        use std::mem::transmute;
-        transmute(&($inlist.__in_list))
+        ::std::mem::transmute(&($inlist.__in_list))
     })
 )
 

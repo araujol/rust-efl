@@ -174,27 +174,18 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: O
 
         if errname.is_not_null() {
             let name_cstr = CString::new(transmute::<_,*const c_char>(errname), false);
-            if name_cstr.is_not_null() {
-                let _name = name.unwrap();
-                *_name = match name_cstr.as_str() {
-                    None => fail!("Not valid string"), Some(s) => s.to_string()
-                };
-
-            } else {
-                fail!("Null CString");
-            }
+            let _name = name.unwrap();
+            *_name = match name_cstr.as_str() {
+                None => fail!("Not valid string"), Some(s) => s.to_string()
+            };
         }
 
         if errmsg.is_not_null() {
             let text_cstr = CString::new(transmute::<_,*const c_char>(errmsg), false);
-            if text_cstr.is_not_null() {
-                let _text = text.unwrap();
-                *_text = match text_cstr.as_str() {
-                    None => fail!("Not valid string"), Some(s) => s.to_string()
-                };
-            } else {
-                fail!("Null CString");
-            }
+            let _text = text.unwrap();
+            *_text = match text_cstr.as_str() {
+                None => fail!("Not valid string"), Some(s) => s.to_string()
+            };
         }
 
         return b;
