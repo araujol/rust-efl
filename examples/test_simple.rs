@@ -38,26 +38,26 @@ fn main() {
     let win: Box<evas::EvasObject> =
         elementary::win_util_standard_add("Enlightenment", "Rust EFL");
     let data: Option<bool> = Some(true);
-    evas::object_smart_callback_add(win, "delete,request",
+    evas::object_smart_callback_add(&*win, "delete,request",
                                     on_done, &data);
-    evas::object_move(win, (200, 100));
+    evas::object_move(&*win, (200, 100));
 
     /* Box Container */
-    let ebox: Box<evas::EvasObject> = elementary::box_add(win);
-    evas::object_size_hint_weight_set(ebox,
+    let ebox: Box<evas::EvasObject> = elementary::box_add(&*win);
+    evas::object_size_hint_weight_set(&*ebox,
                                       evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
-    elementary::win_resize_object_add(win, ebox);
-    evas::object_show(ebox);
+    elementary::win_resize_object_add(&*win, &*ebox);
+    evas::object_show(&*ebox);
 
     /* Label */
-    let lab: Box<evas::EvasObject> = elementary::label_add(win);
-    elementary::object_text_set(lab, "Hello <b>Rust Enlightenment!</b>");
-    elementary::box_pack_end(ebox, lab);
-    evas::object_show(lab);
+    let lab: Box<evas::EvasObject> = elementary::label_add(&*win);
+    elementary::object_text_set(&*lab, "Hello <b>Rust Enlightenment!</b>");
+    elementary::box_pack_end(&*ebox, &*lab);
+    evas::object_show(&*lab);
 
-    evas::object_resize(win, 200, 50);
-    evas::object_show(win);
+    evas::object_resize(&*win, 200, 50);
+    evas::object_show(&*win);
 
     /* Main event loop */
     elementary::run();

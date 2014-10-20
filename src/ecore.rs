@@ -50,13 +50,13 @@ pub enum EcoreEvent {
 
 pub struct SigInfo;
 
-pub struct EcoreEventSignalExit {
+/*pub struct EcoreEventSignalExit {
     pub interrupt: eina::EinaBool,
     pub quit: eina::EinaBool,
     pub terminate: eina::EinaBool,
     pub ext_data: *const c_void,
     pub data: SigInfo
-}
+}*/
 
 type EcoreTimer = eo::Eo;
 

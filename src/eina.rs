@@ -27,8 +27,8 @@ use eseful;
 
 
 pub type EinaBool = u8;
-pub static EINA_FALSE: EinaBool = 0u8;
-pub static EINA_TRUE:  EinaBool = 1u8;
+pub const EINA_FALSE: EinaBool = 0u8;
+pub const EINA_TRUE:  EinaBool = 1u8;
 
 type _EinaMagic = uint;
 type _CEinaMagic = c_uint;
@@ -37,12 +37,12 @@ type _CEinaMagic = c_uint;
  * EinaList object.
  */
 /// EinaList object.
-pub struct EinaList<'r, T> {
+pub struct EinaList<'r, T:'r> {
     _eo: *mut _EinaList<'r, T>
 }
 
 /// Representation of an Eina_List.
-pub struct _EinaList<'r, T> {
+pub struct _EinaList<'r, T:'r> {
     data: &'r T,
     next: *mut _EinaList<'r, T>,
     prev: *mut _EinaList<'r, T>,
@@ -51,7 +51,7 @@ pub struct _EinaList<'r, T> {
     __magic: _EinaMagic
 }
 
-pub struct _EinaListAccounting<'r, T> {
+pub struct _EinaListAccounting<'r, T:'r> {
     last: *mut _EinaList<'r, T>,
     count: uint,
 

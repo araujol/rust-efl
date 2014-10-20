@@ -82,10 +82,10 @@ pub enum ElmPolicy {
     ElmPolicyThrottle
 }
 
-pub enum ElmPolicyQuit {
+/*pub enum ElmPolicyQuit {
     ElmPolicyQuitNone,
     ElmPolicyQuitLastWindowClosed
-}
+}*/
 
 pub enum ElmLabelSlideMode {
     /// No slide effect
