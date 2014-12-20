@@ -234,12 +234,13 @@ pub fn object_style_set(obj: &evas::EvasObject, style: &str) -> bool {
 /// If obj is None this is the first window created.
 pub fn win_add(obj: Option<&evas::EvasObject>, name: &str,
                wtype: ElmWinType) -> Box<evas::EvasObject> {
+    let iwtype = wtype as c_int;
     name.with_c_str(|c_buf| unsafe {
         match obj {
             /* Null pointer */
-            None => transmute(elm_win_add(ptr::null(), c_buf, wtype as c_int)),
+            None => transmute(elm_win_add(ptr::null(), c_buf, iwtype)),
             /* Add win to eobj parent */
-            Some(eobj) => transmute(elm_win_add(eobj, c_buf, wtype as c_int))
+            Some(eobj) => transmute(elm_win_add(eobj, c_buf, iwtype))
         }
     })
 }

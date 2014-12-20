@@ -113,8 +113,9 @@ pub fn clearcache() { unsafe { eet_clearcache() } }
 
 /// Open an eet file on disk, and returns a handle to it.
 pub fn open(file: &str, mode: EetFileMode) -> EetFile {
+    let imode = mode as c_uint;
     file.with_c_str(|c_file| unsafe {
-        EetFile { _eo: eet_open(c_file, mode as c_uint) }
+        EetFile { _eo: eet_open(c_file, imode) }
     })
 }
 
