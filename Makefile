@@ -1,4 +1,4 @@
-libefl.rlib: src/efl.rs
+libefl.rlib: src/*.rs
 	rustc src/efl.rs --crate-type=lib
 
 all: libefl.rlib
