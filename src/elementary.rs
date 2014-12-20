@@ -109,6 +109,11 @@ pub enum ElmBgOption {
     ElmBgOptionLast
 }
 
+pub enum ElmTextFormat {
+        PlainUTF8,
+        MarkupUTF8
+}
+
 #[link(name = "elementary")]
 extern "C" {
     static mut _elm_startup_time: f64;
@@ -160,7 +165,7 @@ extern "C" {
     fn elm_entry_is_empty(obj: *const evas::EvasObject) -> eina::EinaBool;
     fn elm_entry_scrollable_set(obj: *const evas::EvasObject, scroll: eina::EinaBool);
     fn elm_entry_single_line_set(obj: *const evas::EvasObject, single_line: eina::EinaBool);
-
+    fn elm_entry_file_set(obj: *const evas::EvasObject, file: *const c_char, format: c_int) -> u8;
     /* elm_bg */
     fn elm_bg_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
     fn elm_bg_load_size_set(parent: *const evas::EvasObject, w: c_int, h: c_int);
@@ -372,6 +377,12 @@ pub fn entry_entry_get(obj: &evas::EvasObject) -> String {
 pub fn entry_entry_set(obj: &evas::EvasObject, entry: &str) {
     entry.with_c_str(|c_buf| unsafe {
         elm_entry_entry_set(obj, c_buf);
+    })
+}
+pub fn entry_file_set(obj: &evas::EvasObject, file: &str, format: ElmTextFormat) -> eina::EinaBool {
+    let iformat = format as c_int;
+    file.with_c_str(|c_file| unsafe {
+        elm_entry_file_set(obj, c_file, iformat) as eina::EinaBool
     })
 }
 
