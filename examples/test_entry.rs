@@ -67,64 +67,64 @@ fn main() {
     /* Main Window */
     let win: Box<evas::EvasObject> =
         elementary::win_util_standard_add("Rust EFL", "Rust EFL");
-    evas::object_move(win, (200, 100));
-    evas::object_smart_callback_add(win, "delete,request", on_done, &Empty);
+    evas::object_move(&*win, (200, 100));
+    evas::object_smart_callback_add(&*win, "delete,request", on_done, &Empty);
 
     /* Box Container */
-    let ebox: Box<evas::EvasObject> = elementary::box_add(win);
-    evas::object_size_hint_weight_set(ebox,
+    let ebox: Box<evas::EvasObject> = elementary::box_add(&*win);
+    evas::object_size_hint_weight_set(&*ebox,
                                       evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
-    elementary::win_resize_object_add(win, ebox);
-    evas::object_show(ebox);
+    elementary::win_resize_object_add(&*win, &*ebox);
+    evas::object_show(&*ebox);
 
     /* Label */
-    let lab: Box<evas::EvasObject> = elementary::label_add(win);
-    elementary::object_text_set(lab, "[Enter Text]");
-    elementary::box_pack_end(ebox, lab);
-    evas::object_show(lab);
+    let lab: Box<evas::EvasObject> = elementary::label_add(&*win);
+    elementary::object_text_set(&*lab, "[Enter Text]");
+    elementary::box_pack_end(&*ebox, &*lab);
+    evas::object_show(&*lab);
 
     /* Entry */
-    let ent: Box<evas::EvasObject> = elementary::entry_add(win);
-    elementary::entry_scrollable_set(ent, true);
-    elementary::entry_single_line_set(ent, true);
-    evas::object_size_hint_weight_set(ent,
+    let ent: Box<evas::EvasObject> = elementary::entry_add(&*win);
+    elementary::entry_scrollable_set(&*ent, true);
+    elementary::entry_single_line_set(&*ent, true);
+    evas::object_size_hint_weight_set(&*ent,
                                       evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
-    evas::object_size_hint_align_set(ent,
+    evas::object_size_hint_align_set(&*ent,
                                      evas::EVAS_HINT_FILL,
                                      evas::EVAS_HINT_FILL);
-    evas::object_show(ent);
-    elementary::box_pack_end(ebox, ent);
-    elementary::object_focus_set(ent, true);
+    evas::object_show(&*ent);
+    elementary::box_pack_end(&*ebox, &*ent);
+    elementary::object_focus_set(&*ent, true);
 
-    let l: &evas::EvasObject = lab;
-    evas::object_smart_callback_add(ent, "activated", on_enter, &Some(l));
+    let l: &evas::EvasObject = &*lab;
+    evas::object_smart_callback_add(&*ent, "activated", on_enter, &Some(l));
 
     /* Button */
-    let btn = elementary::button_add(win);
-    evas::object_size_hint_weight_set(btn, 
+    let btn = elementary::button_add(&*win);
+    evas::object_size_hint_weight_set(&*btn, 
                                       evas::EVAS_HINT_EXPAND, 
                                       evas::EVAS_HINT_EXPAND);
-    evas::object_size_hint_align_set(btn, 
+    evas::object_size_hint_align_set(&*btn, 
                                      evas::EVAS_HINT_FILL,
                                      evas::EVAS_HINT_FILL);
-    elementary::object_text_set(btn, "Ok");
-    evas::object_show(btn);
-    elementary::box_pack_end(ebox, btn);
+    elementary::object_text_set(&*btn, "Ok");
+    evas::object_show(&*btn);
+    elementary::box_pack_end(&*ebox, &*btn);
 
     /* Share both the 'label' and 'entry' objects with the button callback */
-    let e: &evas::EvasObject = ent;
+    let e: &evas::EvasObject = &*ent;
     let onclicked_data: Option<Box<OnClickedData>> =
         Some(box OnClickedData {
             label: l,
             entry: e
         });
-    evas::object_smart_callback_add(btn, "clicked", on_clicked, &onclicked_data);
+    evas::object_smart_callback_add(&*btn, "clicked", on_clicked, &onclicked_data);
 
     /* Set main window size and show */
-    evas::object_resize(win, 200, 50);
-    evas::object_show(win);
+    evas::object_resize(&*win, 200, 50);
+    evas::object_show(&*win);
 
     /* Start main event loop */
     elementary::run();
