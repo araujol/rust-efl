@@ -36,7 +36,7 @@ pub fn to_c_args(argv: Vec<String>) -> *const *const c_char {
     let mut vchars: Vec<*const c_char> = Vec::new();
 
     for s in argv.iter() {
-        let cchar = unsafe { s.to_c_str().unwrap() };
+        let cchar = unsafe { s.to_c_str().into_inner() };
         vchars.push(cchar);
     }
 

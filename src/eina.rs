@@ -59,6 +59,7 @@ pub struct _EinaListAccounting<'r, T:'r> {
 }
 
 /// C representation of an Eina_List.
+#[repr(C)]
 pub struct _CEinaList {
     data: *const c_void,
     next: *const _CEinaList,
@@ -67,7 +68,7 @@ pub struct _CEinaList {
 
     __magic: _CEinaMagic
 }
-
+#[repr(C)]
 pub struct _CEinaListAccounting {
     last: *const _CEinaList,
     count: c_uint,
@@ -82,7 +83,7 @@ pub struct _CEinaListAccounting {
 pub struct EinaInlist {
     _eo: *const _EinaInlist
 }
-
+#[repr(C)]
 pub struct _EinaInlist {
     /// Next node
     next: *const _EinaInlist,
@@ -112,7 +113,7 @@ pub struct _EinaHash<T> {
 
     __magic: _EinaMagic
 }
-
+#[repr(C)]
 pub struct _CEinaHash {
     key_length_cb: _CEinaKeyLength,
     key_cmp_cb: _CEinaKeyCmp,
@@ -132,25 +133,30 @@ pub struct _CEinaHash {
 
 /// Type for a function to determine the length of a hash key.
 pub type EinaKeyLength<T> = fn (&T) -> int;
+#[repr(C)]
 type _CEinaKeyLength = fn (*const c_void) -> c_int;
 
 /// Type for a function to compare two hash keys.
 pub type EinaKeyCmp<T> = fn (&T, int, &T, int) -> c_int;
+#[repr(C)]
 type _CEinaKeyCmp = fn (*const c_void, c_int, *const c_void, c_int) -> c_int;
 
 /// Type for a function to create a hash key.
 pub type EinaKeyHash<T> = fn (&T, int) -> int;
+#[repr(C)]
 type _CEinaKeyHash = fn (*const c_void, c_int) -> c_int;
 
 /// A callback type used to free data when iterating over a container.
 pub type EinaFreeCb<T> = fn (&T);
+#[repr(C)]
 type _CEinaFreeCb = fn (*const c_void);
 
 /// Type for a Red-Black tree node. It should be inlined into user's type.
+#[repr(C)]
 pub struct EinaRbtree {
     son: *const [EinaRbtree, ..2],
 
-    color: uint
+    color: c_uint
 }
 
 
