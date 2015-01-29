@@ -18,10 +18,7 @@
 
 extern crate libc;
 
-use std::mem::transmute;
-use std::c_str::CString;
-use std::option::Option;
-use std::ptr;
+use std::{mem, ptr, ffi, str};
 
 use eldbus::libc::{c_int, c_uint, c_char};
 // Re-export for macro usage
@@ -82,32 +79,33 @@ extern "C" {
 }
 
 /// Initialize eldbus.
-pub fn init() -> int { unsafe { eldbus_init() as int } }
+pub fn init() -> isize { unsafe { eldbus_init() as isize } }
 
 /// Shutdown eldbus.
-pub fn shutdown() -> int { unsafe { eldbus_shutdown() as int } }
+pub fn shutdown() -> isize { unsafe { eldbus_shutdown() as isize } }
 
-/// Establish a connection to bus and integrate it with the ecore main loop.
+/// Establish a connection to bus and isizeegrate it with the ecore main loop.
 pub fn connection_get(conn_type: EldbusConnectionType) -> Box<EldbusConnection> {
     unsafe { 
-        transmute(eldbus_connection_get(conn_type as c_uint))
+        mem::transmute(eldbus_connection_get(conn_type as c_uint))
     }
 }
 
 /// Get an object of the given bus and path.
 pub fn object_get(conn: &EldbusConnection, bus: &str, path: &str) -> Box<EldbusObject> {
-    bus.with_c_str(|c_bus| unsafe {
-        path.with_c_str(|c_path| {
-            transmute(eldbus_object_get(conn, c_bus, c_path))
-        })
-    })
+    let c_bus = ffi::CString::from_slice(bus.as_bytes());
+    let c_path = ffi::CString::from_slice(path.as_bytes());
+    unsafe {
+        mem::transmute(eldbus_object_get(conn, c_bus.as_ptr(), c_path.as_ptr()))
+    }
 }
 
 /// Get a proxy of the following interface name in a EldbusObject.
 pub fn proxy_get(obj: &EldbusObject, interface: &str) -> Box<EldbusProxy> {
-    interface.with_c_str(|c_interface| unsafe {
-        transmute(eldbus_proxy_get(obj, c_interface))
-    })
+    let c_interface = ffi::CString::from_slice(interface.as_bytes());
+    unsafe {
+        mem::transmute(eldbus_proxy_get(obj, c_interface.as_ptr()))
+    }
 }
 
 /// Decrease proxy reference.
@@ -128,27 +126,26 @@ pub fn connection_unref(conn: &EldbusConnection) {
 /// Call a method in proxy.
 /// This is just a convenient function that sends no data value.
 /// To send data values, use the proxy_call! macro.
-pub fn proxy_call<T>(proxy: &EldbusProxy, member: &str,
-                     cb: EldbusMessageCb<T>, cb_data: &T,
+pub fn proxy_call<T>(proxy: &EldbusProxy, member: &str, cb: EldbusMessageCb<T>, cb_data: &T,
                      timeout: f64, signature: &str) -> Box<EldbusPending> {
-    member.with_c_str(|c_member| unsafe {
-        signature.with_c_str(|c_signature| {
-            transmute(eldbus_proxy_call(proxy, c_member,
-                                        transmute(cb), transmute(cb_data),
-                                        timeout as c_double, c_signature))
-        })
-    })
+    let c_member = ffi::CString::from_slice(member.as_bytes());
+    let c_signature = ffi::CString::from_slice(signature.as_bytes());
+    unsafe {        
+        mem::transmute(eldbus_proxy_call(proxy, c_member.as_ptr(),
+                                         mem::transmute(cb), mem::transmute(cb_data),
+                                         timeout as c_double, c_signature.as_ptr()))
+    }
 }
 
 /// Get the arguments from an Eldbus_Message.
 /// This is just a convenient function for receiving a value of signature T.
 /// To receive a variable list of values, use the message_arguments_get! macro.
-pub fn message_arguments_get<T>(msg: &EldbusMessage, signature: &str,
- 	                        arg: &T) -> bool {
-    signature.with_c_str(|c_signature| unsafe {
-        let c_arg: *const c_char = transmute(arg);
-        from_eina_to_bool(eldbus_message_arguments_get(msg, c_signature, c_arg))
-    })
+pub fn message_arguments_get<T>(msg: &EldbusMessage, signature: &str, arg: &T) -> bool {
+    let c_signature = ffi::CString::from_slice(signature.as_bytes());
+    unsafe {
+        let c_arg: *const c_char = mem::transmute(arg);
+        from_eina_to_bool(eldbus_message_arguments_get(msg, c_signature.as_ptr(), c_arg))
+    }
 }
 
 /// Get the error text and name from a Eldbus_Message.
@@ -157,35 +154,25 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: O
         let errname: *mut c_char = ptr::null_mut();
         let errmsg: *mut c_char = ptr::null_mut();
 
-        let b =
-            if name.is_some() {
-                if text.is_some() {
-                    from_eina_to_bool(eldbus_message_error_get(msg, &errname, &errmsg))
-                } else {
-                    from_eina_to_bool(eldbus_message_error_get(msg, &errname, ptr::null()))
-                }
-            } else {
-                if text.is_some() {
-                    from_eina_to_bool(eldbus_message_error_get(msg, ptr::null(), &errmsg))
-                } else {
-                    from_eina_to_bool(eldbus_message_error_get(msg, ptr::null(), ptr::null()))
-                }
-            };
+        let b = match (name.is_some(), text.is_some()) {
+            (true, true) => from_eina_to_bool(eldbus_message_error_get(msg, &errname, &errmsg)),
+            (true, false) => from_eina_to_bool(eldbus_message_error_get(msg, &errname, ptr::null())),
+            (false, true) =>from_eina_to_bool(eldbus_message_error_get(msg, ptr::null(), &errmsg)),
+            (false, false) => from_eina_to_bool(eldbus_message_error_get(msg, ptr::null(), ptr::null())),
+        };
 
-        if errname.is_not_null() {
-            let name_cstr = CString::new(transmute::<_,*const c_char>(errname), false);
-            let _name = name.unwrap();
-            *_name = match name_cstr.as_str() {
-                None => panic!("Not valid string"), Some(s) => s.to_string()
-            };
+        if !errname.is_null() {
+            match str::from_utf8(ffi::c_str_to_bytes(&(errname as *const _))) {
+                Ok(s) => *(name.unwrap()) = s.to_string(),
+                Err(_) => panic!("invalid `errname` string"),
+            }
         }
 
-        if errmsg.is_not_null() {
-            let text_cstr = CString::new(transmute::<_,*const c_char>(errmsg), false);
-            let _text = text.unwrap();
-            *_text = match text_cstr.as_str() {
-                None => panic!("Not valid string"), Some(s) => s.to_string()
-            };
+        if !errmsg.is_null() {
+            match str::from_utf8(ffi::c_str_to_bytes(&(errmsg as *const _))) {
+                Ok(s) => *(text.unwrap()) = s.to_string(),
+                Err(_) => panic!("invalid `errmsg` string"),
+            }
         }
 
         return b;
@@ -196,29 +183,34 @@ pub fn message_error_get(msg: &EldbusMessage, name: Option<&mut String>, text: O
 /// This is the macro version of the function 'eldbus_proxy_call'
 /// which should allow passing full variable argument lists.
 #[macro_export]
-macro_rules! proxy_call(
-    ($proxy:ident, $member:ident, $cb:ident, $cb_data:ident, $timeout:ident, $signature:ident $(, $obj:ident)*) => (
-        $member.with_c_str(|c_member| unsafe {
-            use std::mem::transmute;
+macro_rules! proxy_call {
+    ($proxy:ident, $member:ident, $cb:ident, $cb_data:ident, $timeout:ident, $signature:ident, $(, $obj:ident)*) => {
+        let c_member = ffi::CString::from_slice($member.as_bytes());
+        let c_signature = ffi::CString::from_slice($signature.as_bytes());
+        unsafe {
             use efl::eldbus;
-            $signature.with_c_str(|c_signature| {
-                let c_cb: eldbus::_CEldbusMessageCb = transmute($cb);
-                let c_cb_data: *const *const eldbus::c_void = transmute($cb_data);
-                transmute::<*const *const eldbus::EldbusPending,Box<eldbus::EldbusPending>>(eldbus::eldbus_proxy_call(transmute::<&eldbus::EldbusProxy,*const *const eldbus::EldbusProxy>($proxy), c_member, c_cb, c_cb_data, $timeout as eldbus::c_double, c_signature $(, $obj)*))
-            })
-        })
-    );
-)
+            let c_cb: eldbus::_CEldbusMessageCb = mem::transmute($cb);
+            let c_cb_data: *const *const eldbus::c_void = mem::transmute($cb_data);
+            mem::transmute::<*const *const eldbus::EldbusPending, Box<eldbus::EldbusPending>>(
+                eldbus::eldbus_proxy_call(
+                    mem::transmute::<&eldbus::EldbusProxy,*const *const eldbus::EldbusProxy>($proxy),
+                    c_member, c_cb, c_cb_data, $timeout as eldbus::c_double, c_signature $(, $obj)*
+                )
+            )
+        }
+    };
+}
 
 /// Get the arguments from an Eldbus_Message.
 /// This is the macro version of the function 'eldbus_message_arguments_get'
 /// which should allow receiving full variable argument lists.
 #[macro_export]
-macro_rules! message_arguments_get(
-    ($msg:ident, $signature:ident $(, $args:expr)*) => (
-        $signature.with_c_str(|c_signature| unsafe {
+macro_rules! message_arguments_get {
+    ($msg:ident, $signature:ident, $(, $args:expr)*) => {
+        let c_signature = ffi::CString::from_slice($signature.as_bytes());
+        unsafe {
             use efl::{eldbus, eseful};
             eseful::from_eina_to_bool(eldbus::eldbus_message_arguments_get($msg, c_signature $(, $args)*))
-        })
-    )
-)
+        }
+    }
+}

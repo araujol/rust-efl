@@ -18,9 +18,7 @@
 
 extern crate libc;
 
-use std::c_str::CString;
-use std::mem::transmute;
-use std::ptr;
+use std::{mem, ptr, ffi, str};
 
 use elementary::libc::{c_int, c_uint, c_char};
 use evas;
@@ -180,9 +178,9 @@ extern "C" {
     fn elm_fileselector_entry_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
 }
 
-pub fn init(argc: uint, argv: Vec<String>) -> uint {
+pub fn init(argc: usize, argv: Vec<String>) -> usize {
     let vchars_ptr: *const *const c_char = eseful::to_c_args(argv);
-    unsafe { elm_init(argc as c_int, vchars_ptr) as uint }
+    unsafe { elm_init(argc as c_int, vchars_ptr) as usize }
 }
 
 pub fn startup_time(t: f64) {
@@ -201,23 +199,25 @@ pub fn exit() {
     unsafe { elm_exit() }
 }
 
-pub fn policy_set(policy: ElmPolicy, value: int) {
+pub fn policy_set(policy: ElmPolicy, value: isize) {
     unsafe { elm_policy_set(policy as c_int, value as c_int) }
 }
 
 /* Object methods */
 pub fn object_text_get(obj: &evas::EvasObject) -> String {
     unsafe {
-        (match CString::new(elm_object_part_text_get(obj, ptr::null()), false).as_str() {
-            None => "", Some(s) => s
-        }).to_string()
+        match str::from_utf8(ffi::c_str_to_bytes(&elm_object_part_text_get(obj, ptr::null()))) {
+            Ok(s) => s,
+            Err(_) => panic!("object text is not utf-8")
+        }.to_string()
     }
 }
 
 pub fn object_text_set(obj: &evas::EvasObject, text: &str) {
-    text.with_c_str(|c_text| unsafe {
-        elm_object_part_text_set(obj, ptr::null(), c_text);
-    })
+    let c_text = ffi::CString::from_slice(text.as_bytes());
+    unsafe {
+        elm_object_part_text_set(obj, ptr::null(), c_text.as_ptr());
+    }
 }
 
 pub fn object_focus_get(obj: &evas::EvasObject) -> bool {
@@ -229,33 +229,34 @@ pub fn object_focus_set(obj: &evas::EvasObject, focus: bool) {
 }
 
 pub fn object_style_set(obj: &evas::EvasObject, style: &str) -> bool {
-    style.with_c_str(|c_style| unsafe {
-        eseful::from_eina_to_bool(elm_object_style_set(obj, c_style))
-    })
+    let c_style = ffi::CString::from_slice(style.as_bytes());
+    unsafe {
+        eseful::from_eina_to_bool(elm_object_style_set(obj, c_style.as_ptr()))
+    }
 }
 
 /* Window methods */
 /// Add a window object.
 /// If obj is None this is the first window created.
-pub fn win_add(obj: Option<&evas::EvasObject>, name: &str,
-               wtype: ElmWinType) -> Box<evas::EvasObject> {
+pub fn win_add(obj: Option<&evas::EvasObject>, name: &str, wtype: ElmWinType) -> Box<evas::EvasObject> {
     let iwtype = wtype as c_int;
-    name.with_c_str(|c_buf| unsafe {
+    let c_buf = ffi::CString::from_slice(name.as_bytes());
+    unsafe {
         match obj {
             /* Null pointer */
-            None => transmute(elm_win_add(ptr::null(), c_buf, iwtype)),
+            None => mem::transmute(elm_win_add(ptr::null(), c_buf.as_ptr(), iwtype)),
             /* Add win to eobj parent */
-            Some(eobj) => transmute(elm_win_add(eobj, c_buf, iwtype))
+            Some(eobj) => mem::transmute(elm_win_add(eobj, c_buf.as_ptr(), iwtype))
         }
-    })
+    }
 }
 
 pub fn win_util_standard_add(name: &str, title: &str) -> Box<evas::EvasObject> {
-    name.with_c_str(|c_name| unsafe {
-        title.with_c_str(|c_title| {
-            transmute(elm_win_util_standard_add(c_name, c_title))
-        })
-    })
+    let c_name = ffi::CString::from_slice(name.as_bytes());
+    let c_title = ffi::CString::from_slice(title.as_bytes());
+    unsafe {
+        mem::transmute(elm_win_util_standard_add(c_name.as_ptr(), c_title.as_ptr()))
+    }
 }
 
 /// Set the window autodel state.
@@ -273,23 +274,25 @@ pub fn win_resize_object_add(obj: &evas::EvasObject, subobj: &evas::EvasObject) 
 /// Get the title window.
 pub fn win_title_get(obj: &evas::EvasObject) -> String {
     unsafe {
-        (match CString::new(elm_win_title_get(obj), false).as_str() {
-            None => "", Some(s) => s
-        }).to_string()
+        match str::from_utf8(ffi::c_str_to_bytes(&elm_win_title_get(obj))) {
+            Ok(s) => s,
+            Err(_) => panic!("win title is not utf-8")
+        }.to_string()
     }
 }
 
 /// Set the title of the window.
 pub fn win_title_set(obj: &evas::EvasObject, title: &str) {
-    title.with_c_str(|c_buf| unsafe {
-        elm_win_title_set(obj, c_buf)
-    })
+    let c_buf = ffi::CString::from_slice(title.as_bytes());
+    unsafe {
+        elm_win_title_set(obj, c_buf.as_ptr())
+    }
 }
 
 /* Box methods */
 /// Add a new box to the parent.
 pub fn box_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
-    unsafe { transmute(elm_box_add(parent)) }
+    unsafe { mem::transmute(elm_box_add(parent)) }
 }
 
 /// Add an object to the beginning of the pack list.
@@ -318,13 +321,13 @@ pub fn box_padding_set(obj: &evas::EvasObject, p: evas::Coord) {
 /* Button methods */
 /// Add a new button to the parent's canvas.
 pub fn button_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
-    unsafe { transmute(elm_button_add(parent)) }
+    unsafe { mem::transmute(elm_button_add(parent)) }
 }
 
 /* Check methods */
 /// Add a new Check object.
 pub fn check_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
-    unsafe { transmute(elm_check_add(parent)) }
+    unsafe { mem::transmute(elm_check_add(parent)) }
 }
 
 /// Set the on/off state of the check object.
@@ -342,7 +345,7 @@ pub fn check_state_get(obj: &evas::EvasObject) -> bool {
 /* Entry methods */
 /// This adds an entry to parent object.
 pub fn entry_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
-    unsafe { transmute(elm_entry_add(parent)) }
+    unsafe { mem::transmute(elm_entry_add(parent)) }
 }
 
 /// Get whether the entry is empty.
@@ -367,29 +370,32 @@ pub fn entry_single_line_set(obj: &evas::EvasObject, single_line: bool) {
 /// This returns the text currently shown in object entry.
 pub fn entry_entry_get(obj: &evas::EvasObject) -> String {
     unsafe {
-        (match CString::new(elm_entry_entry_get(obj), false).as_str() {
-            None => "", Some(s) => s
-        }).to_string()
+        match str::from_utf8(ffi::c_str_to_bytes(&elm_entry_entry_get(obj))) {
+            Ok(s) => s,
+            Err(_) => panic!("entry is not utf-8")
+        }.to_string()
     }
 }
 
 /// This sets the text displayed within the entry to 'entry'.
 pub fn entry_entry_set(obj: &evas::EvasObject, entry: &str) {
-    entry.with_c_str(|c_buf| unsafe {
-        elm_entry_entry_set(obj, c_buf);
-    })
+    let c_buf = ffi::CString::from_slice(entry.as_bytes());
+    unsafe {
+        elm_entry_entry_set(obj, c_buf.as_ptr());
+    }
 }
 pub fn entry_file_set(obj: &evas::EvasObject, file: &str, format: ElmTextFormat) -> eina::EinaBool {
     let iformat = format as c_int;
-    file.with_c_str(|c_file| unsafe {
-        elm_entry_file_set(obj, c_file, iformat) as eina::EinaBool
-    })
+    let c_file = ffi::CString::from_slice(file.as_bytes());
+    unsafe {
+        elm_entry_file_set(obj, c_file.as_ptr(), iformat) as eina::EinaBool
+    }
 }
 
 /* Label methods */
 /// Add a new label to the parent.
 pub fn label_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
-    unsafe { transmute(elm_label_add(parent)) }
+    unsafe { mem::transmute(elm_label_add(parent)) }
 }
 
 /// Set the slide mode of the label widget.
@@ -412,7 +418,7 @@ pub fn label_slide_go(obj: &evas::EvasObject) {
 
 /* Date/Calendar methods */
 pub fn datetime_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
-    unsafe { transmute(elm_datetime_add(parent)) }
+    unsafe { mem::transmute(elm_datetime_add(parent)) }
 }
 
 pub fn calendar_add(parent: &evas::EvasObject) -> *const evas::EvasObject {
@@ -430,7 +436,7 @@ pub fn layout_sizing_eval(obj: &evas::EvasObject) {
 
 /// Add a new background to the parent.
 pub fn bg_add(parent: &evas::EvasObject) -> Box<evas::EvasObject> {
-    unsafe { transmute(elm_bg_add(parent)) }
+    unsafe { mem::transmute(elm_bg_add(parent)) }
 }
 
 pub fn bg_load_size_set(parent: &evas::EvasObject, c: evas::Coord) {
@@ -443,9 +449,9 @@ pub fn bg_option_set(obj: &evas::EvasObject, option: ElmBgOption) {
 }
 
 pub fn bg_file_set(obj: &evas::EvasObject, file: &str, group: &str) -> eina::EinaBool {
-    file.with_c_str(|c_file| unsafe {
-        group.with_c_str(|c_group| {
-            elm_bg_file_set(obj, c_file, c_group) as eina::EinaBool
-        })
-    })
+    let c_file = ffi::CString::from_slice(file.as_bytes());
+    let c_group = ffi::CString::from_slice(group.as_bytes());
+    unsafe {
+        elm_bg_file_set(obj, c_file.as_ptr(), c_group.as_ptr()) as eina::EinaBool
+    }
 }

@@ -18,7 +18,7 @@
 extern crate libc;
 
 use edje::libc::{c_int, c_char};
-use std::mem::transmute;
+use std::{mem, ffi};
 
 use evas;
 use eina;
@@ -38,34 +38,34 @@ extern "C" {
 }
 
 /// Initialize the Edje library.
-pub fn init() -> int {
-    unsafe { edje_init() as int }
+pub fn init() -> isize {
+    unsafe { edje_init() as isize }
 }
 
 /// Shutdown the Edje library.
-pub fn shutdown() -> int {
-    unsafe { edje_shutdown() as int }
+pub fn shutdown() -> isize {
+    unsafe { edje_shutdown() as isize }
 }
 
 /// Instantiate a new Edje object.
 pub fn object_add(evas: &evas::Evas) -> Box<evas::EvasObject> {
-    unsafe { transmute(edje_object_add(evas)) }
+    unsafe { mem::transmute(edje_object_add(evas)) }
 }
 
 /// Sets the EDJ file (and group within it) to load an Edje object's contents from.
 pub fn object_file_set(obj: &evas::EvasObject, file: &str, group: &str) -> bool {
-    file.with_c_str(|c_file| unsafe {
-        group.with_c_str(|c_group| {
-            from_eina_to_bool(edje_object_file_set(obj, c_file, c_group))
-        })
-    })
+    let c_file = ffi::CString::from_slice(file.as_bytes());
+    let c_group = ffi::CString::from_slice(group.as_bytes());
+    unsafe {
+        from_eina_to_bool(edje_object_file_set(obj, c_file.as_ptr(), c_group.as_ptr()))
+    }
 }
 
 /// Sets the text for an object part.
 pub fn object_part_text_set(obj: &evas::EvasObject, part: &str, text: &str) -> bool {
-    part.with_c_str(|c_part| unsafe {
-        text.with_c_str(|c_text| {
-            from_eina_to_bool(edje_object_part_text_set(obj, c_part, c_text))
-        })
-    })
+    let c_part = ffi::CString::from_slice(part.as_bytes());
+    let c_text = ffi::CString::from_slice(text.as_bytes());
+    unsafe {
+        from_eina_to_bool(edje_object_part_text_set(obj, c_part.as_ptr(), c_text.as_ptr()))
+    }
 }

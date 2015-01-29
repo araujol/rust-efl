@@ -18,9 +18,7 @@
 extern crate libc;
 extern crate core;
 
-use std::ptr;
-use std::mem::transmute;
-use std::option::Option;
+use std::{ptr, mem};
 use eina::core::mem::uninitialized;
 use eina::libc::{c_void, c_int, c_uint};
 use eseful;
@@ -30,7 +28,7 @@ pub type EinaBool = u8;
 pub const EINA_FALSE: EinaBool = 0u8;
 pub const EINA_TRUE:  EinaBool = 1u8;
 
-type _EinaMagic = uint;
+type _EinaMagic = usize;
 type _CEinaMagic = c_uint;
 
 /*
@@ -53,7 +51,7 @@ pub struct _EinaList<'r, T:'r> {
 
 pub struct _EinaListAccounting<'r, T:'r> {
     last: *mut _EinaList<'r, T>,
-    count: uint,
+    count: usize,
 
     __magic: _EinaMagic
 }
@@ -104,12 +102,12 @@ pub struct _EinaHash<T> {
     data_free_cb: EinaFreeCb<T>,
 
     buckets: *const *const EinaRbtree,
-    size: int,
-    mask: int,
+    size: isize,
+    mask: isize,
 
-    population: int,
+    population: isize,
 
-    buckets_power_size: int,
+    buckets_power_size: isize,
 
     __magic: _EinaMagic
 }
@@ -132,17 +130,17 @@ pub struct _CEinaHash {
 }
 
 /// Type for a function to determine the length of a hash key.
-pub type EinaKeyLength<T> = fn (&T) -> int;
+pub type EinaKeyLength<T> = fn (&T) -> isize;
 #[repr(C)]
 type _CEinaKeyLength = fn (*const c_void) -> c_int;
 
 /// Type for a function to compare two hash keys.
-pub type EinaKeyCmp<T> = fn (&T, int, &T, int) -> c_int;
+pub type EinaKeyCmp<T> = fn (&T, isize, &T, isize) -> c_int;
 #[repr(C)]
 type _CEinaKeyCmp = fn (*const c_void, c_int, *const c_void, c_int) -> c_int;
 
 /// Type for a function to create a hash key.
-pub type EinaKeyHash<T> = fn (&T, int) -> int;
+pub type EinaKeyHash<T> = fn (&T, isize) -> isize;
 #[repr(C)]
 type _CEinaKeyHash = fn (*const c_void, c_int) -> c_int;
 
@@ -151,10 +149,10 @@ pub type EinaFreeCb<T> = fn (&T);
 #[repr(C)]
 type _CEinaFreeCb = fn (*const c_void);
 
-/// Type for a Red-Black tree node. It should be inlined into user's type.
+/// Type for a Red-Black tree node. It should be inlined isizeo user's type.
 #[repr(C)]
 pub struct EinaRbtree {
-    son: *const [EinaRbtree, ..2],
+    son: *const [EinaRbtree; 2],
 
     color: c_uint
 }
@@ -193,7 +191,7 @@ impl<'r, T> EinaList<'r, T> {
 }
 
 /// EinaList implements the Iterator trait.
-impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
+/*impl<'r, T> Iterator for EinaList<'r, T> {
 
     fn next(&mut self) -> Option<&'r T> {
         let v = list_data_get(self._eo);
@@ -204,7 +202,7 @@ impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
         return v
     }
 
-}
+}*/
 
 /* Implementations for EinaInlist type */
 impl EinaInlist {
@@ -229,16 +227,16 @@ impl EinaInlist {
 
 
 /// Initialize the Eina library.
-pub fn init() -> int { unsafe { eina_init() as int } }
+pub fn init() -> isize { unsafe { eina_init() as isize } }
 
 /// Shut down the Eina library.
-pub fn shutdown() -> int { unsafe { eina_shutdown() as int } }
+pub fn shutdown() -> isize { unsafe { eina_shutdown() as isize } }
 
 /// Free an entire list and all the nodes, ignoring the data contained.
 pub fn list_free<T>(list: *mut _EinaList<T>) -> *mut _EinaList<T> {
     unsafe {
-        transmute::<*const _CEinaList,*mut _EinaList<T>>(
-            eina_list_free(transmute::<*mut _EinaList<T>,*const _CEinaList>(list)))
+        mem::transmute::<*const _CEinaList,*mut _EinaList<T>>(
+            eina_list_free(mem::transmute::<*mut _EinaList<T>,*const _CEinaList>(list)))
     }
 }
 
@@ -246,12 +244,12 @@ pub fn list_free<T>(list: *mut _EinaList<T>) -> *mut _EinaList<T> {
 /// This function appends data to list. If list is 'None', a new list is returned.
 /*pub fn list_append<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
     unsafe {
-        let c_data: *const c_void = transmute(data);
+        let c_data: *const c_void = mem::transmute(data);
         match list {
-            None => transmute::<*const _CEinaList,*mut _EinaList<T>>(
+            None => mem::transmute::<*const _CEinaList,*mut _EinaList<T>>(
                 eina_list_append(ptr::null(), c_data)),
-            Some(l) => transmute::<*const _CEinaList,*mut _EinaList<T>>(
-                eina_list_append(transmute::<*mut _EinaList<T>,*const _CEinaList>(l), c_data))
+            Some(l) => mem::transmute::<*const _CEinaList,*mut _EinaList<T>>(
+                eina_list_append(mem::transmute::<*mut _EinaList<T>,*const _CEinaList>(l), c_data))
         }
     }
 }
@@ -260,12 +258,12 @@ pub fn list_free<T>(list: *mut _EinaList<T>) -> *mut _EinaList<T> {
 /// This function prepends data to list. If list is 'None', a new list is returned.
 pub fn list_prepend<T>(list: Option<*mut _EinaList<T>>, data: &T) -> *mut _EinaList<T> {
     unsafe {
-        let c_data: *const c_void = transmute(data);
+        let c_data: *const c_void = mem::transmute(data);
         match list {
-            None => transmute::<*const _CEinaList,*mut _EinaList<T>>(
+            None => mem::transmute::<*const _CEinaList,*mut _EinaList<T>>(
                 eina_list_prepend(ptr::null(), c_data)),
-            Some(l) => transmute::<*const _CEinaList,*mut _EinaList<T>>(
-                eina_list_prepend(transmute::<*mut _EinaList<T>,*const _CEinaList>(l), c_data))
+            Some(l) => mem::transmute::<*const _CEinaList,*mut _EinaList<T>>(
+                eina_list_prepend(mem::transmute::<*mut _EinaList<T>,*const _CEinaList>(l), c_data))
         }
     }
 }
@@ -319,7 +317,7 @@ pub fn list_prev<'a, T>(list: *mut _EinaList<'a, T>) -> Option<*mut _EinaList<'a
 
 /// Get the count of the number of items in a list.
 #[inline]
-pub fn list_count<'r, T>(list: *mut _EinaList<'r, T>) -> uint {
+pub fn list_count<'r, T>(list: *mut _EinaList<'r, T>) -> usize {
     if list.is_null() { return 0 }
     unsafe {
         (*(*list).accounting).count
@@ -393,7 +391,7 @@ pub fn inlist_remove(in_list: EinaInlist, in_item: *const _EinaInlist) -> EinaIn
 
 /// Get the container object of an in_list.
 /*pub fn inlist_container_get<T>(in_list: EinaInlist) -> &T {
-    unsafe { transmute(in_list._eo) }
+    unsafe { mem::transmute(in_list._eo) }
 }*/
 
 /// Convenient function for object allocation.
@@ -404,41 +402,41 @@ pub fn object<T>() -> T {
 
 /// Macro to get the inlist object of a struct.
 #[macro_export]
-macro_rules! inlist_get(
-    ($inlist:ident) => (unsafe {
-        ::std::mem::transmute(&($inlist.__in_list))
-    })
-)
+macro_rules! inlist_get {
+    ($inlist:ident) => {
+    	unsafe { ::std::mem::mem::transmute(&($inlist.__in_list)) }
+    }
+}
 
 /* Hash type functions */
 /// Create a new hash table optimized for stringshared values.
 pub fn hash_stringshared_new<T>(data_free_cb: EinaFreeCb<T>) -> *mut _EinaHash<T> {
-    unsafe { transmute(eina_hash_stringshared_new(transmute(data_free_cb))) }
+    unsafe { mem::transmute(eina_hash_stringshared_new(mem::transmute(data_free_cb))) }
 }
 
 /// Create a new hash table for use with strings.
 pub fn hash_string_superfast_new<T>(data_free_cb: EinaFreeCb<T>) -> *mut _EinaHash<T> {
-    unsafe { transmute(eina_hash_string_superfast_new(transmute(data_free_cb))) }
+    unsafe { mem::transmute(eina_hash_string_superfast_new(mem::transmute(data_free_cb))) }
 }
 
 /// Add an entry to the given hash table.
 pub fn hash_add<T>(hash: *mut _EinaHash<T>, key: &T, data: &T) -> bool {
     eseful::from_eina_to_bool(unsafe {
-        eina_hash_add(transmute(hash), transmute(key), transmute(data))
+        eina_hash_add(mem::transmute(hash), mem::transmute(key), mem::transmute(data))
     })
 }
 
 /// Retrieve a specific entry in the given hash table.
 pub fn hash_find<T>(hash: *mut _EinaHash<T>, key: &T) -> &T {
-    unsafe { transmute(eina_hash_find(transmute(hash), transmute(key))) }
+    unsafe { mem::transmute(eina_hash_find(mem::transmute(hash), mem::transmute(key))) }
 }
 
 /// Returns the number of entries in the given hash table.
-pub fn hash_population<T>(hash: *mut _EinaHash<T>) -> int {
-    unsafe { eina_hash_population(transmute(hash)) as int }
+pub fn hash_population<T>(hash: *mut _EinaHash<T>) -> isize {
+    unsafe { eina_hash_population(mem::transmute(hash)) as isize }
 }
 
 /// Free the given hash table resources.
 pub fn hash_free<T>(hash: *mut _EinaHash<T>) {
-    unsafe { eina_hash_free(transmute(hash)) }
+    unsafe { eina_hash_free(mem::transmute(hash)) }
 }

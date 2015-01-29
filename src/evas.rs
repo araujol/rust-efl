@@ -19,9 +19,7 @@
 extern crate libc;
 
 use evas::libc::{c_int, c_uint, c_char, c_void};
-use std::mem::transmute;
-use std::option::Option;
-use std::ptr;
+use std::{mem, ffi, ptr};
 
 use eo;
 use eina;
@@ -77,8 +75,8 @@ pub enum EvasCallbackType {
     EvasCallbackDel,
     /// Events go on/off hold
     EvasCallbackHold,
-    /// Size hints changed event
-    EvasCallbackChangedSizeHints,
+    /// Size hisizes changed event
+    EvasCallbackChangedSizeHisizes,
     /// Image has been preloaded
     EvasCallbackImagePrealoaded,
     /// Canvas got focus as a whole
@@ -109,7 +107,7 @@ pub enum EvasCallbackType {
 
 pub type EvasObject = eo::Eo;
 
-pub type Coord = (int, int);
+pub type Coord = (isize, isize);
 
 pub type EvasObjectEventCb<T> = fn (&T, &Evas, &EvasObject, &eseful::EventInfo);
 type _CEvasObjectEventCb = fn (*const c_void, *const Evas, *const EvasObject, *const c_void);
@@ -137,9 +135,9 @@ extern "C"  {
     fn evas_object_color_set(obj: *const EvasObject,
                              r: c_int, g: c_int,
                              b: c_int, a: c_int);
-    fn evas_object_size_hint_min_set(e: *const EvasObject, x: c_int, y: c_int);
-    fn evas_object_size_hint_weight_set(e: *const EvasObject, x: f64, y: f64);
-    fn evas_object_size_hint_align_set(e: *const EvasObject, x: f64, y: f64);
+    fn evas_object_size_hisize_min_set(e: *const EvasObject, x: c_int, y: c_int);
+    fn evas_object_size_hisize_weight_set(e: *const EvasObject, x: f64, y: f64);
+    fn evas_object_size_hisize_align_set(e: *const EvasObject, x: f64, y: f64);
     fn evas_object_focus_set(obj: *const EvasObject, focus: eina::EinaBool);
     fn evas_object_image_add(e: *const Evas) -> *const EvasObject;
     fn evas_object_image_filled_add(e: *const Evas) -> *const EvasObject;
@@ -157,16 +155,16 @@ extern "C"  {
 }
 
 
-pub fn init() -> int {
-    unsafe { evas_init() as int }
+pub fn init() -> isize {
+    unsafe { evas_init() as isize }
 }
 
-pub fn shutdown() -> int {
-    unsafe { evas_shutdown() as int }
+pub fn shutdown() -> isize {
+    unsafe { evas_shutdown() as isize }
 }
 
 pub fn new() -> Box<Evas> {
-    unsafe { transmute(evas_new()) }
+    unsafe { mem::transmute(evas_new()) }
 }
 
 pub fn free(e: &Evas) {
@@ -187,12 +185,11 @@ pub fn object_move(e: &EvasObject, c: Coord) {
 }
 
 pub fn object_name_set(obj: &EvasObject, name: &str) {
-    name.with_c_str(|c_name| unsafe {
-        evas_object_name_set(obj, c_name)
-    })
+    let c_name = ffi::CString::from_slice(name.as_bytes());
+    unsafe { evas_object_name_set(obj, c_name.as_slice_with_nul().as_ptr()) }
 }
 
-pub fn object_color_set(obj: &EvasObject, r: int, g: int, b: int, a: int) {
+pub fn object_color_set(obj: &EvasObject, r: isize, g: isize, b: isize, a: isize) {
     unsafe { 
         evas_object_color_set(obj,
                               r as c_int,
@@ -202,7 +199,7 @@ pub fn object_color_set(obj: &EvasObject, r: int, g: int, b: int, a: int) {
     }
 }
 
-pub fn object_resize(e: &EvasObject, w: int, h: int) {
+pub fn object_resize(e: &EvasObject, w: isize, h: isize) {
     unsafe { evas_object_resize(e, w as c_int, h as c_int) }
 }
 
@@ -211,16 +208,16 @@ pub fn object_del(obj: &EvasObject) {
     unsafe { evas_object_del(obj) }
 }
 
-pub fn object_size_hint_min_set(e: &EvasObject, w: int, h: int) {
-    unsafe { evas_object_size_hint_min_set(e, w as c_int, h as c_int) }
+pub fn object_size_hisize_min_set(e: &EvasObject, w: isize, h: isize) {
+    unsafe { evas_object_size_hisize_min_set(e, w as c_int, h as c_int) }
 }
 
-pub fn object_size_hint_weight_set(e: &EvasObject, x: f64, y: f64) {
-    unsafe { evas_object_size_hint_weight_set(e, x, y) }
+pub fn object_size_hisize_weight_set(e: &EvasObject, x: f64, y: f64) {
+    unsafe { evas_object_size_hisize_weight_set(e, x, y) }
 }
 
-pub fn object_size_hint_align_set(e: &EvasObject, x: f64, y: f64) {
-    unsafe { evas_object_size_hint_align_set(e, x, y) }
+pub fn object_size_hisize_align_set(e: &EvasObject, x: f64, y: f64) {
+    unsafe { evas_object_size_hisize_align_set(e, x, y) }
 }
 
 pub fn object_focus_set(obj: &EvasObject, focus: eina::EinaBool) {
@@ -233,13 +230,13 @@ pub fn object_show(e: &EvasObject) {
 
 /// Creates a new image object on the given Evas e canvas.
 pub fn object_image_add(e: &Evas) -> Box<EvasObject> {
-    unsafe { transmute(evas_object_image_add(e)) }
+    unsafe { mem::transmute(evas_object_image_add(e)) }
 }
 
 /// Creates a new image object that automatically scales its bound image to
 /// the object's area, on both axis.
 pub fn object_image_filled_add(e: &Evas) -> Box<EvasObject> {
-    unsafe { transmute(evas_object_image_filled_add(e)) }
+    unsafe { mem::transmute(evas_object_image_filled_add(e)) }
 }
 
 /// Set how to fill an image object's drawing rectangle given the (real)
@@ -257,18 +254,20 @@ pub fn object_image_fill_set(obj: *const EvasObject, xy: Coord, wh: Coord) {
 /// Set the source file from where an image object must fetch the real
 /// image data (it may be an Eet file, besides pure image ones).
 pub fn object_image_file_set(obj: &EvasObject, file: &str, key: Option<&str>) {
-    file.with_c_str(|c_file| unsafe {
+    let c_file = ffi::CString::from_slice(file.as_bytes());
+    unsafe {
         match key {
-            None => evas_object_image_file_set(obj, c_file, ptr::null()),
-            Some(ref k) =>
-                k.with_c_str(|c_key|
-                             evas_object_image_file_set(obj, c_file, c_key))
+            None => evas_object_image_file_set(obj, c_file.as_slice_with_nul().as_ptr(), ptr::null()),
+            Some(k) => {
+                let c_key = ffi::CString::from_slice(k.as_bytes());
+                evas_object_image_file_set(obj, c_file.as_slice_with_nul().as_ptr(), c_key.as_slice_with_nul().as_ptr())
+            },
         }
-    })
+    }
 }
 
 /// Sets the size of the given image object.
-pub fn object_image_size_set(obj: &EvasObject, w: int, h: int) {
+pub fn object_image_size_set(obj: &EvasObject, w: isize, h: isize) {
     unsafe { evas_object_image_size_set(obj, w as c_int, h as c_int) }
 }
 
@@ -291,21 +290,21 @@ pub fn object_event_callback_add<T>(obj: &EvasObject, cbtype: EvasCallbackType,
                                     func: EvasObjectEventCb<T>, data: &T) {
     unsafe {
         evas_object_event_callback_add(obj, cbtype as c_uint,
-                                       transmute(func), transmute(data))
+                                       mem::transmute(func), mem::transmute(data))
     }
 }
 
 pub fn object_smart_callback_add<T>(e: &EvasObject, event: &str,
                                     cb: EvasSmartCb<T>, data: &Option<T>) {
-    /* Transmute both Data and Callback into the C representation */
-    let c_data: *const c_void = unsafe { transmute(data) };
-    let c_cb: CEvasSmartCb = unsafe { transmute(cb) };
-
-    event.with_c_str(|c_event| unsafe {
-        evas_object_smart_callback_add(e, c_event, c_cb, c_data)
-    })
+    /* Transmute both Data and Callback isizeo the C representation */
+    let c_data: *const c_void = unsafe { mem::transmute(data) };
+    let c_cb: CEvasSmartCb = unsafe { mem::transmute(cb) };
+    let c_event = ffi::CString::from_slice(event.as_bytes());
+    unsafe {
+        evas_object_smart_callback_add(e, c_event.as_slice_with_nul().as_ptr(), c_cb, c_data)
+    }
 }
 
 pub fn object_rectangle_add(e: &Evas) -> Box<EvasObject> {
-    unsafe { transmute(evas_object_rectangle_add(e)) }
+    unsafe { mem::transmute(evas_object_rectangle_add(e)) }
 }

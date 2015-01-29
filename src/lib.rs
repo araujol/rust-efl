@@ -18,9 +18,9 @@
 #![crate_name="efl"]
 #![crate_type="lib"]
 
-#![feature(macro_rules)]
-#![feature(unsafe_destructor)]
+#![feature(libc, core, std_misc, unsafe_destructor)]
 
+pub mod eseful;
 pub mod eo;
 pub mod ecore;
 pub mod evas;
@@ -31,4 +31,4 @@ pub mod edje;
 pub mod eldbus;
 pub mod emotion;
 pub mod elementary;
-pub mod eseful;
+

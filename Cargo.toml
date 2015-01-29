@@ -6,4 +6,4 @@ authors = [ "Luis Araujo <araujoc.luisf@gmail.com>", "Сухарик <suhr@i2pma
 
 [lib]
 name = "efl"
-path = "src/efl.rs"
+

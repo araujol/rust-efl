@@ -21,9 +21,8 @@ extern crate core;
 
 use eet::libc::{c_int, c_uint, c_char, c_void, free};
 use eet::core::num::FromPrimitive;
-use std::mem::transmute;
-use std::fmt::{Show, Formatter, Result};
-
+use std::fmt;
+use std::{mem, ffi};
 
 /// EetFile object.
 pub struct EetFile {
@@ -43,13 +42,13 @@ impl<T> EetValue<T> {
 #[unsafe_destructor]
 impl<T> Drop for EetValue<T> {
     fn drop(&mut self) {
-        unsafe { free(transmute(self._value)) }
+        unsafe { free(mem::transmute(self._value)) }
     }
 }
 
-impl<T: Show> Show for EetValue<T> {
-    fn fmt(&self, _fmt: &mut Formatter) -> Result {
-        unsafe { write!(_fmt, "{}", *((*self)._value)) }
+impl<T: fmt::Debug> fmt::Debug for EetValue<T> {
+    fn fmt(&self, _fmt: &mut fmt::Formatter) -> fmt::Result {
+        unsafe { write!(_fmt, "{:?}", *((*self)._value)) }
     }
 }
 
@@ -66,7 +65,7 @@ pub enum EetFileMode {
     EetFileModeReadWrite	
 }
 
-#[deriving(Show, FromPrimitive)]
+#[derive(Debug, FromPrimitive)]
 pub enum EetError {
     EetErrorNone,
     EetErrorBadObject,
@@ -103,10 +102,10 @@ extern "C" {
 }
 
 /// Initialize the EET library.
-pub fn init() -> int { unsafe { eet_init() as int } }
+pub fn init() -> isize { unsafe { eet_init() as isize } }
 
 /// Shut down the EET library.
-pub fn shutdown() -> int { unsafe { eet_shutdown() as int } }
+pub fn shutdown() -> isize { unsafe { eet_shutdown() as isize } }
 
 /// Clear eet cache.
 pub fn clearcache() { unsafe { eet_clearcache() } }
@@ -114,26 +113,28 @@ pub fn clearcache() { unsafe { eet_clearcache() } }
 /// Open an eet file on disk, and returns a handle to it.
 pub fn open(file: &str, mode: EetFileMode) -> EetFile {
     let imode = mode as c_uint;
-    file.with_c_str(|c_file| unsafe {
-        EetFile { _eo: eet_open(c_file, imode) }
-    })
+    let c_file = ffi::CString::from_slice(file.as_bytes());
+    unsafe {
+        EetFile { _eo: eet_open(c_file.as_ptr(), imode) }
+    }
 }
 
 /// Read a specified entry from an eet file and return data.
 pub fn read<T>(ef: EetFile, name: &str, size_ret: &mut i32) -> EetValue<T> {
-    name.with_c_str(|c_name| unsafe {
+    let c_name = ffi::CString::from_slice(name.as_bytes());
+    unsafe {
         EetValue {
-            _value: transmute::<*const c_void,*const T>(eet_read(ef._eo, c_name, size_ret))
+            _value: mem::transmute::<*const c_void,*const T>(eet_read(ef._eo, c_name.as_ptr(), size_ret))
         }
-    })
+    }
 }
 
 /// Write a specified entry to an eet file handle.
-pub fn write<T>(ef: EetFile, name: &str, data: &T,
-                size: uint, compress: int) -> int {
-    name.with_c_str(|c_name| unsafe {
-        eet_write(ef._eo, c_name, transmute(data), size as c_uint, compress as c_int) as int
-    })
+pub fn write<T>(ef: EetFile, name: &str, data: &T, size: usize, compress: isize) -> isize {
+    let c_name = ffi::CString::from_slice(name.as_bytes());
+    unsafe {
+        eet_write(ef._eo, c_name.as_ptr(), mem::transmute(data), size as c_uint, compress as c_int) as isize
+    }
 }
 
 //// Close an eet file handle and flush pending writes.
