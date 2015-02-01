@@ -1,0 +1,14 @@
+language: rust
+env:
+  global:
+    - secure: orBPCoHCJ5OpuqCpaBMTzamA0iL4DVriNST6X/tb3t+T4Vqn8BNxbkJfTtYHzLJVuxRI6ir1bPZd1iHVppLxYulAS/1DBajRF+37gJuklcIJ48oKREjo/Mh1TvOf/YfdGE9Sgl4R0IZ9HuD0fps+rxB2hLyilDP18jwu8cMlDzM=
+before_script:
+  - sudo add-apt-repository ppa:niko2040/e19 -y
+  - sudo apt-get update -q
+  - sudo apt-get install efl elementary
+script:
+  - cargo build
+  - cargo doc
+after_script: |
+  mv target/doc . &&
+  (curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh)

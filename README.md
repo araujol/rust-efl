@@ -19,16 +19,17 @@ Requirements:
 
 ## Building library:
 
-In the top level directory of this source code:
+Use cargo to build the library:
 
-    $ rustc src/efl.rs --crate-type=lib
+	% cargo build --release
 
 Now you can build programs using the rust-efl library bindings:
 
-    $ rustc tests/test_simple.rs -L.
+    % rustc tests/test_simple.rs -L target/release/
 
 ## Run:
 
-    $ ./test_simple
+    % ./test_simple
 
 Enjoy!
+

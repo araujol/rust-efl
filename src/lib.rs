@@ -15,12 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-#![crate_id="efl#1.10.0-0.0.1.99"]
+#![crate_name="efl"]
 #![crate_type="lib"]
 
-#![feature(macro_rules)]
-#![feature(unsafe_destructor)]
+#![feature(libc, core, std_misc, unsafe_destructor)]
 
+pub mod eseful;
 pub mod eo;
 pub mod ecore;
 pub mod evas;
@@ -31,4 +31,4 @@ pub mod edje;
 pub mod eldbus;
 pub mod emotion;
 pub mod elementary;
-pub mod eseful;
+

@@ -1,0 +1,9 @@
+[package]
+
+name = "rust-efl"
+version = "0.0.1"
+authors = [ "Luis Araujo <araujoc.luisf@gmail.com>", "Сухарик <suhr@i2pmail.org>" ]
+
+[lib]
+name = "efl"
+

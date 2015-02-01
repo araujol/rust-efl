@@ -17,6 +17,7 @@
 
 extern crate libc;
 
+use std::ffi;
 use eo::libc::{c_char, c_uint};
 use eina;
 use eseful;
@@ -30,9 +31,9 @@ pub type EoClass = Eo;
 extern "C" {
     fn eo_init() -> eina::EinaBool;
     fn eo_shutdown() -> eina::EinaBool;
-    fn _eo_do_start(obj: *Eo, cur_klass: *EoClass, is_super: eina::EinaBool,
-                    file: *c_char, func: *c_char, line: c_uint) -> eina::EinaBool;
-    fn _eo_do_end(obj: **Eo);
+    fn _eo_do_start(obj: *const Eo, cur_klass: *const EoClass, is_super: eina::EinaBool,
+                    file: *const c_char, func: *const c_char, line: c_uint) -> eina::EinaBool;
+    fn _eo_do_end(obj: *const *const Eo);
 }
 
 
@@ -46,15 +47,19 @@ pub fn shutdown() -> eina::EinaBool {
     unsafe { eo_shutdown() }
 }
 
-pub fn _do_start(obj: *Eo, cur_klass: *EoClass, is_super: bool,
-                 file: &str, func: &str, line: uint) -> bool {
-    file.with_c_str(|c_file| unsafe {
-        func.with_c_str(|c_func| {
-            eseful::from_eina_to_bool(_eo_do_start(obj, cur_klass, eseful::from_bool_to_eina(is_super), c_file, c_func, line as c_uint))
-        })
-    })
+pub fn _do_start(obj: *const Eo, cur_klass: *const EoClass, is_super: bool, file: &str, func: &str, line: usize) -> bool {
+    let c_file = ffi::CString::from_slice(file.as_bytes());
+    let c_func = ffi::CString::from_slice(func.as_bytes());
+    unsafe {
+        eseful::from_eina_to_bool(
+            _eo_do_start(
+                obj, cur_klass, eseful::from_bool_to_eina(is_super),
+                c_file.as_slice_with_nul().as_ptr(), c_func.as_slice_with_nul().as_ptr(), line as c_uint
+            )
+        )
+    }
 }
 
-pub fn _do_end(obj: **Eo) {
+pub fn _do_end(obj: *const *const Eo) {
     unsafe { _eo_do_end(obj) }
 }

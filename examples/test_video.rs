@@ -35,7 +35,7 @@ fn main() {
             args.get(1).as_slice()
         } else {
             println!("No video file. Usage: {} <file>", args.get(0));
-            fail!()
+            panic!()
         };
 
     ecore::evas_init();

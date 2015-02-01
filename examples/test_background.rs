@@ -20,7 +20,7 @@ fn main() {
             args.get(1).as_slice()
         } else {
             println!("No logo file. Usage: {} <file>", args.get(0));
-            fail!()
+            panic!()
         };
 
     elementary::startup_time(ecore::time_unix_get());
