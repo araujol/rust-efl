@@ -134,28 +134,25 @@ pub struct _CEinaHash {
 
 /// Type for a function to determine the length of a hash key.
 pub type EinaKeyLength<T> = fn (&T) -> int;
-#[repr(C)]
 type _CEinaKeyLength = fn (*const c_void) -> c_int;
 
 /// Type for a function to compare two hash keys.
 pub type EinaKeyCmp<T> = fn (&T, int, &T, int) -> c_int;
-#[repr(C)]
 type _CEinaKeyCmp = fn (*const c_void, c_int, *const c_void, c_int) -> c_int;
 
 /// Type for a function to create a hash key.
 pub type EinaKeyHash<T> = fn (&T, int) -> int;
-#[repr(C)]
 type _CEinaKeyHash = fn (*const c_void, c_int) -> c_int;
 
 /// A callback type used to free data when iterating over a container.
 pub type EinaFreeCb<T> = fn (&T);
-#[repr(C)]
 type _CEinaFreeCb = fn (*const c_void);
 
 /// Type for a Red-Black tree node. It should be inlined into user's type.
 #[repr(C)]
 pub struct EinaRbtree {
-    son: *const [EinaRbtree, ..2],
+    // FIXME Restore ..2 syntax?  son: *const [EinaRbtree, ..2],
+    son: *const [EinaRbtree],
 
     color: c_uint
 }
@@ -194,7 +191,8 @@ impl<'r, T> EinaList<'r, T> {
 }
 
 /// EinaList implements the Iterator trait.
-impl<'r, T> Iterator<&'r T> for EinaList<'r, T> {
+impl<'r, T> Iterator for EinaList<'r, T> {
+    type Item = &'r T;
 
     fn next(&mut self) -> Option<&'r T> {
         let v = list_data_get(self._eo);
