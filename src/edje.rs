@@ -17,6 +17,7 @@
 
 extern crate libc;
 
+use types::{int, uint};
 use edje::libc::{c_int, c_char};
 use std::mem::transmute;
 

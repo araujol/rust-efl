@@ -18,6 +18,7 @@
 
 extern crate libc;
 
+use types::{int, uint};
 use std::mem::transmute;
 use std::ffi::CString;
 use std::option::Option;

@@ -18,6 +18,7 @@
 extern crate libc;
 extern crate core;
 
+use types::{int, uint};
 use std::ptr;
 use std::mem::transmute;
 use std::option::Option;
@@ -408,7 +409,7 @@ macro_rules! inlist_get(
     ($inlist:ident) => (unsafe {
         ::std::mem::transmute(&($inlist.__in_list))
     })
-)
+);
 
 /* Hash type functions */
 /// Create a new hash table optimized for stringshared values.

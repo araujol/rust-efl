@@ -31,3 +31,8 @@ pub mod eldbus;
 pub mod emotion;
 pub mod elementary;
 pub mod eseful;
+pub mod types {
+    // Define old int/uint types used by original Rust code
+    pub type int = i32;
+    pub type uint = u32;
+}

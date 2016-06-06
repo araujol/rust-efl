@@ -17,6 +17,7 @@
 
 extern crate libc;
 
+use types::{int, uint};
 use eo::libc::{c_char, c_uint};
 use eina;
 use eseful;

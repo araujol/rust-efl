@@ -22,6 +22,7 @@
 
 extern crate libc;
 
+use types::{int, uint};
 use std::mem::forget;
 use eseful::libc::c_char;
 use eina;

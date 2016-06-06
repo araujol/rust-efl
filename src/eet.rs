@@ -22,6 +22,7 @@ extern crate core;
 extern crate num;
 use eet::num::FromPrimitive;
 
+use types::{int, uint};
 use eet::libc::{c_int, c_uint, c_char, c_void, free};
 use std::mem::transmute;
 use std::fmt::{Debug, Formatter, Result};

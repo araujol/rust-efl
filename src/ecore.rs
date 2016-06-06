@@ -18,6 +18,7 @@
 
 extern crate libc;
 
+use types::{int, uint};
 use std::ptr;
 use std::option::Option;
 use std::mem::transmute;
