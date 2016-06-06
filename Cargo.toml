@@ -7,3 +7,8 @@ authors = [ "Luis Araujo <araujoc.luisf@gmail.com>", "Сухарик <suhr@i2pma
 [lib]
 name = "efl"
 path = "src/efl.rs"
+
+[dependencies]
+libc = "0.2.11"
+num = "0.1.32"
+enum_primitive = "0.1.0"

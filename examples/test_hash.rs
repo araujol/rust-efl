@@ -32,11 +32,11 @@ fn find_value(hash: *mut eina::_EinaHash<c_char>, key: &str) -> String {
         let cstr = CString::new(value, false);
         if cstr.is_not_null() {
             match cstr.as_str() {
-                None => fail!("Not valid string"), 
+                None => panic!("Not valid string"),
                 Some(s) => s.to_string()
             }
         } else {
-            fail!("Null string!")
+            panic!("Null string!")
         }
     })
 }

@@ -9,7 +9,7 @@ extern crate efl;
 
 extern crate libc;
 
-use std::c_str::CString;
+use std::ffi::CString;
 use libc::c_char;
 use efl::ecore;
 use efl::eldbus;

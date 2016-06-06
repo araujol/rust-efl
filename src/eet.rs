@@ -19,11 +19,12 @@
 extern crate libc;
 extern crate core;
 
-use eet::libc::{c_int, c_uint, c_char, c_void, free};
-use eet::core::num::FromPrimitive;
-use std::mem::transmute;
-use std::fmt::{Show, Formatter, Result};
+extern crate num;
+use eet::num::FromPrimitive;
 
+use eet::libc::{c_int, c_uint, c_char, c_void, free};
+use std::mem::transmute;
+use std::fmt::{Debug, Formatter, Result};
 
 /// EetFile object.
 pub struct EetFile {
@@ -40,14 +41,13 @@ impl<T> EetValue<T> {
     pub fn get_val(&self) -> *const T { self._value }
 }
 
-#[unsafe_destructor]
 impl<T> Drop for EetValue<T> {
     fn drop(&mut self) {
         unsafe { free(transmute(self._value)) }
     }
 }
 
-impl<T: Show> Show for EetValue<T> {
+impl<T: Debug> Debug for EetValue<T> {
     fn fmt(&self, _fmt: &mut Formatter) -> Result {
         unsafe { write!(_fmt, "{}", *((*self)._value)) }
     }
@@ -66,7 +66,8 @@ pub enum EetFileMode {
     EetFileModeReadWrite	
 }
 
-#[deriving(Show, FromPrimitive)]
+enum_from_primitive!{
+#[derive(Debug)]
 pub enum EetError {
     EetErrorNone,
     EetErrorBadObject,
@@ -87,6 +88,7 @@ pub enum EetError {
     EetErrorPrngNotSeeded,
     EetErrorEncryptFailed,
     EetErrorDecryptFailed
+}
 }
 
 #[link(name = "eet")]
@@ -138,12 +140,12 @@ pub fn write<T>(ef: EetFile, name: &str, data: &T,
 
 //// Close an eet file handle and flush pending writes.
 pub fn close(ef: EetFile) -> EetError {
-    let v: Option<EetError> = FromPrimitive::from_u32(unsafe { eet_close(ef._eo) });
+    let v: Option<EetError> = EetError::from_u32(unsafe { eet_close(ef._eo) });
     v.unwrap()
 }
 
 /// Sync content of an eet file handle, flushing pending writes.
 pub fn sync(ef: EetFile) -> EetError {
-    let v: Option<EetError> = FromPrimitive::from_u32(unsafe { eet_sync(ef._eo) });
+    let v: Option<EetError> = EetError::from_u32(unsafe { eet_sync(ef._eo) });
     v.unwrap()
 }

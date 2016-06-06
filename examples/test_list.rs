@@ -38,7 +38,7 @@ fn main() {
 
     let last =
         match eina::list_last(strlst) {
-            None => { fail!("No last?!") }
+            None => { panic!("No last?!") }
             Some(last) => {
                 println!("Last Value: {}", eina::list_data_get(last));
                 last

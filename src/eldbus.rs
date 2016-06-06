@@ -19,7 +19,7 @@
 extern crate libc;
 
 use std::mem::transmute;
-use std::c_str::CString;
+use std::ffi::CString;
 use std::option::Option;
 use std::ptr;
 
@@ -208,7 +208,7 @@ macro_rules! proxy_call(
             })
         })
     );
-)
+);
 
 /// Get the arguments from an Eldbus_Message.
 /// This is the macro version of the function 'eldbus_message_arguments_get'
@@ -221,4 +221,4 @@ macro_rules! message_arguments_get(
             eseful::from_eina_to_bool(eldbus::eldbus_message_arguments_get($msg, c_signature $(, $args)*))
         })
     )
-)
+);

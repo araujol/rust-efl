@@ -18,7 +18,7 @@
 
 extern crate libc;
 
-use std::c_str::CString;
+use std::ffi::CString;
 use std::mem::transmute;
 use std::ptr;
 

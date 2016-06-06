@@ -18,8 +18,7 @@
 #![crate_name="efl"]
 #![crate_type="lib"]
 
-#![feature(macro_rules)]
-#![feature(unsafe_destructor)]
+#[macro_use] extern crate enum_primitive;
 
 pub mod eo;
 pub mod ecore;

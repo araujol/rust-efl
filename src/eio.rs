@@ -24,7 +24,7 @@ use eina;
 
 pub enum EioFile {}
 
-#[deriving(Show)]
+#[derive(Debug)]
 pub enum EioFileOp {
     /// I/O operation is about a specific file copy.
     EioFileCopy,
