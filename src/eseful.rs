@@ -22,7 +22,6 @@
 
 extern crate libc;
 
-use types::{int, uint};
 use std::mem::forget;
 use std::ffi::CString;
 use eseful::libc::c_char;

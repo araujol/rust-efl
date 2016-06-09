@@ -17,7 +17,7 @@
 
 extern crate libc;
 
-use types::{int, uint};
+use types::{uint};
 use std::ffi::CString;
 use eo::libc::{c_char, c_uint};
 use eina;

@@ -26,7 +26,6 @@ use types::{int, uint};
 use eet::libc::{c_int, c_uint, c_char, c_void, free};
 use std::ffi::CString;
 use std::mem::transmute;
-use std::fmt::{Debug, Formatter, Result};
 
 /// EetFile object.
 pub struct EetFile {

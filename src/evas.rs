@@ -18,7 +18,7 @@
 
 extern crate libc;
 
-use types::{int, uint};
+use types::{int};
 use evas::libc::{c_int, c_uint, c_char, c_void};
 use std::ffi::CString;
 use std::mem::transmute;

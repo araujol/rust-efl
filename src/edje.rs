@@ -17,7 +17,7 @@
 
 extern crate libc;
 
-use types::{int, uint};
+use types::{int};
 use edje::libc::{c_int, c_char};
 use std::mem::transmute;
 use std::ffi::CString;

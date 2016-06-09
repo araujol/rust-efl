@@ -40,6 +40,8 @@ pub mod elementary;
 pub mod eseful;
 pub mod types {
     // Define old int/uint types used by original Rust code
+    #[allow(non_camel_case_types)]
     pub type int = i32;
+    #[allow(non_camel_case_types)]
     pub type uint = u32;
 }

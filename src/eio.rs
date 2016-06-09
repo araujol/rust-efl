@@ -17,7 +17,7 @@
 
 extern crate libc;
 
-use types::{int, uint};
+use types::{int};
 use eio::libc::{c_int, c_char, c_void, c_float, c_longlong, mode_t};
 use std::mem::transmute;
 use std::ffi::CString;

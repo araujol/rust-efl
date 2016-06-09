@@ -18,7 +18,6 @@
 
 extern crate libc;
 
-use types::{int, uint};
 use std::mem::transmute;
 use std::ffi::{CString, CStr};
 use emotion::libc::c_char;
