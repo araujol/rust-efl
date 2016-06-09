@@ -20,6 +20,7 @@ extern crate libc;
 
 use types::{int, uint};
 use evas::libc::{c_int, c_uint, c_char, c_void};
+use std::ffi::CString;
 use std::mem::transmute;
 use std::option::Option;
 use std::ptr;
@@ -188,9 +189,10 @@ pub fn object_move(e: &EvasObject, c: Coord) {
 }
 
 pub fn object_name_set(obj: &EvasObject, name: &str) {
-    name.with_c_str(|c_name| unsafe {
-        evas_object_name_set(obj, c_name)
-    })
+    let c_name = CString::new(name).unwrap();
+    unsafe {
+        evas_object_name_set(obj, c_name.as_ptr())
+    }
 }
 
 pub fn object_color_set(obj: &EvasObject, r: int, g: int, b: int, a: int) {
@@ -258,14 +260,17 @@ pub fn object_image_fill_set(obj: *const EvasObject, xy: Coord, wh: Coord) {
 /// Set the source file from where an image object must fetch the real
 /// image data (it may be an Eet file, besides pure image ones).
 pub fn object_image_file_set(obj: &EvasObject, file: &str, key: Option<&str>) {
-    file.with_c_str(|c_file| unsafe {
+    let c_file = CString::new(file).unwrap();
+    unsafe {
         match key {
-            None => evas_object_image_file_set(obj, c_file, ptr::null()),
-            Some(ref k) =>
-                k.with_c_str(|c_key|
-                             evas_object_image_file_set(obj, c_file, c_key))
+            None => evas_object_image_file_set(obj, c_file.as_ptr(), ptr::null()),
+            // FIXME this was Some(ref k), but caused compile error. Okay to remove ref?
+            Some(k) => {
+                let c_key = CString::new(k).unwrap();
+                evas_object_image_file_set(obj, c_file.as_ptr(), c_key.as_ptr())
+            }
         }
-    })
+    }
 }
 
 /// Sets the size of the given image object.
@@ -301,10 +306,10 @@ pub fn object_smart_callback_add<T>(e: &EvasObject, event: &str,
     /* Transmute both Data and Callback into the C representation */
     let c_data: *const c_void = unsafe { transmute(data) };
     let c_cb: CEvasSmartCb = unsafe { transmute(cb) };
-
-    event.with_c_str(|c_event| unsafe {
-        evas_object_smart_callback_add(e, c_event, c_cb, c_data)
-    })
+    let c_event = CString::new(event).unwrap();
+    unsafe {
+        evas_object_smart_callback_add(e, c_event.as_ptr(), c_cb, c_data)
+    }
 }
 
 pub fn object_rectangle_add(e: &Evas) -> Box<EvasObject> {

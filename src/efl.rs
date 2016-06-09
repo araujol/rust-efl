@@ -20,6 +20,13 @@
 
 #[macro_use] extern crate enum_primitive;
 
+/* Project-wide Issues
+
+TODO CString pointers review.
+ Currently, as_ptr() is used. Should into_raw() and from_raw() be used in some places?
+
+*/
+
 pub mod eo;
 pub mod ecore;
 pub mod evas;

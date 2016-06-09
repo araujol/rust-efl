@@ -24,6 +24,7 @@ extern crate libc;
 
 use types::{int, uint};
 use std::mem::forget;
+use std::ffi::CString;
 use eseful::libc::c_char;
 use eina;
 
@@ -36,8 +37,8 @@ pub struct EventInfo;
 pub fn to_c_args(argv: Vec<String>) -> *const *const c_char {
     let mut vchars: Vec<*const c_char> = Vec::new();
 
-    for s in argv.iter() {
-        let cchar = unsafe { s.to_c_str().into_inner() };
+    for s in argv {
+        let cchar = unsafe { CString::new(s).unwrap().as_ptr() };
         vchars.push(cchar);
     }
 

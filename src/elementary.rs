@@ -19,7 +19,7 @@
 extern crate libc;
 
 use types::{int, uint};
-use std::ffi::CString;
+use std::ffi::{CString, CStr};
 use std::mem::transmute;
 use std::ptr;
 
@@ -209,16 +209,15 @@ pub fn policy_set(policy: ElmPolicy, value: int) {
 /* Object methods */
 pub fn object_text_get(obj: &evas::EvasObject) -> String {
     unsafe {
-        (match CString::new(elm_object_part_text_get(obj, ptr::null()), false).as_str() {
-            None => "", Some(s) => s
-        }).to_string()
+        CStr::from_ptr(elm_object_part_text_get(obj, ptr::null())).to_string_lossy().into_owned()
     }
 }
 
 pub fn object_text_set(obj: &evas::EvasObject, text: &str) {
-    text.with_c_str(|c_text| unsafe {
-        elm_object_part_text_set(obj, ptr::null(), c_text);
-    })
+    let c_text = CString::new(text).unwrap();
+    unsafe {
+        elm_object_part_text_set(obj, ptr::null(), c_text.as_ptr());
+    }
 }
 
 pub fn object_focus_get(obj: &evas::EvasObject) -> bool {
@@ -230,9 +229,10 @@ pub fn object_focus_set(obj: &evas::EvasObject, focus: bool) {
 }
 
 pub fn object_style_set(obj: &evas::EvasObject, style: &str) -> bool {
-    style.with_c_str(|c_style| unsafe {
-        eseful::from_eina_to_bool(elm_object_style_set(obj, c_style))
-    })
+    let c_style = CString::new(style).unwrap();
+    unsafe {
+        eseful::from_eina_to_bool(elm_object_style_set(obj, c_style.as_ptr()))
+    }
 }
 
 /* Window methods */
@@ -241,22 +241,23 @@ pub fn object_style_set(obj: &evas::EvasObject, style: &str) -> bool {
 pub fn win_add(obj: Option<&evas::EvasObject>, name: &str,
                wtype: ElmWinType) -> Box<evas::EvasObject> {
     let iwtype = wtype as c_int;
-    name.with_c_str(|c_buf| unsafe {
+    let c_buf = CString::new(name).unwrap();
+    unsafe {
         match obj {
             /* Null pointer */
-            None => transmute(elm_win_add(ptr::null(), c_buf, iwtype)),
+            None => transmute(elm_win_add(ptr::null(), c_buf.as_ptr(), iwtype)),
             /* Add win to eobj parent */
-            Some(eobj) => transmute(elm_win_add(eobj, c_buf, iwtype))
+            Some(eobj) => transmute(elm_win_add(eobj, c_buf.as_ptr(), iwtype))
         }
-    })
+    }
 }
 
 pub fn win_util_standard_add(name: &str, title: &str) -> Box<evas::EvasObject> {
-    name.with_c_str(|c_name| unsafe {
-        title.with_c_str(|c_title| {
-            transmute(elm_win_util_standard_add(c_name, c_title))
-        })
-    })
+    let c_name = CString::new(name).unwrap();
+    let c_title = CString::new(title).unwrap();
+    unsafe {
+        transmute(elm_win_util_standard_add(c_name.as_ptr(), c_title.as_ptr()))
+    }
 }
 
 /// Set the window autodel state.
@@ -274,17 +275,16 @@ pub fn win_resize_object_add(obj: &evas::EvasObject, subobj: &evas::EvasObject) 
 /// Get the title window.
 pub fn win_title_get(obj: &evas::EvasObject) -> String {
     unsafe {
-        (match CString::new(elm_win_title_get(obj), false).as_str() {
-            None => "", Some(s) => s
-        }).to_string()
+        CStr::from_ptr(elm_win_title_get(obj)).to_string_lossy().into_owned()
     }
 }
 
 /// Set the title of the window.
 pub fn win_title_set(obj: &evas::EvasObject, title: &str) {
-    title.with_c_str(|c_buf| unsafe {
-        elm_win_title_set(obj, c_buf)
-    })
+    let c_buf = CString::new(title).unwrap();
+    unsafe {
+        elm_win_title_set(obj, c_buf.as_ptr())
+    }
 }
 
 /* Box methods */
@@ -368,23 +368,23 @@ pub fn entry_single_line_set(obj: &evas::EvasObject, single_line: bool) {
 /// This returns the text currently shown in object entry.
 pub fn entry_entry_get(obj: &evas::EvasObject) -> String {
     unsafe {
-        (match CString::new(elm_entry_entry_get(obj), false).as_str() {
-            None => "", Some(s) => s
-        }).to_string()
+        CStr::from_ptr(elm_entry_entry_get(obj)).to_string_lossy().into_owned()
     }
 }
 
 /// This sets the text displayed within the entry to 'entry'.
 pub fn entry_entry_set(obj: &evas::EvasObject, entry: &str) {
-    entry.with_c_str(|c_buf| unsafe {
-        elm_entry_entry_set(obj, c_buf);
-    })
+    let c_buf = CString::new(entry).unwrap();
+    unsafe {
+        elm_entry_entry_set(obj, c_buf.as_ptr());
+    }
 }
 pub fn entry_file_set(obj: &evas::EvasObject, file: &str, format: ElmTextFormat) -> eina::EinaBool {
     let iformat = format as c_int;
-    file.with_c_str(|c_file| unsafe {
-        elm_entry_file_set(obj, c_file, iformat) as eina::EinaBool
-    })
+    let c_file = CString::new(file).unwrap();
+    unsafe {
+        elm_entry_file_set(obj, c_file.as_ptr(), iformat) as eina::EinaBool
+    }
 }
 
 /* Label methods */
@@ -444,9 +444,9 @@ pub fn bg_option_set(obj: &evas::EvasObject, option: ElmBgOption) {
 }
 
 pub fn bg_file_set(obj: &evas::EvasObject, file: &str, group: &str) -> eina::EinaBool {
-    file.with_c_str(|c_file| unsafe {
-        group.with_c_str(|c_group| {
-            elm_bg_file_set(obj, c_file, c_group) as eina::EinaBool
-        })
-    })
+    let c_file = CString::new(file).unwrap();
+    let c_group = CString::new(group).unwrap();
+    unsafe {
+        elm_bg_file_set(obj, c_file.as_ptr(), c_group.as_ptr()) as eina::EinaBool
+    }
 }

@@ -66,10 +66,11 @@ fn main() {
     proxy_call!(manager, member, _on_method_call,
                 data, timeout, signature);
     /*
-    hostname.with_c_str(|c_hostname| unsafe {
+    let c_hostname = CString::new(hostname).unwrap();
+    unsafe {
         proxy_call!(manager, member, _on_method_call, data,
-                    timeout, signature, c_hostname)
-    });
+                    timeout, signature, c_hostname.as_ptr())
+    };
      */
     ecore::main_loop_begin();
 

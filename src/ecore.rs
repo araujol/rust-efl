@@ -19,6 +19,7 @@
 extern crate libc;
 
 use types::{int, uint};
+use std::ffi::CString;
 use std::ptr;
 use std::option::Option;
 use std::mem::transmute;
@@ -168,21 +169,20 @@ pub fn evas_new(engine_name: Option<&str>,
                 x: int, y: int,
                 w: int, h: int,
                 extra_options: &str) -> Box<EcoreEvas> {
+
+    let c_extra_options = CString::new(extra_options).unwrap();
     unsafe {
         transmute(match engine_name {
             /* Null pointer */
-            None =>
-                extra_options.with_c_str(|c_extra_options| {
-                    ecore_evas_new(ptr::null(), x as c_int, y as c_int, 
-                                   w as c_int, h as c_int, c_extra_options)
-                }),
-            Some(ename) =>
-                ename.with_c_str(|c_engine_name| {
-                    extra_options.with_c_str(|c_extra_options| {
-                        ecore_evas_new(c_engine_name, x as c_int, y as c_int, 
-                                       w as c_int, h as c_int, c_extra_options)
-                    })
-                })
+            None => {
+                ecore_evas_new(ptr::null(), x as c_int, y as c_int,
+                               w as c_int, h as c_int, c_extra_options.as_ptr())
+            },
+            Some(ename) => {
+                let c_engine_name = CString::new(ename).unwrap();
+                ecore_evas_new(c_engine_name.as_ptr(), x as c_int, y as c_int,
+                               w as c_int, h as c_int, c_extra_options.as_ptr())
+            }
         })
     }
 }
@@ -219,14 +219,16 @@ pub fn evas_callback_resize_set(ee: &EcoreEvas, func: EcoreEvasEventCb) {
 
 /// Store user data in an Ecore_Evas structure.
 pub fn evas_data_set<T>(ee: &EcoreEvas, key: &str, data: &T) {
-    key.with_c_str(|c_key| unsafe {
-        ecore_evas_data_set(ee, c_key, transmute(data))
-    })
+    let c_key = CString::new(key).unwrap();
+    unsafe {
+        ecore_evas_data_set(ee, c_key.as_ptr(), transmute(data))
+    }
 }
 
 /// Retrieve user data associated with an Ecore_Evas.
 pub fn evas_data_get<T>(ee: &EcoreEvas, key: &str) -> Box<T> {
-    key.with_c_str(|c_key| unsafe {
-        transmute(ecore_evas_data_get(ee, c_key))
-    })
+    let c_key = CString::new(key).unwrap();
+    unsafe {
+        transmute(ecore_evas_data_get(ee, c_key.as_ptr()))
+    }
 }

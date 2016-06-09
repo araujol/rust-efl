@@ -18,6 +18,7 @@
 extern crate libc;
 
 use types::{int, uint};
+use std::ffi::CString;
 use eo::libc::{c_char, c_uint};
 use eina;
 use eseful;
@@ -49,11 +50,13 @@ pub fn shutdown() -> eina::EinaBool {
 
 pub fn _do_start(obj: *const Eo, cur_klass: *const EoClass, is_super: bool,
                  file: &str, func: &str, line: uint) -> bool {
-    file.with_c_str(|c_file| unsafe {
-        func.with_c_str(|c_func| {
-            eseful::from_eina_to_bool(_eo_do_start(obj, cur_klass, eseful::from_bool_to_eina(is_super), c_file, c_func, line as c_uint))
-        })
-    })
+
+    let c_file = CString::new(file).unwrap();
+    let c_func = CString::new(func).unwrap();
+    unsafe {
+        eseful::from_eina_to_bool(_eo_do_start(obj, cur_klass, eseful::from_bool_to_eina(is_super),
+                                               c_file.as_ptr(), c_func.as_ptr(), line as c_uint))
+    }
 }
 
 pub fn _do_end(obj: *const *const Eo) {

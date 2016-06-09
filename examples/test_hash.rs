@@ -16,19 +16,21 @@ fn _free_hash(data: &c_char) {
 }
 
 fn add_to_hash(hash: *mut eina::_EinaHash<c_char>, key: &str, data: &str) -> bool {
-    key.with_c_str(|c_key| unsafe {
+    let c_key = CString::new(key).unwrap();
+    unsafe {
         // Unwrap the cstring to forget ownership of the value so it can be
         // saved in the hash.
         // This *c_char will be freed by _free_hash
         let cstr = data.to_c_str();
         let cchar = cstr.unwrap();
-        eina::hash_add(hash, transmute(c_key), transmute(cchar))
-    })
+        eina::hash_add(hash, transmute(c_key.as_ptr()), transmute(cchar))
+    }
 }
 
 fn find_value(hash: *mut eina::_EinaHash<c_char>, key: &str) -> String {
-    key.with_c_str(|c_key| unsafe {
-        let value: &c_char = eina::hash_find(hash, transmute(c_key));
+    let c_key = CString::new(key).unwrap();
+    unsafe {
+        let value: &c_char = eina::hash_find(hash, transmute(c_key.as_ptr()));
         let cstr = CString::new(value, false);
         if cstr.is_not_null() {
             match cstr.as_str() {
@@ -38,7 +40,7 @@ fn find_value(hash: *mut eina::_EinaHash<c_char>, key: &str) -> String {
         } else {
             panic!("Null string!")
         }
-    })
+    }
 }
 
 

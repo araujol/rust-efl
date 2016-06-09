@@ -20,6 +20,7 @@ extern crate libc;
 use types::{int, uint};
 use edje::libc::{c_int, c_char};
 use std::mem::transmute;
+use std::ffi::CString;
 
 use evas;
 use eina;
@@ -55,18 +56,18 @@ pub fn object_add(evas: &evas::Evas) -> Box<evas::EvasObject> {
 
 /// Sets the EDJ file (and group within it) to load an Edje object's contents from.
 pub fn object_file_set(obj: &evas::EvasObject, file: &str, group: &str) -> bool {
-    file.with_c_str(|c_file| unsafe {
-        group.with_c_str(|c_group| {
-            from_eina_to_bool(edje_object_file_set(obj, c_file, c_group))
-        })
-    })
+    let c_file = CString::new(file).unwrap();
+    let c_group = CString::new(group).unwrap();
+    unsafe {
+        from_eina_to_bool(edje_object_file_set(obj, c_file.as_ptr(), c_group.as_ptr()))
+    }
 }
 
 /// Sets the text for an object part.
 pub fn object_part_text_set(obj: &evas::EvasObject, part: &str, text: &str) -> bool {
-    part.with_c_str(|c_part| unsafe {
-        text.with_c_str(|c_text| {
-            from_eina_to_bool(edje_object_part_text_set(obj, c_part, c_text))
-        })
-    })
+    let c_part = CString::new(part).unwrap();
+    let c_text = CString::new(text).unwrap();
+    unsafe {
+        from_eina_to_bool(edje_object_part_text_set(obj, c_part.as_ptr(), c_text.as_ptr()))
+    }
 }

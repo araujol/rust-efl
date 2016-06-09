@@ -20,7 +20,7 @@ extern crate libc;
 
 use types::{int, uint};
 use std::mem::transmute;
-use std::ffi::CString;
+use std::ffi::{CString, CStr};
 use emotion::libc::c_char;
 use evas;
 use eina;
@@ -43,25 +43,32 @@ pub fn object_add(evas: &evas::Evas) -> Box<evas::EvasObject> {
 
 /// Initializes an emotion object with the specified module.
 pub fn object_init(obj: &evas::EvasObject, module_filename: &str) -> eina::EinaBool {
-    module_filename.with_c_str(|c_mf| unsafe {
-        emotion_object_init(obj, c_mf) as eina::EinaBool
-    })
+    let c_mf = CString::new(module_filename).unwrap();
+    unsafe {
+        emotion_object_init(obj, c_mf.as_ptr()) as eina::EinaBool
+    }
 }
 
 /// Get the filename of the file associated with the emotion object.
 pub fn object_file_get(obj: &evas::EvasObject) -> String {
     unsafe {
+        // https://doc.rust-lang.org/std/ffi/struct.CStr.html
+        CStr::from_ptr(emotion_object_file_get(obj)).to_string_lossy().into_owned()
+        // TODO does this old code check for null? Does the code above?
+        /*
         (match CString::new(emotion_object_file_get(obj), false).as_str() {
             None => "", Some(s) => s
         }).to_string()
+        */
     }
 }
 
 /// Set the file to be played in the Emotion object.
 pub fn object_file_set(obj: &evas::EvasObject, filename: &str) -> eina::EinaBool {
-    filename.with_c_str(|c_filename| unsafe {
-        emotion_object_file_set(obj, c_filename) as eina::EinaBool
-    })
+    let c_filename = CString::new(filename).unwrap();
+    unsafe {
+        emotion_object_file_set(obj, c_filename.as_ptr()) as eina::EinaBool
+    }
 }
 
 /// Get play/pause state of the media file.

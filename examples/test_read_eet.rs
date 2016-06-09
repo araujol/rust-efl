@@ -20,9 +20,10 @@ fn main() {
     // Write compressed string
     let s = "Hello Eet!";
     // Apply some magic for proper C string conversion
-    s.with_c_str(|c_str| unsafe {
-        eet::write(ef, "String", transmute::<*c_char,&c_char>(c_str), s.len()+1, 1)
-    });
+    let c_str = CString::new(s).unwrap();
+    unsafe {
+        eet::write(ef, "String", transmute::<*c_char,&c_char>(c_str.as_ptr()), s.len()+1, 1)
+    }
     // Write uncompressed integer
     let i = 13;
     eet::write(ef, "Integer", &i, size_of_val(&i), 0);

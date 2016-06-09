@@ -20,6 +20,7 @@ extern crate libc;
 use types::{int, uint};
 use eio::libc::{c_int, c_char, c_void, c_float, c_longlong, mode_t};
 use std::mem::transmute;
+use std::ffi::CString;
 
 use eina;
 
@@ -103,60 +104,65 @@ pub fn shutdown() -> int {
 pub fn file_ls<T>(dir: &str, filter_cb: EioFilterCb<T>,
                   main_cb: EioMainCb<T>, done_cb: EioDoneCb<T>,
                   error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
-    dir.with_c_str(|c_dir| unsafe {
+
+    let c_dir = CString::new(dir).unwrap();
+    unsafe {
         let c_filter_cb: _CEioFilterCb = transmute(filter_cb);
         let c_main_cb: _CEioMainCb = transmute(main_cb);
         let c_done_cb: _CEioDoneCb = transmute(done_cb);
         let c_error_cb: _CEioErrorCb = transmute(error_cb);
         let c_data: *const c_void = transmute(data);
 
-        transmute(eio_file_ls(c_dir, c_filter_cb, c_main_cb,
+        transmute(eio_file_ls(c_dir.as_ptr(), c_filter_cb, c_main_cb,
                               c_done_cb, c_error_cb, c_data))
-    })
+    }
 }
 
 /// Create a new directory.
 pub fn file_mkdir<T>(path: &str, mode: mode_t, done_cb: EioDoneCb<T>,
                      error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
-    path.with_c_str(|c_path| unsafe {
+    let c_path = CString::new(path).unwrap();
+    unsafe {
         let c_done_cb: _CEioDoneCb = transmute(done_cb);
         let c_error_cb: _CEioErrorCb = transmute(error_cb);
         let c_data: *const c_void = transmute(data);
 
-        transmute(eio_file_mkdir(c_path, mode, c_done_cb, c_error_cb, c_data))
-    })
+        transmute(eio_file_mkdir(c_path.as_ptr(), mode, c_done_cb, c_error_cb, c_data))
+    }
 }
 
 /// Move a file asynchronously.
 pub fn file_move<T>(source: &str, dest: &str, 
                     progress_cb: EioProgressCb<T>, done_cb: EioDoneCb<T>, 
                     error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
-    source.with_c_str(|c_source| unsafe {
-        dest.with_c_str(|c_dest| {
-            let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
-            let c_done_cb: _CEioDoneCb = transmute(done_cb);
-            let c_error_cb: _CEioErrorCb = transmute(error_cb);
-            let c_data: *const c_void = transmute(data);
+    let c_source = CString::new(source).unwrap();
+    let c_dest = CString::new(dest).unwrap();
 
-            transmute(eio_file_move(c_source, c_dest, c_progress_cb,
-                                    c_done_cb, c_error_cb, c_data))
-        })
-    })
+    unsafe {
+        let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
+        let c_done_cb: _CEioDoneCb = transmute(done_cb);
+        let c_error_cb: _CEioErrorCb = transmute(error_cb);
+        let c_data: *const c_void = transmute(data);
+
+        transmute(eio_file_move(c_source.as_ptr(), c_dest.as_ptr(), c_progress_cb,
+                                c_done_cb, c_error_cb, c_data))
+    }
 }
 
 /// Copy a file asynchronously.
 pub fn file_copy<T>(source: &str, dest: &str, 
                     progress_cb: EioProgressCb<T>, done_cb: EioDoneCb<T>, 
                     error_cb: EioErrorCb<T>, data: &T) -> Box<EioFile> {
-    source.with_c_str(|c_source| unsafe {
-        dest.with_c_str(|c_dest| {
-            let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
-            let c_done_cb: _CEioDoneCb = transmute(done_cb);
-            let c_error_cb: _CEioErrorCb = transmute(error_cb);
-            let c_data: *const c_void = transmute(data);
+    let c_source = CString::new(source).unwrap();
+    let c_dest = CString::new(dest).unwrap();
 
-            transmute(eio_file_copy(c_source, c_dest, c_progress_cb,
-                                    c_done_cb, c_error_cb, c_data))
-        })
-    })
+    unsafe {
+        let c_progress_cb: _CEioProgressCb = transmute(progress_cb);
+        let c_done_cb: _CEioDoneCb = transmute(done_cb);
+        let c_error_cb: _CEioErrorCb = transmute(error_cb);
+        let c_data: *const c_void = transmute(data);
+
+        transmute(eio_file_copy(c_source.as_ptr(), c_dest.as_ptr(), c_progress_cb,
+                                c_done_cb, c_error_cb, c_data))
+    }
 }
