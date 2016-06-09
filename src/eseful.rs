@@ -37,15 +37,13 @@ pub fn to_c_args(argv: Vec<String>) -> *const *const c_char {
     let mut vchars: Vec<*const c_char> = Vec::new();
 
     for s in argv {
-        let cchar = unsafe { CString::new(s).unwrap().as_ptr() };
-        vchars.push(cchar);
+        vchars.push(CString::new(s).unwrap().as_ptr());
     }
 
     let vchars_ptr = vchars.as_ptr();
-    unsafe {
-        // Forget the vector of chars so it can be stored statically from C.
-        forget(vchars);
-    }
+    // Forget the vector of chars so it can be stored statically from C.
+    forget(vchars);
+
     return vchars_ptr;
 }
 
