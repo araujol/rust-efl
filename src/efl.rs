@@ -27,6 +27,9 @@ TODO CString pointers review.
 
 TODO Replace int/uint with appropriate primitive: i32, i64, u32, u64, usize, isize
 
+TODO Review FromPrimitive
+https://www.reddit.com/r/rust/comments/36pgn9/integer_to_enum_after_removal_of_fromprimitive/
+
 */
 
 pub mod eo;

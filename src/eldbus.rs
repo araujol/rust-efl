@@ -58,7 +58,7 @@ pub enum EldbusConnectionType
 
 pub type EldbusMessageCb<T> = fn (&T, &EldbusMessage, &EldbusPending);
 /* This C equivalent type needs to be public for proper macro expansion */
-pub type _CEldbusMessageCb = fn (*const c_void, *const EldbusMessage, *const EldbusPending);
+pub type _CEldbusMessageCb = extern fn (*const c_void, *const EldbusMessage, *const EldbusPending);
 
 #[link(name = "eldbus")]
 extern "C" {

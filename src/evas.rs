@@ -114,12 +114,12 @@ pub type EvasObject = eo::Eo;
 pub type Coord = (int, int);
 
 pub type EvasObjectEventCb<T> = fn (&T, &Evas, &EvasObject, &eseful::EventInfo);
-type _CEvasObjectEventCb = fn (*const c_void, *const Evas, *const EvasObject, *const c_void);
+type _CEvasObjectEventCb = extern fn (*const c_void, *const Evas, *const EvasObject, *const c_void);
 
 /* High level callback notation */
 pub type EvasSmartCb<T> = fn (&Option<T>, &EvasObject, &eseful::EventInfo) -> ();
 /* C level callback notation */
-type CEvasSmartCb = fn (*const c_void, *const EvasObject, *const c_void) -> c_void;
+type CEvasSmartCb = extern fn (*const c_void, *const EvasObject, *const c_void) -> c_void;
 
 
 #[link(name = "evas")]

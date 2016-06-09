@@ -96,8 +96,10 @@ pub struct _EinaInlist {
 
 /*
  * EinaHash type.
+ TODO Is the duplication here necessary?
  */
 /// Type for a generic hash table.
+#[allow(dead_code)]
 pub struct _EinaHash<T> {
     key_length_cb: EinaKeyLength<T>,
     key_cmp_cb: EinaKeyCmp<T>,
@@ -134,19 +136,19 @@ pub struct _CEinaHash {
 
 /// Type for a function to determine the length of a hash key.
 pub type EinaKeyLength<T> = fn (&T) -> int;
-type _CEinaKeyLength = fn (*const c_void) -> c_int;
+type _CEinaKeyLength = extern fn (*const c_void) -> c_int;
 
 /// Type for a function to compare two hash keys.
 pub type EinaKeyCmp<T> = fn (&T, int, &T, int) -> c_int;
-type _CEinaKeyCmp = fn (*const c_void, c_int, *const c_void, c_int) -> c_int;
+type _CEinaKeyCmp = extern fn (*const c_void, c_int, *const c_void, c_int) -> c_int;
 
 /// Type for a function to create a hash key.
 pub type EinaKeyHash<T> = fn (&T, int) -> int;
-type _CEinaKeyHash = fn (*const c_void, c_int) -> c_int;
+type _CEinaKeyHash = extern fn (*const c_void, c_int) -> c_int;
 
 /// A callback type used to free data when iterating over a container.
 pub type EinaFreeCb<T> = fn (&T);
-type _CEinaFreeCb = fn (*const c_void);
+type _CEinaFreeCb = extern fn (*const c_void);
 
 /// Type for a Red-Black tree node. It should be inlined into user's type.
 #[repr(C)]
@@ -159,6 +161,7 @@ pub struct EinaRbtree {
 
 
 #[link(name = "eina")]
+#[allow(dead_code)]
 extern "C" {
     fn eina_init() -> c_int;
     fn eina_shutdown() -> c_int;

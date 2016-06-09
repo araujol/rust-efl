@@ -24,6 +24,8 @@ use std::ffi::CString;
 
 use eina;
 
+// FIXME Define EioFile correctly, set #[repr(C)]
+//typedef Eio_File* (*Eio_Job_Direct_Ls_Func)(const char *path, Eio_Filter_Direct_Cb, Eio_Main_Direct_Cb, Eio_Done_Cb, Eio_Error_Cb, const void *data);
 pub enum EioFile {}
 
 #[derive(Debug)]
@@ -46,6 +48,7 @@ pub enum EioFileOp {
     EioFileGetgrnam
 }
 
+#[repr(C)]
 pub struct EioProgress {
     pub op: EioFileOp,
 
@@ -58,19 +61,19 @@ pub struct EioProgress {
 }
 
 pub type EioFilterCb<T> = fn (&mut T, &EioFile, *const c_char) -> bool;
-type _CEioFilterCb = fn (*const c_void, *const EioFile, *const c_char) -> eina::EinaBool;
+type _CEioFilterCb = extern fn (*const c_void, *const EioFile, *const c_char) -> eina::EinaBool;
 
 pub type EioMainCb<T> = fn (&mut T, &EioFile, *const c_char);
-type _CEioMainCb = fn (*const c_void, *const EioFile, *const c_char);
+type _CEioMainCb = extern fn (*const c_void, *const EioFile, *const c_char);
 
 pub type EioDoneCb<T> = fn (&mut T, &EioFile);
-type _CEioDoneCb = fn (*const c_void, *const EioFile);
+type _CEioDoneCb = extern fn (*const c_void, *const EioFile);
  
 pub type EioErrorCb<T> = fn (&mut T, &EioFile, int);
-type _CEioErrorCb = fn (*const c_void, *const EioFile, c_int);
+type _CEioErrorCb = extern fn (*const c_void, *const EioFile, c_int);
 
 pub type EioProgressCb<T> = fn (&mut T, &EioFile, &EioProgress);
-type _CEioProgressCb = fn (*const c_void, *const EioFile, *const EioProgress);
+type _CEioProgressCb = extern fn (*const c_void, *const EioFile, *const EioProgress);
 
 #[link(name = "eio")]
 extern "C" {

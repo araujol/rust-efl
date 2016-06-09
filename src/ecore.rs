@@ -67,15 +67,15 @@ pub static ECORE_CALLBACK_RENEW: eina::EinaBool = eina::EINA_TRUE;
 /* High level callback notation */
 pub type EcoreTaskCb<T> = fn (&Option<T>) -> eina::EinaBool;
 /* C level callback notation */
-type CEcoreTaskCb = fn (*const c_void) -> u8;
+type CEcoreTaskCb = extern fn (*const c_void) -> u8;
 
 /* High level callback notation */
 pub type EcoreEventHandlerCb<T> = fn (&Option<T>, int, &EventInfo) -> bool;
 /* C level callback notation */
-type CEcoreEventHandlerCb = fn (*const c_void, c_int, *const c_void) -> u8;
+type CEcoreEventHandlerCb = extern fn (*const c_void, c_int, *const c_void) -> u8;
 
 pub type EcoreEvasEventCb = fn (&EcoreEvas);
-type _CEcoreEvasEventCb = fn (*const EcoreEvas);
+type _CEcoreEvasEventCb = extern fn (*const EcoreEvas);
 
 #[link(name = "ecore")]
 extern "C" {
