@@ -25,6 +25,8 @@
 TODO CString pointers review.
  Currently, as_ptr() is used. Should into_raw() and from_raw() be used in some places?
 
+TODO Replace int/uint with appropriate primitive: i32, i64, u32, u64, usize, isize
+
 */
 
 pub mod eo;
@@ -41,7 +43,7 @@ pub mod eseful;
 pub mod types {
     // Define old int/uint types used by original Rust code
     #[allow(non_camel_case_types)]
-    pub type int = i32;
+    pub type int = isize;
     #[allow(non_camel_case_types)]
-    pub type uint = u32;
+    pub type uint = usize;
 }

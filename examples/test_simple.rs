@@ -8,7 +8,7 @@
 
 extern crate efl;
 
-use std::os;
+use std::env;
 use std::option::{Option};
 
 use efl::ecore;
@@ -28,8 +28,8 @@ fn on_done(data: &Option<bool>,
 }
 
 fn main() {
-    let args: Vec<String> = os::args();
-    let argc: uint = args.len();
+    let args: Vec<String> = env::args().collect();
+    let argc = args.len();
 
     elementary::startup_time(ecore::time_unix_get());
     elementary::init(argc, args);
