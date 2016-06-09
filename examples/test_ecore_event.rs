@@ -10,7 +10,7 @@ use std::option::{Option};
 
 use efl::ecore;
 use efl::eina::EinaBool;
-use efl::eseful::{EventInfo, Empty};
+use efl::eseful::{EventInfo, EMPTY};
 
 fn timer(data: &Option<f64>) -> EinaBool {
     match *data {
@@ -49,7 +49,7 @@ fn main() {
     /* Add timer and handler */
     /* TODO: Create enum for signals */
     ecore::event_handler_add(ecore::EcoreEventSignalExit, 
-                             exit_func, &Empty);
+                             exit_func, &EMPTY);
     ecore::timer_add(1.0, timer, &Some(start_time));
 
     /* Start main event loop */

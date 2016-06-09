@@ -17,7 +17,7 @@ use std::option::{Option};
 use efl::ecore;
 use efl::evas;
 use efl::elementary;
-use efl::eseful::{EventInfo, Empty};
+use efl::eseful::{EventInfo, EMPTY};
 
 struct OnClickedData<'r> {
     label: &'r evas::EvasObject,
@@ -68,7 +68,7 @@ fn main() {
     let win: Box<evas::EvasObject> =
         elementary::win_util_standard_add("Rust EFL", "Rust EFL");
     evas::object_move(&*win, (200, 100));
-    evas::object_smart_callback_add(&*win, "delete,request", on_done, &Empty);
+    evas::object_smart_callback_add(&*win, "delete,request", on_done, &EMPTY);
 
     /* Box Container */
     let ebox: Box<evas::EvasObject> = elementary::box_add(&*win);

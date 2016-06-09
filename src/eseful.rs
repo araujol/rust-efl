@@ -28,7 +28,7 @@ use eseful::libc::c_char;
 use eina;
 
 // Empty value handy to use in the 'data' field for callbacks.
-pub static Empty: Option<()> = None;
+pub static EMPTY: Option<()> = None;
 
 // Callbacks event.
 pub struct EventInfo;
