@@ -29,10 +29,9 @@ fn on_done(data: &Option<bool>,
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let argc = args.len();
 
     elementary::startup_time(ecore::time_unix_get());
-    elementary::init(argc, args);
+    elementary::init(args);
 
     /* Main Window */
     let win: Box<evas::EvasObject> =

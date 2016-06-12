@@ -122,7 +122,8 @@ pub fn init() -> i32 {
     unsafe { ecore_init() as i32 }
 }
 
-pub fn app_args_set(argc: uint, argv: Vec<String>) {
+pub fn app_args_set(argv: Vec<String>) {
+    let argc = argv.len();
     let vchars_ptr: *const *const c_char = to_c_args(argv);
     unsafe { ecore_app_args_set(argc as c_int, vchars_ptr) }
 }

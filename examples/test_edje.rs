@@ -112,12 +112,13 @@ collections {
 
 extern crate efl;
 
+use efl::types::int;
 use efl::ecore;
 use efl::edje;
 use efl::evas;
 
-static WIDTH: int = 320;
-static HEIGHT: int = 240;
+static WIDTH: int = 640;
+static HEIGHT: int = 480;
 
 
 fn main() {
@@ -128,24 +129,24 @@ fn main() {
     let window: Box<ecore::EcoreEvas> =
         ecore::evas_new(None, 0, 0, WIDTH, HEIGHT, "");
 
-    let canvas = ecore::evas_get(window);
+    let canvas = ecore::evas_get(&window);
     
     /* Instantiate edje object */
-    let edje: Box<evas::EvasObject> = edje::object_add(canvas);
+    let edje: Box<evas::EvasObject> = edje::object_add(&canvas);
 
-    edje::object_file_set(edje, "./edje_example.edj", "my_example");
+    edje::object_file_set(&edje, "./test.edj", "main");
 
-    edje::object_part_text_set(edje, "text", "Rust-Efl Edje Example!");
+    edje::object_part_text_set(&edje, "text", "Rust-Efl Edje Example!");
 
-    evas::object_move(edje, (0, 0));
-    evas::object_resize(edje, WIDTH, HEIGHT);
-    evas::object_show(edje);
+    evas::object_move(&edje, (0, 0));
+    evas::object_resize(&edje, WIDTH, HEIGHT);
+    evas::object_show(&edje);
 
-    ecore::evas_show(window);
+    ecore::evas_show(&window);
     ecore::main_loop_begin();
     
-    evas::object_del(edje);
-    ecore::evas_free(window);
+    evas::object_del(&edje);
+    ecore::evas_free(&window);
     
     edje::shutdown();
     ecore::evas_shutdown();

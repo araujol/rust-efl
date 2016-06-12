@@ -30,7 +30,9 @@ use eseful;
 
 
 /// Types of windows that can be created.
+#[repr(C)]
 pub enum ElmWinType {
+    // TODO Remove ElmWin prefix
     ElmWinUnknown = -1,
     /// A normal window. Indicates a normal, top-level
     /// window. Almost every window will be created with this
@@ -77,16 +79,45 @@ pub enum ElmWinType {
     ElmWinSocketImage
 }
 
+#[repr(C)]
 pub enum ElmPolicy {
-    ElmPolicyQuit,
-    ElmPolicyExit,
-    ElmPolicyThrottle
+    /// under which circumstances the application should quit automatically. See ElmPolicyQuit
+    Quit = 0,
+    /// defines elm_exit() behaviour. See also Elm_Policy.ELM_POLICY_EXIT.
+    Exit,
+    /// defines how throttling should work. See also * @ref Elm_Policy.ELM_POLICY_THROTTLE
+    Throttle,
+    // Undocumented in elm_general.eot.h
+    Last
 }
 
-/*pub enum ElmPolicyQuit {
-    ElmPolicyQuitNone,
-    ElmPolicyQuitLastWindowClosed
-}*/
+#[repr(C)]
+pub enum ElmPolicyQuit {
+    /// never quit the application automatically
+    None = 0,
+    /// quit when the application's last window is closed
+    LastWindowClosed,
+    /// quit when the application's last window is hidden
+    LastWindowHidden
+}
+
+#[repr(C)]
+pub enum ElmPolicyExit {
+    /// just quit the main loop on elm_exit()
+    None = 0,
+    /// delete all the windows after quitting the main loop
+    WindowsDel
+}
+
+#[repr(C)]
+pub enum ElmPolicyThrottle {
+    /// do whatever elementary config is configured to do
+    Config = 0,
+    /// always throttle when all windows are no longer visible
+    HiddenAlways,
+    /// never throttle when windows are all hidden, regardless of config settings
+    Never
+}
 
 pub enum ElmLabelSlideMode {
     /// No slide effect
@@ -181,7 +212,8 @@ extern "C" {
     fn elm_fileselector_entry_add(parent: *const evas::EvasObject) -> *const evas::EvasObject;
 }
 
-pub fn init(argc: uint, argv: Vec<String>) -> uint {
+pub fn init(argv: Vec<String>) -> uint {
+    let argc = argv.len();
     let vchars_ptr: *const *const c_char = eseful::to_c_args(argv);
     unsafe { elm_init(argc as c_int, vchars_ptr) as uint }
 }
@@ -202,6 +234,9 @@ pub fn exit() {
     unsafe { elm_exit() }
 }
 
+// Need to do generic form, or just mark ElmPolicyValue trait for value?
+// TODO change function signature so callers don't need to cast enum objects
+//pub fn policy_set<V: ElmPolicyValue>(policy: ElmPolicy, value: V) {
 pub fn policy_set(policy: ElmPolicy, value: int) {
     unsafe { elm_policy_set(policy as c_int, value as c_int) }
 }
