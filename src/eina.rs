@@ -153,8 +153,7 @@ type _CEinaFreeCb = extern fn (*const c_void);
 /// Type for a Red-Black tree node. It should be inlined into user's type.
 #[repr(C)]
 pub struct EinaRbtree {
-    // FIXME Restore ..2 syntax?  son: *const [EinaRbtree, ..2],
-    son: *const [EinaRbtree],
+    son: *const [EinaRbtree; 2],
 
     color: c_uint
 }
