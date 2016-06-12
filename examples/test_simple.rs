@@ -16,6 +16,7 @@ use efl::evas;
 use efl::elementary;
 use efl::eseful::EventInfo;
 
+#[allow(unused_variables)]
 fn on_done(data: &Option<bool>,
            e: &evas::EvasObject,
            event_info: &EventInfo) {

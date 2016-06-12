@@ -24,11 +24,31 @@ use std::ffi::CString;
 
 use eina;
 
-// FIXME Define EioFile correctly, set #[repr(C)]
-//typedef Eio_File* (*Eio_Job_Direct_Ls_Func)(const char *path, Eio_Filter_Direct_Cb, Eio_Main_Direct_Cb, Eio_Done_Cb, Eio_Error_Cb, const void *data);
-pub enum EioFile {}
+// TODO Define EioFile struct
+/* eio_private.h
+struct _Eio_File
+{
+    Ecore_Thread *thread;
+    const void *data;
+    void *container;
+
+    int error;
+
+    Eio_Error_Cb error_cb;
+    Eio_Done_Cb done_cb;
+
+    struct {
+        Eina_Hash *associated;
+    } worker, main;
+};
+*/
+#[repr(C)]
+pub struct EioFile {
+    error: c_int
+}
 
 #[derive(Debug)]
+#[repr(C)]
 pub enum EioFileOp {
     /// I/O operation is about a specific file copy.
     EioFileCopy,

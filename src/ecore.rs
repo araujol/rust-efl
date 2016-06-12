@@ -18,7 +18,7 @@
 
 extern crate libc;
 
-use types::{int, uint};
+use types::{int};
 use std::ffi::CString;
 use std::ptr;
 use std::option::Option;

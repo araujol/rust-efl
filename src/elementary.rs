@@ -83,9 +83,9 @@ pub enum ElmWinType {
 pub enum ElmPolicy {
     /// under which circumstances the application should quit automatically. See ElmPolicyQuit
     Quit = 0,
-    /// defines elm_exit() behaviour. See also Elm_Policy.ELM_POLICY_EXIT.
+    /// defines elm_exit() behaviour. See ElmPolicyExit
     Exit,
-    /// defines how throttling should work. See also * @ref Elm_Policy.ELM_POLICY_THROTTLE
+    /// defines how throttling should work. See ElmPolicyThrottle
     Throttle,
     // Undocumented in elm_general.eot.h
     Last
