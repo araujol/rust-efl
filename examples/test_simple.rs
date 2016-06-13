@@ -13,6 +13,7 @@ use std::option::{Option};
 
 use efl::ecore;
 use efl::evas;
+use efl::evas::EvasObjectMeta;
 use efl::elementary;
 use efl::eseful::EventInfo;
 
@@ -37,10 +38,15 @@ fn main() {
     /* Main Window */
     let win: Box<evas::EvasObject> =
         elementary::win_util_standard_add("Enlightenment", "Rust EFL");
+
+    elementary::win_autodel_set(&win, true);
+
     let data: Option<bool> = Some(true);
     evas::object_smart_callback_add(&*win, "delete,request",
                                     on_done, &data);
-    evas::object_move(&*win, (200, 100));
+    // Alternative API proof of concept
+//    evas::object_move(&*win, (200, 200));
+    win.move_to(200, 200);
 
     /* Box Container */
     let ebox: Box<evas::EvasObject> = elementary::box_add(&*win);
@@ -48,7 +54,8 @@ fn main() {
                                       evas::EVAS_HINT_EXPAND,
                                       evas::EVAS_HINT_EXPAND);
     elementary::win_resize_object_add(&*win, &*ebox);
-    evas::object_show(&*ebox);
+//    evas::object_show(&*ebox);
+    ebox.show();
 
     /* Label */
     let lab: Box<evas::EvasObject> = elementary::label_add(&*win);

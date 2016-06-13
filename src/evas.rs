@@ -109,7 +109,30 @@ pub enum EvasCallbackType {
     EvasCallbackLast
 }
 
+// TODO this obscures error messages by printing Eo instead of EvasObject
 pub type EvasObject = eo::Eo;
+
+// Proof of concept so that callers can do evas_obj.object_move(x, y);
+// TODO Decide how to support methods on instances using traits
+// Should both versions be supported, or only the trait? *-sys pattern mentioned on StackOverflow?
+// Research Evas_Object_group
+// Maybe this can be auto-generated with a macro or support library
+
+/// Trait so evas_object_* methods can be used on the EvasObject itself.
+pub trait EvasObjectMeta {
+    // move is a reserved keyword, so renamed to move_to
+    fn move_to(&self, x: i32, y: i32);
+    fn show(&self);
+}
+
+impl EvasObjectMeta for EvasObject {
+    fn move_to(&self, x: i32, y: i32) {
+        unsafe { evas_object_move(self, x, y) }
+    }
+    fn show(&self) {
+        unsafe { evas_object_show(self) }
+    }
+}
 
 pub type Coord = (int, int);
 

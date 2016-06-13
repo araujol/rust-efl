@@ -24,7 +24,7 @@ use eina;
 use eseful;
 
 
-pub enum Eo {}
+pub enum Eo {}  // needs to be enum otherwise error about empty struct
 pub type EoClass = Eo;
 
 
