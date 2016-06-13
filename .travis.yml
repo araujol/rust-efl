@@ -1,4 +1,6 @@
 language: rust
+rust:
+  - stable
 env:
   global:
     - secure: orBPCoHCJ5OpuqCpaBMTzamA0iL4DVriNST6X/tb3t+T4Vqn8BNxbkJfTtYHzLJVuxRI6ir1bPZd1iHVppLxYulAS/1DBajRF+37gJuklcIJ48oKREjo/Mh1TvOf/YfdGE9Sgl4R0IZ9HuD0fps+rxB2hLyilDP18jwu8cMlDzM=
