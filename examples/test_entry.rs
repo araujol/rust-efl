@@ -11,7 +11,7 @@
 
 extern crate efl;
 
-use std::os;
+use std::env;
 use std::option::{Option};
 
 use efl::ecore;
@@ -24,25 +24,28 @@ struct OnClickedData<'r> {
     entry: &'r evas::EvasObject
 }
 
+#[allow(unused_variables)]
 fn on_done<T>(data: &Option<T>,
               e: &evas::EvasObject,
               event_info: &EventInfo) {
     elementary::exit()
 }
 
+#[allow(unused_variables)]
 fn on_enter(data: &Option<&evas::EvasObject>,
             e: &evas::EvasObject,
             event_info: &EventInfo) {
     match *data {
         None => (),
         Some(eobj) => {
-            elementary::object_text_set(eobj, elementary::entry_entry_get(e).as_slice());
+            elementary::object_text_set(eobj, &elementary::entry_entry_get(e));
             /* Reset text entry */
             elementary::entry_entry_set(e, "");
         }
     }
 }
 
+#[allow(unused_variables)]
 fn on_clicked(data: &Option<Box<OnClickedData>>,
               e: &evas::EvasObject,
               event_info: &EventInfo) {
@@ -50,7 +53,7 @@ fn on_clicked(data: &Option<Box<OnClickedData>>,
         None => (),
         Some(ref onclicked) => {
             let txt = elementary::entry_entry_get(onclicked.entry);
-            elementary::object_text_set(onclicked.label, txt.as_slice());
+            elementary::object_text_set(onclicked.label, &txt);
             /* Reset text entry */
             elementary::entry_entry_set(onclicked.entry, "");
         }
@@ -58,11 +61,10 @@ fn on_clicked(data: &Option<Box<OnClickedData>>,
 }
 
 fn main() {
-    let args: Vec<String> = os::args();
-    let argc: uint = args.len();
+    let args: Vec<String> = env::args().collect();
 
     elementary::startup_time(ecore::time_unix_get());
-    elementary::init(argc, args);
+    elementary::init(args);
 
     /* Main Window */
     let win: Box<evas::EvasObject> =
@@ -116,10 +118,10 @@ fn main() {
     /* Share both the 'label' and 'entry' objects with the button callback */
     let e: &evas::EvasObject = &*ent;
     let onclicked_data: Option<Box<OnClickedData>> =
-        Some(box OnClickedData {
+        Some(Box::new(OnClickedData {
             label: l,
             entry: e
-        });
+        }));
     evas::object_smart_callback_add(&*btn, "clicked", on_clicked, &onclicked_data);
 
     /* Set main window size and show */

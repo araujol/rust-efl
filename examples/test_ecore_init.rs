@@ -4,15 +4,12 @@
 
 extern crate efl;
 
-use std::os;
+use std::env;
 use efl::ecore;
 
 fn main() {
-    let args: Vec<String> = os::args();
-    let argc: uint = args.len();
-
     ecore::init();
-    ecore::app_args_set(argc, args);
+    ecore::app_args_set(env::args().collect());
     ecore::main_loop_begin();
     ecore::shutdown();
 }
