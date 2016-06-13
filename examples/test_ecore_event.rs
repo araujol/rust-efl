@@ -4,11 +4,12 @@
 
 extern crate efl;
 
-use std::os;
+use std::env;
 use std::mem::transmute;
 use std::option::{Option};
 
 use efl::ecore;
+use efl::ecore::EcoreEvent;
 use efl::eina::EinaBool;
 use efl::eseful::{EventInfo, EMPTY};
 
@@ -18,12 +19,14 @@ fn timer(data: &Option<f64>) -> EinaBool {
         Some(stime) =>
             println!("Tick timer: {}", ecore::time_get() - stime)
     }
-    return ecore::ECORE_CALLBACK_RENEW
+    ecore::ECORE_CALLBACK_RENEW
 }
 
+#[allow(unused_variables)]
 fn exit_func<T>(data: &Option<T>,
-                htype: int,
+                htype: isize,
                 event: &EventInfo) -> bool {
+    // TODO do unsafe transmute in the library? Maybe implement patterns and match?
     let e: &ecore::EcoreEventSignalExit = unsafe { transmute(event) };
 
     if (*e).quit == 1 {
@@ -35,20 +38,18 @@ fn exit_func<T>(data: &Option<T>,
     }
 
     ecore::main_loop_quit();
-    return true;
+    true
 }
 
 fn main() {
-    let args: Vec<String> = os::args();
-    let argc: uint = args.len();
+    let args: Vec<String> = env::args().collect();
 
     ecore::init();
-    ecore::app_args_set(argc, args);
+    ecore::app_args_set(args);
 
     let start_time: f64 = ecore::time_get();
     /* Add timer and handler */
-    /* TODO: Create enum for signals */
-    ecore::event_handler_add(ecore::EcoreEventSignalExit, 
+    ecore::event_handler_add(EcoreEvent::EcoreEventSignalExit,
                              exit_func, &EMPTY);
     ecore::timer_add(1.0, timer, &Some(start_time));
 
