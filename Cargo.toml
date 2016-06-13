@@ -4,6 +4,12 @@ name = "rust-efl"
 version = "0.0.1"
 authors = [ "Luis Araujo <araujoc.luisf@gmail.com>", "Сухарик <suhr@i2pmail.org>" ]
 
+[features]
+default = []
+
+eina = []
+eio = []
+
 [lib]
 name = "efl"
 path = "src/efl.rs"

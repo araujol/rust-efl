@@ -15,6 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+//! eio file operations. (requires "eio" feature)
+//! WARNING: Not maintained currently; not tested beyond file_ls()
+// TODO Does it still make sense to use eio in Rust or should we
+// recommend equivalent Rust async file IO library or documentation.
 extern crate libc;
 
 use types::{int};

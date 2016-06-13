@@ -15,6 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+/*
+ Why would Rust users want Hash and List?
+ Not maintaining unless user need determined.
+ */
 extern crate libc;
 extern crate core;
 
@@ -22,14 +26,10 @@ use types::{int, uint};
 use std::ptr;
 use std::mem::transmute;
 use std::option::Option;
-use eina::core::mem::uninitialized;
-use eina::libc::{c_void, c_int, c_uint};
+use self::core::mem::uninitialized;
+use self::libc::{c_void, c_int, c_uint};
+use eina::eina_minimal::EinaBool;
 use eseful;
-
-
-pub type EinaBool = u8;
-pub const EINA_FALSE: EinaBool = 0u8;
-pub const EINA_TRUE:  EinaBool = 1u8;
 
 type _EinaMagic = uint;
 type _CEinaMagic = c_uint;

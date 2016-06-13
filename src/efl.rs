@@ -36,6 +36,7 @@ pub mod eo;
 pub mod ecore;
 pub mod evas;
 pub mod eina;
+#[cfg(feature = "eio")]
 pub mod eio;
 pub mod eet;
 pub mod edje;
